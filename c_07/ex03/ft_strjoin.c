@@ -42,24 +42,22 @@ char	*ft_strcat(char *dest, char *src)
 	return (dest);
 }
 
-char *ft_strjoin(int size, char **strs, char *sep)
+char	*ft_strjoin(int size, char **strs, char *sep)
 {
-	int	i;
-	int	maxlen;
+	int		i;
+	int		maxlen;
 	char	*s1;
 
 	maxlen = 0;
 	i = 0;
 	if (size == 0)
 		return ((char *)malloc(sizeof(char)));
-	//calcular byte max de tudo
 	while (i < size)
 	{
 		maxlen += ft_strlen(strs[i]);
 		i++;
 	}
-	maxlen += ft_strlen(sep) * size - 1;
-	//Aloca memoria
+	maxlen += ft_strlen(sep) * size;
 	s1 = (char *)malloc(sizeof(char) * (maxlen + 1));
 	i = 0;
 	while (i < size)
@@ -71,7 +69,7 @@ char *ft_strjoin(int size, char **strs, char *sep)
 	}
 	return (s1);
 }
-
+/*
 int	main(void)
 {
 	char *strings[] = {"abc", "def", "ghi"};
@@ -84,9 +82,7 @@ int	main(void)
 		printf("String concatenada: %s\n", result);
 		free(result);
 	}
-	else
-	{
-		printf("Mallocfail\n");
-	}
+
 	return 0;
 }
+*/

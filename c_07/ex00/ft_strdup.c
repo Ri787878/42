@@ -28,11 +28,11 @@ char	*ft_strdup(char *src)
 {
 	char	*sdup;
 
-	sdup = (char *)malloc(sizeof(char*) * ft_strlen(src));
+	sdup = malloc(sizeof(char *) * ft_strlen(src));
 	sdup = src;
 	return (sdup);
 }
-
+/*
 int main (void)
 {
 	char	*w1 = "Maria";
@@ -42,3 +42,4 @@ int main (void)
 	printf("%s \n", w2);
 	return (0);
 }
+*/

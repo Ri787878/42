@@ -33,7 +33,7 @@ int	*ft_range(int min, int max)
 	}
 	return (recheio);
 }
-
+/*
 int	main(void)
 {
 	int	min;
@@ -53,3 +53,4 @@ int	main(void)
 		i++;
 	}
 }
+*/
