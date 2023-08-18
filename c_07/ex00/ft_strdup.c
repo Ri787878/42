@@ -9,8 +9,9 @@
 /*   Updated: 2023/08/10 21:13:04 by rmano-cl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 int	ft_strlen(char *str)
 {
@@ -26,18 +27,27 @@ int	ft_strlen(char *str)
 
 char	*ft_strdup(char *src)
 {
+	int		b;
 	char	*sdup;
 
-	sdup = malloc(sizeof(char *) * ft_strlen(src));
-	sdup = src;
+	b = 0;
+	sdup = (char *)malloc (ft_strlen(src));
+	while (src[b] != '\0')
+	{
+		sdup[b] = src[b];
+		b++;
+	}
+	sdup[b] = '\0';
 	return (sdup);
 }
 /*
-int main (void)
+int	main(void)
 {
-	char	*w1 = "Maria";
+	int		i;
+	char	*w1= "Maria";
 	char	*w2;
 
+	i = 0;
 	w2 = ft_strdup(w1);
 	printf("%s \n", w2);
 	return (0);
