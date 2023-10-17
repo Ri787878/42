@@ -6,14 +6,15 @@
 /*   By: rmano-cl <rmano-cl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/09 14:58:52 by rmano-cl          #+#    #+#             */
-/*   Updated: 2023/10/09 14:59:38 by rmano-cl         ###   ########.fr       */
+/*   Updated: 2023/10/16 13:53:08 by rmano-cl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_isdigit	(int c){
-	if(c >= '0' && c <= '9')
+int	ft_isdigit(int c)
+{
+	if (c >= '0' && c <= '9')
 		return (1);
 	return (0);
 }

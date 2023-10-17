@@ -1,3 +1,17 @@
-#include "libft.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_substr.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rmano-cl <rmano-cl@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/16 13:44:28 by rmano-cl          #+#    #+#             */
+/*   Updated: 2023/10/16 13:44:37 by rmano-cl         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-char *ft_substr(char const *s, unsigned int start, size_t len);
+#include "libft.h"
+/*
+char *ft_substr(char const *s, unsigned int start, size_t len)
+
+*/

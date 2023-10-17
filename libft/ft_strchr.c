@@ -1,11 +1,26 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_strchr.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rmano-cl <rmano-cl@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/10/16 13:46:08 by rmano-cl          #+#    #+#             */
+/*   Updated: 2023/10/16 14:00:55 by rmano-cl         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 
-char	*ft_strchr	(const char *s, int c)
+char	*ft_strchr(const char *s, int c)
 {
-	while(s[i] != "\0")
+	int	i;
+
+	while (s[i] != '\0')
 	{
-		if(s[i] == c)
-			return (1);
+		if (s[i] == c)
+			return ((char *) s);
 		i++;
 	}
+	return (0);
 }

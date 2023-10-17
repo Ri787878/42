@@ -6,28 +6,39 @@
 /*   By: rmano-cl <rmano-cl@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/03 14:50:57 by rmano-cl          #+#    #+#             */
-/*   Updated: 2023/10/09 15:06:09 by rmano-cl         ###   ########.fr       */
+/*   Updated: 2023/10/16 13:47:01 by rmano-cl         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string.h>
-#include <stdio.h>
-//#include "libft.h"
-#include <ctype.h>
-#include <stdlib.h>
-#include <stddef.h>
+#include "libft.h"
 
 
-
+/*
+Allocates (with malloc(3)) and returns a substring
+from the string ’s’.
+The substring begins at index ’start’ and is of
+maximum size ’len’.
+*/
 char *ft_substr(char const *s, unsigned int start, size_t len)
 {
-	int i;
+	char	*substr;
+	size_t	i;
 
+	if (!s)
+		return (ft_strdup(""));
+	if (start > ft_strlen(s))
+		return (ft_strdup(""));
+	substr = (char *)malloc(sizeof(char) * (len + 1));
+	if (!substr)
+		return (NULL);
 	i = 0;
-	while(s[start + i] != '\0' && i < len)
+	while (i < len && s[start + i])
 	{
-		
+		substr[i] = s[start + i];
+		i++;
 	}
+	substr[i] = 0;
+	return (substr);
 }
 
 
@@ -185,7 +196,7 @@ ft_memcmp
 	printf("\n-----------------------//-----------------------\n");
 	printf("A minha versao deu: %d, e a versao correta deu: %d. \n", p1, p2);
 	printf("-----------------------//-----------------------\n\n");
-	
+
 
 ft_atoi(usa argc e argv)
 	if (ac)
