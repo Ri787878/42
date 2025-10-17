@@ -1,0 +1,18 @@
+//ft_memcpy
+int main (void)
+{
+	char	src[10] = "BOM dia !!";
+	char	dest1[10];
+	char	dest2[10];
+	
+	printf("String:\t%s\n", src);
+
+	ft_memcpy(dest1, src, 10);
+	printf("My version:\t%s\n", dest1);
+
+	memcpy(dest2, src, 10);
+	printf("Original:\t%s\n", dest2);
+	
+	return (0);
+}
+
