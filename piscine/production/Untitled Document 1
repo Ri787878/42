@@ -1,0 +1,103 @@
+int	check_sign(char *str)
+{
+	int	sign;
+
+	sign = 1;
+	while (*str < '0' || *str > '9')
+	{
+		if (*str == '-')
+			sign = -sign;
+		str++;
+	}
+	return (sign);
+}
+
+int	count_decimal_cases(char *str)
+{
+	int	n;
+	int	num;
+	int	extra;
+
+	n = 0;
+	num = 0;
+	extra = 0;
+	while (str[n] != '\0')
+	{
+		if (str[n] == '-')
+		{
+			n = 1;
+			extra++;
+		}
+		if (str[n] == '+')
+		{
+			extra++;
+		}
+		if (str[n] >= '0' && str[n] <= '9')
+			num++;
+		if ((str[n] < '0' || str[n] > '9') && str[n] != '-' && str[n] != '+')
+			return (num);
+		printf("n = %d && num = %d && extra = %d && str[n] = %c\n", n, num, extra, str[n]);
+		n++;
+	}
+	return (num);
+}
+
+int ft_pow(int base, int exp)
+{
+	int result;
+
+	result = 1;
+	while (exp > 0)
+	{
+		result *= base;
+		exp--;
+	}
+	return (result);
+}
+
+int	ft_atoi(char *str)
+{
+	int	decimal_cases;
+	int	result;
+	int	sign;
+	int	n;
+
+	sign = check_sign(str);
+	n = 0;
+	result = 0;
+	decimal_cases = count_decimal_cases(str);
+	if (sign < 0)
+		n = 1;
+	decimal_cases = decimal_cases - 1;
+	while (str[n] != '\0' && decimal_cases > 0)
+	{
+		if (str[n] != '-' && str[n] != '+' && decimal_cases >= 0)
+		{
+			//printf("decimal_cases = %d result = %d && %c - '0' = %d\n", decimal_cases, result, str[n], str[n] - 48);
+			result += (str[n] - 48) * ft_pow(10, decimal_cases);
+			decimal_cases--;
+		}
+		n++;
+	}
+	return (result * sign);
+}
+
+
+int main(void){
+	char	*text = " ---+--+1234ab567";
+
+	printf("The text:%s\nTurns to:%d\n\n", text, ft_atoi(text));
+
+	text = "12345";
+	printf("The text:%s\nTurns to:%d\n\n", text, ft_atoi(text));
+
+	text = "54321";
+	printf("The text:%s\nTurns to:%d\n\n", text, ft_atoi(text));
+
+	text = "    4567";
+	printf("The text:%s\nTurns to:%d\n\n", text, ft_atoi(text));
+
+	text = "+6789";
+	printf("The text:%s\nTurns to:%d\n\n", text, ft_atoi(text));
+}
+
