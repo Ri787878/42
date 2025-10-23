@@ -4,7 +4,7 @@ int main (void)
 	char	src[10] = "BOM dia !!";
 	char	dest1[10];
 	char	dest2[10];
-	
+
 	printf("String:\t%s\n", src);
 
 	ft_memcpy(dest1, src, 10);
@@ -12,7 +12,7 @@ int main (void)
 
 	memcpy(dest2, src, 10);
 	printf("Original:\t%s\n", dest2);
-	
+
 	return (0);
 }
 
@@ -21,7 +21,7 @@ int main (void)
 {
 	int		n = 0;
 	char	src[13] = "BOM dia 123!!";
-	
+
 	printf("String:\t%s\n", src);
 
 	while (n < sizeof(src))
@@ -29,7 +29,7 @@ int main (void)
 		printf("letter %c is %d\n", src[n], ft_isalpha(src[n]));
 		n++;
 	}
-	
+
 	return (0);
 }
 
@@ -38,7 +38,7 @@ int main (void)
 {
 	int		n = 0;
 	char	src[13] = "BOM dia 123!!";
-	
+
 	printf("String:\t%s\n", src);
 
 	while (n < sizeof(src))
@@ -46,7 +46,7 @@ int main (void)
 		printf("letter %c is %d\n", src[n], ft_isdigit(src[n]));
 		n++;
 	}
-	
+
 	return (0);
 }
 
@@ -55,7 +55,7 @@ int main (void)
 {
 	unsigned long		n = 0;
 	char	src[13] = "BOM dia 1\n3!!";
-	
+
 	printf("String:\t%s\n", src);
 
 	while (n < sizeof(src))
@@ -63,7 +63,7 @@ int main (void)
 		printf("letter %c is %d\n", src[n], ft_isalnum(src[n]));
 		n++;
 	}
-	
+
 	return (0);
 }
 
@@ -72,7 +72,7 @@ int main (void)
 {
 	unsigned long		n = 0;
 	char	src[13] = "BOM dia 1\n3!!";
-	
+
 	printf("String:\t%s\n", src);
 
 	while (n < sizeof(src))
@@ -89,7 +89,7 @@ int main (void)
 {
 	unsigned long		n = 0;
 	char	src[13] = "BOM dia \t\n3!!";
-	
+
 	printf("String:\t%s\n", src);
 
 	while (n < sizeof(src))
@@ -111,7 +111,7 @@ int main (void)
 	printf("My version:\t%lu\n", ft_strlen(src));
 
 	printf("Original:\t%lu\n", strlen(src));
-	
+
 	return (0);
 }
 
@@ -119,11 +119,11 @@ int main (void)
 int main (void)
 {
 	char	*src = "BOM dia !!";
-	
+
 	printf("String:\t%s\n", src);
 	ft_bzero(src, 10);
 	printf("My version:\t%s\n", src);
-	
+
 	return (0);
 }
 
@@ -133,7 +133,7 @@ int main (void)
 	char	*src = "BOM dia !!";
 	char	*dest1 = NULL;
 	char	*dest2 = NULL;
-	
+
 	dest1 = malloc(10 * sizeof(char));
 	dest2 = malloc(10 * sizeof(char));
 
@@ -144,7 +144,7 @@ int main (void)
 
 	memmove(dest2, src, 10);
 	printf("Original:\t%s\n", dest2);
-	
+
 	free(dest1);
 	free(dest2);
 	return (0);
@@ -159,7 +159,7 @@ int main (void)
 
 	printf("the exit code is %lu\n", code);
 	printf("The word\t\"%s\"\n result is \t\"%s\".\n", test, result);
-	
+
 	return (0);
 }
 
@@ -175,7 +175,7 @@ int main (void)
 	{
 		ft_strlcpy(result, tests[n], ft_strlen(tests[n]) + 1);
 		printf("The word\t\"%s\"\n result is \t\"%s\"\n\n", tests[n], result);
-		n++; 
+		n++;
 	}
 	return (0);
 }
@@ -193,7 +193,7 @@ int main (void)
 		n++;
 	}
 	dst[n] = '\0';
-	
+
 	printf("dst = %s\n", dst);
 	size_t	code = ft_strlcat(dst, src, 34);
 
@@ -248,7 +248,7 @@ int main (void)
 		printf("\nThe frase \"%s\"\n", tests[n]);
 		printf("MINE result is \t\"%s\"\n", result);
 		printf("THEI result is \t\"%s\"\n", result_true);
-		n++; 
+		n++;
 	}
 	return (0);
 }
@@ -269,7 +269,7 @@ int main (void)
 		printf("\nThe frase \"%s\"\n", tests[n]);
 		printf("MINE result is \t\"%s\"\n", result);
 		printf("THEI result is \t\"%s\"\n", result_true);
-		n++; 
+		n++;
 	}
 	return (0);
 }
@@ -290,7 +290,7 @@ int main (void)
 		printf("\nThe frase \"%s\"\n", tests[n]);
 		printf("MINE result is \t\"%d\"\n", result);
 		printf("THEI result is \t\"%d\"\n", result_true);
-		n++; 
+		n++;
 	}
 	return (0);
 }
@@ -311,7 +311,70 @@ int main (void)
 		printf("\nThe frase \"%s\"\n", tests[n]);
 		printf("MINE result is \t\"%s\"\n", result);
 		printf("THEI result is \t\"%s\"\n", result_true);
-		n++; 
+		n++;
+	}
+	return (0);
+}
+
+//memcmp
+int main (void)
+{
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!", "0123456789", "the \t tab is tabb\ting"};
+	int	result_true;
+	int	result;
+	int		n = 0;
+	int		size = 4;
+
+	while (n < size)
+	{
+		result = ft_memcmp(tests[n], tests[0], 5);
+		result_true = memcmp(tests[n], tests[0], 5);
+		printf("\nThe frase \"%s\" && comparing \"%s\"\n", tests[n], tests[0]);
+		printf("MINE result is \t\"%d\"\n", result);
+		printf("THEI result is \t\"%d\"\n", result_true);
+		n++;
+	}
+	return (0);
+}
+
+//strnstr
+int	main(void)
+{
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+		"0123456789", "the \t tab is tabb\ting"};
+	char	*result;
+	int		n;
+	int		size;
+
+	n = 0;
+	size = 4;
+	while (n < size)
+	{
+		result = ft_strnstr(tests[n], "b", strlen(tests[n]));
+		printf("\nThe frase \"%s\"\n", tests[n]);
+		printf("MINE result is \t\"%s\"\n", result);
+		n++;
+	}
+	return (0);
+}
+
+//atoi
+int	main(void)
+{
+	char	*tests[] = {"42", "   42", "-42", "+42", "0042", "123abc", "abc123",
+		"--5", "", "  + 5", "2147483647", "-2147483648", NULL};
+	int		i;
+	int		mine;
+	int		real;
+
+	i = 0;
+	while (tests[i])
+	{
+		mine = ft_atoi(tests[i]);
+		real = atoi(tests[i]);
+		printf("Test %2d: \"%s\"\n", i + 1, tests[i]);
+		printf("ft_atoi: %d\tatoi: %d\n\n", mine, real);
+		i++;
 	}
 	return (0);
 }
