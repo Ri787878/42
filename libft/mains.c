@@ -388,3 +388,22 @@ int	main(void)
 	}
 	return (0);
 }
+
+//calloc
+int	main(void)
+{
+	int	*a;
+	int	*b;
+	int	i;
+
+	i = 0;
+	a = ft_calloc(10, sizeof(int));
+	b = calloc(10, sizeof(int));
+	while (i < 10)
+	{
+		printf("ft_calloc[%d] = %d\t\t| calloc[%d] = %d\n", i, a[i], i, b[i]);
+		i++;
+	}
+	free(a);
+	free(b);
+}

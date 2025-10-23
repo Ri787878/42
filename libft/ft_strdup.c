@@ -1,26 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_bzero.c                                         :+:      :+:    :+:   */
+/*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/17 16:21:34 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/23 19:47:39 by ridias           ###   ########.fr       */
+/*   Created: 2025/10/23 19:55:33 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/23 19:55:36 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void	ft_bzero(void *s, size_t n)
+int	ft_strlen(char *str)
 {
-	size_t	t;
+	int	n;
+
+	n = 0;
+	while (str[n] != '\0')
+	{
+		n++;
+	}
+	return (n);
+}
+
+char	*ft_strdup(char *src)
+{
+	int		n;
 	char	*str;
 
-	str = (char *)s;
-	t = 0;
-	while (t < n)
+	n = 0;
+	str = malloc(ft_strlen(src));
+	while (src[n])
 	{
-		str[t] = '0';
-		t++;
+		str[n] = src[n];
+		n++;
 	}
-	return ;
+	str[n] = '\0';
+	return (str);
 }
