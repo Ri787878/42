@@ -1,176 +1,168 @@
-//ft_memcpy
-int main (void)
+// ft_memcpy
+int	main(void)
 {
 	char	src[10] = "BOM dia !!";
 	char	dest1[10];
 	char	dest2[10];
 
 	printf("String:\t%s\n", src);
-
 	ft_memcpy(dest1, src, 10);
 	printf("My version:\t%s\n", dest1);
-
 	memcpy(dest2, src, 10);
 	printf("Original:\t%s\n", dest2);
-
 	return (0);
 }
 
-//ft_isalpha
-int main (void)
+// ft_isalpha
+int	main(void)
 {
-	int		n = 0;
+	int		n;
 	char	src[13] = "BOM dia 123!!";
 
+	n = 0;
 	printf("String:\t%s\n", src);
-
 	while (n < sizeof(src))
 	{
 		printf("letter %c is %d\n", src[n], ft_isalpha(src[n]));
 		n++;
 	}
-
 	return (0);
 }
 
-//isdigit
-int main (void)
+// isdigit
+int	main(void)
 {
-	int		n = 0;
+	int		n;
 	char	src[13] = "BOM dia 123!!";
 
+	n = 0;
 	printf("String:\t%s\n", src);
-
 	while (n < sizeof(src))
 	{
 		printf("letter %c is %d\n", src[n], ft_isdigit(src[n]));
 		n++;
 	}
-
 	return (0);
 }
 
-//isalnum
-int main (void)
+// isalnum
+int	main(void)
 {
-	unsigned long		n = 0;
-	char	src[13] = "BOM dia 1\n3!!";
+	unsigned long	n;
+	char			src[13] = "BOM dia 1\n3!!";
 
+	n = 0;
 	printf("String:\t%s\n", src);
-
 	while (n < sizeof(src))
 	{
 		printf("letter %c is %d\n", src[n], ft_isalnum(src[n]));
 		n++;
 	}
-
 	return (0);
 }
 
-//ft_isascii
-int main (void)
+// ft_isascii
+int	main(void)
 {
-	unsigned long		n = 0;
-	char	src[13] = "BOM dia 1\n3!!";
+	unsigned long	n;
+	char			src[13] = "BOM dia 1\n3!!";
 
+	n = 0;
 	printf("String:\t%s\n", src);
-
 	while (n < sizeof(src))
 	{
 		printf("letter %c is %d\n", src[n], ft_isascii(src[n]));
 		n++;
 	}
-
 	return (0);
 }
 
-//ft_isprint
-int main (void)
+// ft_isprint
+int	main(void)
 {
-	unsigned long		n = 0;
-	char	src[13] = "BOM dia \t\n3!!";
+	unsigned long	n;
+	char			src[13] = "BOM dia \t\n3!!";
 
+	n = 0;
 	printf("String:\t%s\n", src);
-
 	while (n < sizeof(src))
 	{
 		printf("letter %c is %d\n", src[n], ft_isprint(src[n]));
 		n++;
 	}
-
 	return (0);
 }
 
-//strlen
-int main (void)
+// strlen
+int	main(void)
 {
 	char	src[10] = "BOM dia !!";
 
 	printf("String:\t\"%s\"\n", src);
-
 	printf("My version:\t%lu\n", ft_strlen(src));
-
 	printf("Original:\t%lu\n", strlen(src));
-
 	return (0);
 }
 
-//ft_bzero
-int main (void)
+// ft_bzero
+int	main(void)
 {
-	char	*src = "BOM dia !!";
+	char	*src;
 
+	src = "BOM dia !!";
 	printf("String:\t%s\n", src);
 	ft_bzero(src, 10);
 	printf("My version:\t%s\n", src);
-
 	return (0);
 }
 
-//memmove
-int main (void)
+// memmove
+int	main(void)
 {
-	char	*src = "BOM dia !!";
-	char	*dest1 = NULL;
-	char	*dest2 = NULL;
+	char	*src;
+	char	*dest1;
+	char	*dest2;
 
+	src = "BOM dia !!";
+	dest1 = NULL;
+	dest2 = NULL;
 	dest1 = malloc(10 * sizeof(char));
 	dest2 = malloc(10 * sizeof(char));
-
 	printf("String:\t%s\n", src);
-
 	ft_memmove(dest1, src, 10);
 	printf("My version:\t%s\n", dest1);
-
 	memmove(dest2, src, 10);
 	printf("Original:\t%s\n", dest2);
-
 	free(dest1);
 	free(dest2);
 	return (0);
 }
 
-//strlcpy
-int main (void)
+// strlcpy
+int	main(void)
 {
-	char	*test = "abcdefghijklmnopqrstuvwxyz";
+	char	*test;
 	char	result[27];
-	size_t	code = ft_strlcpy(result, test, 27);
+	size_t	code;
 
+	test = "abcdefghijklmnopqrstuvwxyz";
+	code = ft_strlcpy(result, test, 27);
 	printf("the exit code is %lu\n", code);
 	printf("The word\t\"%s\"\n result is \t\"%s\".\n", test, result);
-
 	return (0);
 }
 
-int main (void)
+int	main(void)
 {
-	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!", "0123456789", "the \t tab is tabb\ting"};
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+			"0123456789", "the \t tab is tabb\ting"};
 	char	result[27];
-	int		n = 0;
-	int		size = 4;
-	// int		t = 0;
+	int		n;
+	int		size;
 
+	n = 0;
+	size = 4;
+	// int		t = 0;
 	while (n < size)
 	{
 		ft_strlcpy(result, tests[n], ft_strlen(tests[n]) + 1);
@@ -180,36 +172,38 @@ int main (void)
 	return (0);
 }
 
-//strlcat
-int main (void)
+// strlcat
+int	main(void)
 {
-	char	*src = "abcdefghijklmnopqrstuvwxyz";
+	char	*src;
 	char	dst[30];
-	int		n = 0;
+	int		n;
+	size_t	code;
 
+	src = "abcdefghijklmnopqrstuvwxyz";
+	n = 0;
 	while (n <= 10)
 	{
 		dst[n] = 'X';
 		n++;
 	}
 	dst[n] = '\0';
-
 	printf("dst = %s\n", dst);
-	size_t	code = ft_strlcat(dst, src, 34);
-
+	code = ft_strlcat(dst, src, 34);
 	printf("the exit code is %lu\n", code);
 	printf("The word\t\"%s\"\n result is \t\"%s\".\n", src, dst);
 	return (0);
 }
 
-//toupper && tolower
-int main (void)
+// toupper && tolower
+int	main(void)
 {
-	int		n = 0;
+	int		n;
 	char	str[] = "abcdefGHIJK012345n\tcc";
 
+	n = 0;
 	printf("before:\t%s\n", str);
-	while (str[n] != '\0' )
+	while (str[n] != '\0')
 	{
 		str[n] = (char)ft_toupper(str[n]);
 		n++;
@@ -217,13 +211,14 @@ int main (void)
 	printf("after:\t%s\n", str);
 	return (0);
 }
-int main (void)
+int	main(void)
 {
-	int		n = 0;
+	int		n;
 	char	str[] = "abcdefGHIJK012345n\tCC";
 
+	n = 0;
 	printf("before:\t%s\n", str);
-	while (str[n] != '\0' )
+	while (str[n] != '\0')
 	{
 		str[n] = (char)ft_tolower(str[n]);
 		n++;
@@ -232,15 +227,18 @@ int main (void)
 	return (0);
 }
 
-//strchr
-int main (void)
+// strchr
+int	main(void)
 {
-	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!", "0123456789", "the \t tab is tabb\ting"};
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+			"0123456789", "the \t tab is tabb\ting"};
 	char	*result_true;
 	char	*result;
-	int		n = 0;
-	int		size = 4;
+	int		n;
+	int		size;
 
+	n = 0;
+	size = 4;
 	while (n < size)
 	{
 		result = ft_strchr(tests[n], 'i');
@@ -253,15 +251,18 @@ int main (void)
 	return (0);
 }
 
-//strrchr
-int main (void)
+// strrchr
+int	main(void)
 {
-	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!", "0123456789", "the \t tab is tabb\ting"};
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+			"0123456789", "the \t tab is tabb\ting"};
 	char	*result_true;
 	char	*result;
-	int		n = 0;
-	int		size = 4;
+	int		n;
+	int		size;
 
+	n = 0;
+	size = 4;
 	while (n < size)
 	{
 		result = ft_strrchr(tests[n], 'i');
@@ -274,15 +275,18 @@ int main (void)
 	return (0);
 }
 
-//strncmp
-int main (void)
+// strncmp
+int	main(void)
 {
-	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!", "0123456789", "the \t tab is tabb\ting"};
-	int	result_true;
-	int	result;
-	int		n = 0;
-	int		size = 4;
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+			"0123456789", "the \t tab is tabb\ting"};
+	int		result_true;
+	int		result;
+	int		n;
+	int		size;
 
+	n = 0;
+	size = 4;
 	while (n < size)
 	{
 		result = ft_strncmp(tests[n], tests[0], 5);
@@ -295,15 +299,18 @@ int main (void)
 	return (0);
 }
 
-//memchr
-int main (void)
+// memchr
+int	main(void)
 {
-	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!", "0123456789", "the \t tab is tabb\ting"};
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+			"0123456789", "the \t tab is tabb\ting"};
 	char	*result_true;
 	char	*result;
-	int		n = 0;
-	int		size = 4;
+	int		n;
+	int		size;
 
+	n = 0;
+	size = 4;
 	while (n < size)
 	{
 		result = ft_memchr(tests[n], 'i', 20);
@@ -316,15 +323,18 @@ int main (void)
 	return (0);
 }
 
-//memcmp
-int main (void)
+// memcmp
+int	main(void)
 {
-	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!", "0123456789", "the \t tab is tabb\ting"};
-	int	result_true;
-	int	result;
-	int		n = 0;
-	int		size = 4;
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+			"0123456789", "the \t tab is tabb\ting"};
+	int		result_true;
+	int		result;
+	int		n;
+	int		size;
 
+	n = 0;
+	size = 4;
 	while (n < size)
 	{
 		result = ft_memcmp(tests[n], tests[0], 5);
@@ -337,11 +347,11 @@ int main (void)
 	return (0);
 }
 
-//strnstr
+// strnstr
 int	main(void)
 {
 	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
-		"0123456789", "the \t tab is tabb\ting"};
+			"0123456789", "the \t tab is tabb\ting"};
 	char	*result;
 	int		n;
 	int		size;
@@ -358,11 +368,11 @@ int	main(void)
 	return (0);
 }
 
-//atoi
+// atoi
 int	main(void)
 {
 	char	*tests[] = {"42", "   42", "-42", "+42", "0042", "123abc", "abc123",
-		"--5", "", "  + 5", "2147483647", "-2147483648", NULL};
+			"--5", "", "  + 5", "2147483647", "-2147483648", NULL};
 	int		i;
 	int		mine;
 	int		real;
