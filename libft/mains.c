@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   mains.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/24 13:16:21 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/24 14:26:08 by ridias           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 // ft_memcpy
 int	main(void)
 {
@@ -407,3 +419,64 @@ int	main(void)
 	free(a);
 	free(b);
 }
+
+//substr
+size_t	ft_strlen(const char *str)
+{
+	int	n;
+
+	n = 0;
+	while (str[n] != '\0')
+	{
+		n++;
+	}
+	return (n);
+}
+
+int	main(void)
+{
+	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+		"0123456789", "the \t tab is tabb\ting"};
+	char	*result;
+	int		n;
+	int		size;
+
+	n = 0;
+	size = 4;
+	while (n < size)
+	{
+		result = ft_substr(tests[n], 5, ft_strlen(tests[n]));
+		printf("\nThe frase \"%s\"\n", tests[n]);
+		printf("MINE result is \t\"%s\"\n", result);
+		free(result);
+		n++;
+	}
+	return (0);
+}
+
+//strjoin
+
+int	main(void)
+{
+	char	tests[5][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+		"0123456789", "the \t tab is tabb\ting", ""};
+	char	*result;
+	int		n;
+	int		t;
+	int		size;
+
+	n = 0;
+	size = 5;
+	t = size - 1;
+	while (n < size)
+	{
+		result = ft_strjoin(tests[n], tests[t]);
+		printf("\nThe 1st frase \"%s\"\nThe 2nd frase \"%s\"\n", tests[n], tests[t]);
+		printf("MINE result is \t\"%s\"\n", result);
+		free(result);
+		t--;
+		n++;
+	}
+	return (0);
+}
+

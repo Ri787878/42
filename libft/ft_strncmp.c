@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 16:07:39 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/21 16:13:18 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/24 13:26:37 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	int	i;
 
 	i = 0;
-	while (i < (int)n - 1 && (s1[i] == s2[i] && s1[i] != '\0' && s2[i] != '\0'))
+	while (i < (int)n - 1
+		&& (s1[i] == s2[i] && s1[i] != '\0' && s2[i] != '\0'))
 		i++;
 	if (n == 0)
 		return (0);
