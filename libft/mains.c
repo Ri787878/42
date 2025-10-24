@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 13:16:21 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/24 14:26:08 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/24 15:23:04 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -480,3 +480,26 @@ int	main(void)
 	return (0);
 }
 
+//strtrim
+int	main(void)
+{
+	char	tests[5][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
+		"0123456789", "the \t tab is tabb\ting", ""};
+	char	*result;
+	int		n;
+	int		t;
+	int		size;
+
+	n = 0;
+	size = 5;
+	t = size - 1;
+	while (n < size)
+	{
+		result = ft_strtrim(tests[n], "Mb anichret");
+		printf("\nThe 1st frase \"%s\"\n", tests[n]);
+		printf("MINE result is \t\"%s\"\n", result);
+		t--;
+		n++;
+	}
+	return (0);
+}
