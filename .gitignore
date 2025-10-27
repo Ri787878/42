@@ -1,0 +1,33 @@
+# Compiled object files
+*.o
+*.obj
+
+# Compiled executable
+*.exe
+*.out
+*.out.*
+a.out
+
+# Backup and temporary files
+*~
+*.swp
+*.swo
+*.tmp
+
+# Logs
+*.log
+
+# IDE / Editor files
+.vscode/
+.idea/
+*.code-workspace
+
+# MacOS files
+.DS_Store
+
+# Other generated files
+*.dSYM/
+*.d
+
+piscine/main
+
