@@ -6,12 +6,9 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 16:40:06 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/21 16:55:57 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/27 13:49:14 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include <string.h>
-#include <stdio.h>
 
 int	ft_memcmp(const void *s1, const void *s2, size_t n)
 {

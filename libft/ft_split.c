@@ -6,12 +6,9 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/27 13:56:02 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/27 17:50:37 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 11:19:35 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include <stdio.h>
-#include <stdlib.h>
 
 int	word_counter(char *s, char c)
 {
@@ -85,22 +82,4 @@ char	**ft_split(char const *s, char c)
 	if (!array)
 		return (NULL);
 	return (create_array(array, (char *)s, c, index));
-}
-
-int	main(void)
-{
-	char	**result;
-	char	separator;
-	int		n;
-
-	separator = ' ';
-	n = 0;
-	result = ft_split("Maria is nice!!", separator);
-	while (n < 3)
-	{
-		printf("result[%d] = %s\n", n, result[n]);
-		n++;
-	}
-	free(result);
-	return (0);
 }

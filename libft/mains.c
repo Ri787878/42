@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 13:16:21 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/24 15:23:04 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 12:39:17 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -501,5 +501,54 @@ int	main(void)
 		t--;
 		n++;
 	}
+	return (0);
+}
+
+//split
+int	main(void)
+{
+	char	**result;
+	char	separator;
+	int		n;
+
+	separator = ' ';
+	n = 0;
+	result = ft_split("Maria is nice!!", separator);
+	while (n < 3)
+	{
+		printf("result[%d] = %s\n", n, result[n]);
+		n++;
+	}
+	free(result);
+	return (0);
+}
+
+//itoa
+int	main(void)
+{
+	int		n;
+	char	*nbr;
+
+	n = -123456789;
+	nbr = ft_itoa(n);
+	printf("the number %d,", n);
+	printf(" turns to the string %s\n", nbr);
+	nbr = ft_itoa(0);
+	n = 0;
+	printf("the number %d,", n);
+	printf(" turns to the string %s\n", nbr);
+	nbr = ft_itoa(-1);
+	n = -1;
+	printf("the number %d,", n);
+	printf(" turns to the string %s\n", nbr);
+	nbr = ft_itoa(2147483647);
+	n = 2147483647;
+	printf("the number %d,", n);
+	printf(" turns to the string %s\n", nbr);
+	nbr = ft_itoa(-2147483648);
+	n = -2147483648;
+	printf("the number %d,", n);
+	printf(" turns to the string %s\n", nbr);
+	free(nbr);
 	return (0);
 }
