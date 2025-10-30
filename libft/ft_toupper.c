@@ -6,11 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:18:11 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/21 15:34:39 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 17:07:21 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
+#include "libft.h"
 
 int	ft_toupper(int c)
 {

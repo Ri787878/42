@@ -6,13 +6,15 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 16:14:02 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/20 12:11:33 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 17:27:18 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "libft.h"
+
 int	ft_isprint(int c)
 {
-	if (' ' <= c && c <= 127)
+	if (32 <= c && c <= 126)
 		return (1);
 	else
 		return (0);

@@ -29,5 +29,7 @@ a.out
 *.dSYM/
 *.d
 
+# My ignored files
 piscine/main
+libft/francinette
 

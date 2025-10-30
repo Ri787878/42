@@ -6,9 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 16:27:41 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/21 15:40:10 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 17:34:06 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "libft.h"
 
 void	*ft_memmove(void *dest, const void *src, size_t n)
 {
@@ -19,9 +21,9 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 		return (NULL);
 	while (t >= 0)
 	{
-		((char *)dest)[t] = ((char *)src)[t];
+		((unsigned char *)dest)[t] = ((unsigned char *)src)[t];
 		t--;
 	}
-	((char *)dest)[n] = '\0';
+	((unsigned char *)dest)[n] = '\0';
 	return (dest);
 }

@@ -6,20 +6,22 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 16:21:34 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/23 19:47:39 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 17:29:59 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "libft.h"
 
 void	ft_bzero(void *s, size_t n)
 {
 	size_t	t;
-	char	*str;
+	unsigned char	*str;
 
-	str = (char *)s;
+	str = (unsigned char *)s;
 	t = 0;
 	while (t < n)
 	{
-		str[t] = '0';
+		str[t] = '\0';
 		t++;
 	}
 	return ;

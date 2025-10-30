@@ -6,9 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:28:53 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/23 19:56:22 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 17:05:19 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "libft.h"
 
 void	ft_bzero(void *s, size_t n);
 

@@ -6,9 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/27 13:56:02 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 11:19:35 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 17:06:22 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "libft.h"
 
 int	word_counter(char *s, char c)
 {

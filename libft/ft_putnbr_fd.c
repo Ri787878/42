@@ -1,22 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_itoa.c                                          :+:      :+:    :+:   */
+/*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/29 11:20:04 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:05:41 by ridias           ###   ########.fr       */
+/*   Created: 2025/10/29 16:25:41 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/29 17:06:10 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
+void	ft_putchar_fd(char c, int fd);
+
+void	ft_putstr_fd(char *s, int fd);
+
 int	int_size(int nb)
 {
 	int	n;
 
-	n = 1;
+	n = 0;
 	while (nb / 10 != 0)
 	{
 		nb = nb / 10;
@@ -38,43 +42,40 @@ int	ft_pow(int base, int exp)
 	return (result);
 }
 
-long	handle_sign(int n, int *sign)
+int	check_nb(int nb, int fd)
 {
-	long	num;
-
-	num = n;
-	if (n < 0)
+	if (nb == -2147483648)
 	{
-		*sign = -1;
-		num = -num;
+		ft_putstr_fd("-2147483648", fd);
+		return (-2147483648);
 	}
-	return (num);
+	if (nb == 0)
+	{
+		ft_putchar_fd('0', fd);
+		return (-2147483648);
+	}
+	return (nb);
 }
 
-char	*ft_itoa(int n)
+void	ft_putnbr_fd(int n, int fd)
 {
-	int		sign;
-	long	num;
-	int		nbr_size;
-	char	*nbr;
-	int		t;
+	int	nb_size;
+	int	res;
 
-	t = 0;
-	sign = 0;
-	num = handle_sign(n, &sign);
-	nbr_size = int_size(n);
-	nbr = malloc((nbr_size - sign + 1) * sizeof(char));
-	if (!nbr)
-		return (NULL);
-	if (sign == -1)
-		nbr[t++] = '-';
-	while (nbr_size != 0)
+	nb_size = int_size(n);
+	if (check_nb(n, fd) == -2147483648)
+		return ;
+	if (n < 0)
 	{
-		nbr[t] = (num / ft_pow(10, nbr_size - 1) + '0');
-		num = num - (nbr[t] - '0') * ft_pow(10, nbr_size - 1);
-		nbr_size--;
-		t++;
+		ft_putchar_fd('-', fd);
+		n = -n;
 	}
-	nbr[t] = '\0';
-	return (nbr);
+	while (nb_size != 0)
+	{
+		res = n / ft_pow(10, nb_size);
+		ft_putchar_fd(res + '0', fd);
+		n = n - res * ft_pow(10, nb_size);
+		nb_size--;
+	}
+	ft_putchar_fd((n % 10) + '0', fd);
 }

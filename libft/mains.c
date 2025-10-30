@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 13:16:21 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 12:39:17 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 16:41:04 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -550,5 +550,81 @@ int	main(void)
 	printf("the number %d,", n);
 	printf(" turns to the string %s\n", nbr);
 	free(nbr);
+	return (0);
+}
+
+//strmapi
+char to_upper(unsigned int i, char c) {
+	(void)i;  // ignore the index
+	if (c >= 'a' && c <= 'z')
+		return c - ('a' - 'A');
+	return c;
+}
+
+int	main(void)
+{
+	char	*string = "Maria is Nice!!";
+	char	*result;
+
+	result = malloc(ft_strlen(string));
+	printf("The string: \"%s\", ", string);
+	result = ft_strmapi(string, to_upper);
+	printf("turns to become: \"%s\"\n", result);
+	free(result);
+	return(0);
+}
+
+//striteri
+void	to_upper(unsigned int i, char *c)
+{
+	(void)i;
+	if (*c >= 'a' && *c <= 'z')
+		*c = *c - 32;
+}
+
+int	main(void)
+{
+	char	string[] = "Maria is Nice!!";
+
+	printf("The string: \"%s\", ", string);
+	ft_striteri(string, to_upper);
+	printf("turns to become: \"%s\"\n", string);
+	return (0);
+}
+
+//putchar_fd
+int	main(void)
+{
+	ft_putchar_fd('a', 1);
+	ft_putchar_fd('\n', 1);
+	ft_putchar_fd('c', 1);
+	ft_putchar_fd('\n', 1);
+	ft_putchar_fd('\t', 1);
+	ft_putchar_fd('g', 1);
+	return (0);
+}
+
+//putstr_fd
+int	main(void)
+{
+	char	string[] = "Maria is Nice!!";
+
+	ft_putstr_fd(string, 1);
+	return (0);
+}
+
+//putendl_fd
+int	main(void)
+{
+	char	string[] = "Maria is Nice!!";
+
+	ft_putendl_fd(string, 1);
+	return (0);
+}
+
+//ft_putnbr_fd
+int	main(void)
+{
+	ft_putnbr_fd(123456789, 1);
 	return (0);
 }

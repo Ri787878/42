@@ -6,9 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:59:03 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/21 16:06:49 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 17:07:04 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "libft.h"
 
 size_t	ft_strlen(const char *str);
 

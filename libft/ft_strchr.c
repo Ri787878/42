@@ -6,9 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:44:58 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/21 15:58:26 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/29 17:06:26 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "libft.h"
 
 char	*ft_strchr(const char *s, int c)
 {
