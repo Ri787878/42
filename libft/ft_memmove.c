@@ -6,24 +6,54 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 16:27:41 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:34:06 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 16:40:50 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_memmove(void *dest, const void *src, size_t n)
+static void	cpy_str_rev(void *dest, const void *src, size_t n, size_t code)
 {
 	int	t;
 
-	t = n - 1;
-	if (!dest && !src)
-		return (NULL);
-	while (t >= 0)
+	if (code == 1)
 	{
-		((unsigned char *)dest)[t] = ((unsigned char *)src)[t];
-		t--;
+		t = 0;
+		while (t < (int)n)
+		{
+			((unsigned char *)dest)[t] = ((unsigned char *)src)[t];
+			t++;
+		}
 	}
-	((unsigned char *)dest)[n] = '\0';
+	else if (code == 2)
+	{
+		if (n == 0)
+			return ;
+		t = n - 1;
+		while (t >= 0)
+		{
+			((unsigned char *)dest)[t] = ((unsigned char *)src)[t];
+			t--;
+		}
+	}
+}
+
+void	*ft_memmove(void *dest, const void *src, size_t n)
+{
+	unsigned char		*d;
+	const unsigned char	*s;
+
+	d = (unsigned char *)dest;
+	s = (const unsigned char *)src;
+	if (d == s)
+		return (dest);
+	else if (d < s)
+	{
+		cpy_str_rev(dest, src, n, 1);
+	}
+	else
+	{
+		cpy_str_rev(dest, src, n, 2);
+	}
 	return (dest);
 }

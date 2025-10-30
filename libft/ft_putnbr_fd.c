@@ -6,17 +6,13 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:25:41 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:06:10 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 16:41:23 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_putchar_fd(char c, int fd);
-
-void	ft_putstr_fd(char *s, int fd);
-
-int	int_size(int nb)
+static int	int_size(int nb)
 {
 	int	n;
 
@@ -29,7 +25,7 @@ int	int_size(int nb)
 	return (n);
 }
 
-int	ft_pow(int base, int exp)
+static int	ft_pow(int base, int exp)
 {
 	int	result;
 
@@ -42,7 +38,7 @@ int	ft_pow(int base, int exp)
 	return (result);
 }
 
-int	check_nb(int nb, int fd)
+static int	check_nb(int nb, int fd)
 {
 	if (nb == -2147483648)
 	{

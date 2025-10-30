@@ -6,13 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:16:20 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:06:15 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 16:41:38 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-
-void	ft_putchar_fd(char c, int fd);
 
 void	ft_putstr_fd(char *s, int fd)
 {

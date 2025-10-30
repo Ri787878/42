@@ -6,13 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 12:40:34 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:06:51 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 16:44:20 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-
-size_t	ft_strlen(const char *str);
 
 char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 {

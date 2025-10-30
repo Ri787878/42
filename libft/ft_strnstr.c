@@ -6,16 +6,19 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 18:30:25 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:07:00 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 17:17:16 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-size_t	ft_strlen(const char *str);
-
-int	sub_string_check(char *str, char *needle, int needle_size)
+static int	sub_string_check(char *str, char *needle, size_t len, int index)
 {
+	int	needle_size;
+
+	needle_size = ft_strlen(needle);
+	if (index + needle_size > (int)len)
+		return (-1);
 	while (*str == *needle && needle_size > 0)
 	{
 		if (*needle == '\0')
@@ -37,15 +40,13 @@ char	*ft_strnstr(const char *str, const char *to_find, size_t len)
 	size_t	t;
 	char	*haystack;
 	char	*needle;
-	int		needle_size;
 
 	t = 0;
 	haystack = (char *)str;
 	needle = (char *)to_find;
-	needle_size = ft_strlen(needle);
 	while (haystack[t] != '\0' && t < len)
 	{
-		if (sub_string_check(&haystack[t], needle, needle_size) == 1)
+		if (sub_string_check(&haystack[t], needle, len, t) == 1)
 			return (&haystack[t]);
 		t++;
 	}

@@ -6,13 +6,13 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/27 13:56:02 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:06:22 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 16:43:19 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	word_counter(char *s, char c)
+static int	word_counter(char *s, char c)
 {
 	int	word_counter;
 	int	index;
@@ -28,7 +28,7 @@ int	word_counter(char *s, char c)
 	return (word_counter);
 }
 
-char	*ft_strncpy(char *dest, char *src, unsigned int n)
+static char	*ft_strncpy(char *dest, char *src, unsigned int n)
 {
 	int	i;
 
@@ -46,7 +46,7 @@ char	*ft_strncpy(char *dest, char *src, unsigned int n)
 	return (dest);
 }
 
-char	**create_array(char **array, char *s, char c, int index)
+static char	**create_array(char **array, char *s, char c, int index)
 {
 	int	n;
 	int	word_start;

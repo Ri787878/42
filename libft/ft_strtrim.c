@@ -6,15 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 14:29:32 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:07:08 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 16:44:40 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-
-char	*ft_strchr(const char *s, int c);
-
-size_t	ft_strlen(const char *str);
 
 char	*ft_strtrim(char const *s1, char const *set)
 {

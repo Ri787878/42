@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 13:16:21 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 16:41:04 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 16:24:38 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,36 +131,35 @@ int	main(void)
 // memmove
 int	main(void)
 {
-	char	*src;
-	char	*dest1;
-	char	*dest2;
+	char	src[] = "consectetur";
+	char	dest1[] = "ipsum dolor sit a";
+	char	dest2[] = "ipsum dolor sit a";
 
-	src = "BOM dia !!";
-	dest1 = NULL;
-	dest2 = NULL;
-	dest1 = malloc(10 * sizeof(char));
-	dest2 = malloc(10 * sizeof(char));
 	printf("String:\t%s\n", src);
-	ft_memmove(dest1, src, 10);
-	printf("My version:\t%s\n", dest1);
-	memmove(dest2, src, 10);
-	printf("Original:\t%s\n", dest2);
-	free(dest1);
-	free(dest2);
+	memmove(dest2, src, 5);
+	printf("Original:\t\"%s\"\n", dest2);
+	ft_memmove(dest1, src, 5);
+	printf("My version:\t\"%s\"\n", dest1);
+
 	return (0);
 }
 
 // strlcpy
 int	main(void)
 {
-	char	*test;
-	char	result[27];
-	size_t	code;
+	char	test1[] = "abcdefghijklmnopqrstuvwxyz";
+	char	test2[] = "abcdefghijklmnopqrstuvwxyz";
+	char	result1[27];
+	char	result2[27];
+	size_t	size;
 
-	test = "abcdefghijklmnopqrstuvwxyz";
-	code = ft_strlcpy(result, test, 27);
-	printf("the exit code is %lu\n", code);
-	printf("The word\t\"%s\"\n result is \t\"%s\".\n", test, result);
+	size = ft_strlcpy(result1, test1, 27);
+	printf("the exit size is %lu\n", size);
+	printf("The word\t\"%s\"\n result is \t\"%s\".\n", test1, result1);
+
+	size = strlcpy(result2, test2, 27);
+	printf("the exit size is %lu\n", size);
+	printf("The word\t\"%s\"\n result is \t\"%s\".\n", test2, result2);
 	return (0);
 }
 
@@ -187,23 +186,32 @@ int	main(void)
 // strlcat
 int	main(void)
 {
-	char	*src;
-	char	dst[30];
+	char	src1 = 'a';
+	char	src2 = 'a';
+	char	dst1[30];
+	char	dst2[30];
 	int		n;
 	size_t	code;
 
-	src = "abcdefghijklmnopqrstuvwxyz";
 	n = 0;
 	while (n <= 10)
 	{
-		dst[n] = 'X';
+		dst1[n] = 'X';
+		dst2[n] = 'X';
 		n++;
 	}
-	dst[n] = '\0';
-	printf("dst = %s\n", dst);
-	code = ft_strlcat(dst, src, 34);
+	dst1[n] = '\0';
+	dst2[n] = '\0';
+	printf("dst1 = %s\n", dst1);
+	code = strlcat(dst1, src1, 30);
 	printf("the exit code is %lu\n", code);
-	printf("The word\t\"%s\"\n result is \t\"%s\".\n", src, dst);
+	printf(" Original\t\"%s\"\n result is \t\"%s\".\n", src1, dst1);
+
+
+	printf("dst2 = %s\n", dst2);
+	code = ft_strlcat(dst2, src2, 30);
+	printf("the exit code is %lu\n", code);
+	printf("Mine\t\t\"%s\"\n result is \t\"%s\".\n", src2, dst2);
 	return (0);
 }
 
@@ -290,24 +298,14 @@ int	main(void)
 // strncmp
 int	main(void)
 {
-	char	tests[4][27] = {"abcdefghijklmnopqrstuvwxyz", "Maria is nice!!",
-			"0123456789", "the \t tab is tabb\ting"};
 	int		result_true;
 	int		result;
-	int		n;
-	int		size;
 
-	n = 0;
-	size = 4;
-	while (n < size)
-	{
-		result = ft_strncmp(tests[n], tests[0], 5);
-		result_true = strncmp(tests[n], tests[0], 5);
-		printf("\nThe frase \"%s\"\n", tests[n]);
-		printf("MINE result is \t\"%d\"\n", result);
-		printf("THEI result is \t\"%d\"\n", result_true);
-		n++;
-	}
+	result = ft_strncmp("test\200", "test\0", 6);
+	result_true = strncmp("test\200", "test\0", 6);
+	printf("\nThe frase \"%s\" && \"%s\"\n", "test\200", "test\0");
+	printf("MINE result is \t\"%d\"\n", result);
+	printf("THEI result is \t\"%d\"\n", result_true);
 	return (0);
 }
 

@@ -6,13 +6,13 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 11:20:04 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/29 17:05:41 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/30 16:40:37 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	int_size(int nb)
+static int	int_size(int nb)
 {
 	int	n;
 
@@ -25,7 +25,7 @@ int	int_size(int nb)
 	return (n);
 }
 
-int	ft_pow(int base, int exp)
+static int	ft_pow(int base, int exp)
 {
 	int	result;
 
@@ -38,7 +38,7 @@ int	ft_pow(int base, int exp)
 	return (result);
 }
 
-long	handle_sign(int n, int *sign)
+static long	handle_sign(int n, int *sign)
 {
 	long	num;
 
