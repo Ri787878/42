@@ -1,33 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strmapi.c                                       :+:      :+:    :+:   */
+/*   ft_memcmp.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/29 12:40:34 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/31 13:12:26 by ridias           ###   ########.fr       */
+/*   Created: 2025/10/31 14:35:48 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/31 14:36:08 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
+int	ft_memcmp(const void *s1, const void *s2, size_t n)
 {
-	char			*string;
-	unsigned int	t;
+	const unsigned char	*p_s1;
+	const unsigned char	*p_s2;
+	int					i;
 
-	t = 0;
-	if (!s || !f)
-		return (NULL);
-	string = malloc((ft_strlen(s) + 1) * sizeof(char));
-	if (!string)
-		return (NULL);
-	while (s[t])
-	{
-		string[t] = f(t, s[t]);
-		t++;
-	}
-	string[t] = '\0';
-	return (string);
+	p_s1 = (const unsigned char *)s1;
+	p_s2 = (const unsigned char *)s2;
+	i = 0;
+	if ((int)n == 0)
+		return (0);
+	while (i < (int)n && p_s1[i] == p_s2[i])
+		i++;
+	if (i < (int)n && p_s1[i] < p_s2[i])
+		return (-p_s2[i]);
+	if (i < (int)n && p_s1[i] > p_s2[i])
+		return (p_s1[i]);
+	return (0);
 }

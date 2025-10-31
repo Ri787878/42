@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:44:58 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/30 16:09:12 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/31 14:32:29 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,11 @@ char	*ft_strchr(const char *s, int c)
 	t = 0;
 	while (s[t] != '\0')
 	{
-		if (s[t] == c)
+		if ((unsigned char)s[t] == (unsigned char)c)
 			return ((char *)&s[t]);
 		t++;
 	}
-	if (c == '\0')
+	if ((unsigned char)c == '\0')
 		return ((char *)&s[t]);
 	return (NULL);
 }

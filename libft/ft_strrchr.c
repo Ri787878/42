@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 15:59:03 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/30 16:14:57 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/31 14:30:01 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,12 @@ char	*ft_strrchr(const char *s, int c)
 {
 	int	n;
 
-	n = (int)ft_strlen(s) - 1;
+	n = (int)ft_strlen(s);
 	while (n >= 0)
 	{
-		if (s[n] == c)
+		if (s[n] == (char)c)
 			return ((char *)&s[n]);
 		n--;
 	}
-	if (c == '\0')
-		return ((char *)&s[n]);
 	return (NULL);
 }

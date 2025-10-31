@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 18:30:25 by ridias            #+#    #+#             */
-/*   Updated: 2025/10/30 17:17:16 by ridias           ###   ########.fr       */
+/*   Updated: 2025/10/31 14:52:50 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,18 @@
 
 static int	sub_string_check(char *str, char *needle, size_t len, int index)
 {
-	int	needle_size;
+	size_t	t;
 
-	needle_size = ft_strlen(needle);
-	if (index + needle_size > (int)len)
-		return (-1);
-	while (*str == *needle && needle_size > 0)
+	t = 0;
+	while (needle[t] && ((size_t)index + t) < len)
 	{
-		if (*needle == '\0')
-			return (1);
-		if (*str == '\0')
+		if (str[t] != needle[t])
 			return (-1);
-		str++;
-		needle++;
-		needle_size++;
+		t++;
 	}
-	if (*needle == '\0')
+	if (needle[t] == '\0')
 		return (1);
-	else
-		return (-1);
+	return (-1);
 }
 
 char	*ft_strnstr(const char *str, const char *to_find, size_t len)
@@ -41,6 +34,8 @@ char	*ft_strnstr(const char *str, const char *to_find, size_t len)
 	char	*haystack;
 	char	*needle;
 
+	if (*to_find == '\0')
+		return ((char *)str);
 	t = 0;
 	haystack = (char *)str;
 	needle = (char *)to_find;
