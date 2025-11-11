@@ -6,13 +6,28 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/11 15:22:27 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/11 15:33:49 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <fcntl.h>
 #include <stdio.h>
+
+void	*ft_calloc(size_t number, size_t size)
+{
+	void	*objects;
+
+	if (number == 0 | size == 0)
+		return (malloc(1));
+	if (number > (SIZE_MAX / size))
+		return (NULL);
+	objects = malloc(number * size);
+	if (!objects)
+		return (NULL);
+	ft_bzero(objects, number * size);
+	return (objects);
+}
 
 char	*extract_line(char **buffer)
 {
@@ -27,18 +42,27 @@ char	*extract_line(char **buffer)
 	return (overflow);
 }
 
-char	*read_and_append(int fd, char *buffer)
+char	*read_and_append(int fd, char *overflow)
 {
-	char	*to_add;
-	char	*buffer
+	char	*buffer;
 	ssize_t	bytes_read;
 
-	to_add = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!to_add)
-		return (NULL);
-	bytes_read = read(fd, to_add, BUFFER_SIZE);
-	to_add[bytes_read] = '\0';
-	ft_strjoin()
+	if (!overflow)
+		res = ft_calloc(1, 1);
+	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	bytes_read = 1;
+	while (bytes_read > 0)
+	{
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (byte_read == -1)
+		{
+			free(buffer);
+			return (NULL);
+		}
+		buffer[bytes_read] = '\0';
+		res = ft_free(res, buffer);
+		
+	}
 	return (read_str)
 }
 
@@ -46,16 +70,11 @@ char	*get_next_line(int fd)
 {
 	static char	*buffer;
 
-	if (BUFFER_SIZE <= 0 || fd < 0)
-	{
-		if (buffer)
-		{
-			free(buffer);
-			buffer = NULL;
-		}
+	if (BUFFER_SIZE <= 0 || fd < 0 || read(fd, 0, 0) < 0)
 		return (NULL);
-	}
 	buffer = read_and_append(fd, buffer);
+	if (!buffer)
+		return (NULL);
 	return (buffer);
 }
 
