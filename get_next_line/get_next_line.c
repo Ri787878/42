@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/09 17:35:08 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/11 14:49:03 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,87 +14,70 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-static char	*pass_string(char *big_string, char const *string, int big_counter)
+size_t	ft_strlcat(char *dst, const char *src, size_t size)
 {
-	int	t;
+	size_t	n;
+	size_t	src_leng;
+	size_t	dst_leng;
 
-	t = 0;
-	while (string[t] != '\0')
+	n = 0;
+	src_leng = ft_strlen(src);
+	dst_leng = ft_strlen(dst);
+	if (src == NULL)
+		return (0);
+	if (dst == NULL || size == 0)
+		return (src_leng);
+	if (dst_leng >= size)
+		return (src_leng + size);
+	while ((n + dst_leng < size - 1) && src[n] != '\0')
 	{
-		big_string[big_counter] = string[t];
-		t++;
-		big_counter++;
+		dst[dst_leng + n] = src[n];
+		n++;
 	}
-	return (big_string);
+	dst[dst_leng + n] = '\0';
+	return (dst_leng + src_leng);
 }
 
-char	*ft_strjoin(const char *s1, const char *s2)
+char	*extract_line(char **buffer)
 {
-	int		big_counter;
-	char	*big_string;
+	int		index;
+	char	*overflow;
 
-	if (!s1 || !s2)
+	index = find_new_line(*buffer);
+	overflow = malloc((index + 2) * sizeof(char));
+	if (!overflow)
 		return (NULL);
-	big_string = malloc(((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char)));
-	if (!big_string)
-		return (NULL);
-	big_counter = 0;
-	pass_string(big_string, s1, big_counter);
-	big_counter = ft_strlen(s1);
-	pass_string(big_string, s2, big_counter);
-	big_counter += ft_strlen(s2);
-	big_string[big_counter] = '\0';
-	return (big_string);
+	ft_strlcpy(overlow, *buffer, index + 2)
+	return (overflow);
 }
 
-void	print_file_line(int fd)
+char	*read_and_append(int fd, char *read_str)
 {
-	static char	*stash = NULL;
-	char		*buffer;
-	char		*combined;
-	char		*newline_pos;
-	char		*result;
-	size_t		line_len;
-	ssize_t		bytes_read;
+	char	*to_add;
 
-	buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
-	if (!buffer)
-		return ;
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	if (bytes_read <= 0)
-	{
-		free(buffer);
-		return ;
-	}
-	combined = ft_strjoin(stash, buffer);
-	free(stash);
-	stash = NULL;
-	newline_pos = ft_strchr(combined, '\n');
-	if (newline_pos)
-	{
-		line_len = newline_pos - combined + 1;
-		result = malloc(line_len + 1);
-		if (!result)
-		{
-			free(buffer);
-			free(combined);
-			return ;
-		}
-		ft_strlcpy(result, combined, line_len + 1);
-		stash = ft_strdup(newline_pos + 1);
-	}
-	else
-	{
-		result = ft_strdup(combined);
-	}
-	ft_putstr(result);
-	free(result);
-	free(buffer);
-	free(combined);
+	to_add = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!to_add)
+		return (NULL);
+	read(fd, to_add, BUFFER_SIZE);
+	to_add[BUFFER_SIZE + 1] = '\0';
+	
+	return (read_str)
+}
+
+char	*get_next_line(int fd)
+{
+	static char	*buffer;
+
+	buffer = NULL;
+	if (!)
+		retun (NULL);
+	buffer = read_and_append(fd, buffer);
+	
 }
 
 int	main(void)
 {
+	
 	int	fd;
 	int	size;
 
@@ -105,6 +88,7 @@ int	main(void)
 		return (-1);
 	}
 	print_file_line(fd);
+	
 	return (0);
 }
 
@@ -122,4 +106,173 @@ char	*get_next_line(int fd)
 	rest = &buffer[t];
 	return ()
 }
+
+
+
+
+
+
+
+
+
+void	print_file_line(int fd)
+{
+	int			t;
+	size_t		bytes_read;
+	static char	*stash;
+	char		*buffer;
+	char		*result;
+
+	t = 0;
+	stash = NULL;
+	buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return ;
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	if (bytes_read <= 0)
+	{
+		free(buffer);
+		return ;
+	}
+	t = find_chr(buffer, '\n') + 1;
+	if (t == -42)
+	{
+		printf("\"%s\"\n", buffer);
+		write(1, "Error on find_chr\n", 19);
+		return ;
+	}
+	else if (t >= 0)
+	{
+		result = calloc(t + 1, sizeof(char));
+		if (!buffer)
+		{
+			free(buffer);
+			return ;
+		}
+		ft_strlcpy(overflow, buffer, t);
+		ft_putstr(overflow);
+	}
+	free(overflow);
+	free(buffer);
+}
+
+
+
+
+char	*get_next_line(int fd)
+{
+	static char	*buffer;
+	char		*result;
+
+	t = 0;
+	if (!buffer)
+		buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (fd < 0 || BUFFER_SIZE == 0 || read(fd, 0, 0) < 0)
+		return (NULL);
+	buffer = read_remainder(fd, buffer);
+	if (bytes_read <= 0)
+	{
+		free(buffer);
+		return ;
+	}
+	t = find_chr(buffer, '\n') + 1;
+	if (t == -42)
+	{
+		printf("\"%s\"\n", buffer);
+		write(1, "Error -42 on find_chr\n", 23);
+		return (NULL);
+	}/*
+char	*get_next_line(int fd)
+{
+	size_t		bytes_read;
+	char		*buffer;
+	static int	t;
+
+	buffer = calloc(count, sizeof(char));
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	while (buffer[t] != '\n' || t == 42)
+		t++;
+	rest = &buffer[t];
+	return ()
+}
+
+
+
+
+
+
+
+
+
+void	print_file_line(int fd)
+{
+	int			t;
+	size_t		bytes_read;
+	static char	*stash;
+	char		*buffer;
+	char		*result;
+
+	t = 0;
+	stash = NULL;
+	buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		return ;
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	if (bytes_read <= 0)
+	{
+		free(buffer);
+		return ;
+	}
+	t = find_chr(buffer, '\n') + 1;
+	if (t == -42)
+	{
+		printf("\"%s\"\n", buffer);
+		write(1, "Error on find_chr\n", 19);
+		return ;
+	}
+	else if (t >= 0)
+	{
+		result = calloc(t + 1, sizeof(char));
+		if (!buffer)
+		{
+			free(buffer);
+			return ;
+		}
+		ft_strlcpy(overflow, buffer, t);
+		ft_putstr(overflow);
+	}
+	free(overflow);
+	free(buffer);
+}
+
+
+
+
+char	*get_next_line(int fd)
+{
+	static char	*buffer;
+	char		*result;
+
+	t = 0;
+	if (!buffer)
+		buffer = calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (fd < 0 || BUFFER_SIZE == 0 || read(fd, 0, 0) < 0)
+		return (NULL)
+	else if (t >= 0)
+	{
+		result = calloc(t + 1, sizeof(char));
+		if (!buffer)
+		{
+			free(buffer);
+			return ;
+		}
+		ft_strlcpy(result, buffer, t);
+		buffer = &buffer[t];
+		return (result);
+	}
+	free(result);
+	free(buffer);
+}
+
+
 */

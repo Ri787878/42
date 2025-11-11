@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:53 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/09 17:19:50 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/11 14:40:45 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,20 +52,18 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	return (ft_strlen(src));
 }
 
-char	*ft_strchr(const char *s, int c)
+size_t	find_new_line(const char *s)
 {
-	int	t;
+	size_t	t;
 
 	t = 0;
 	while (s[t] != '\0')
 	{
-		if ((unsigned char)s[t] == (unsigned char)c)
-			return ((char *)&s[t]);
+		if ((unsigned char)s[t] == '\n')
+			return (t);
 		t++;
 	}
-	if ((unsigned char)c == '\0')
-		return ((char *)&s[t]);
-	return (NULL);
+	return (-1);
 }
 
 char	*ft_strdup(const char *src)
