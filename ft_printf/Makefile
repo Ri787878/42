@@ -6,7 +6,8 @@ AR = ar rcs
 RM = rm -f
 
 SRCS =	ft_printf.c \
-		ft_printf_helper1.c
+		ft_printf_helper1.c \
+		ft_printf_helper2.c \
 
 OBJECTS = $(SRCS:.c=.o)
 
