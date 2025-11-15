@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/13 15:21:49 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/15 18:54:06 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,13 @@ char	*read_and_append(int fd, char *overflow)
 	ssize_t	bytes_read;
 
 	if (!overflow)
-		res = ft_calloc(1, 1);
+		overflow = ft_calloc(1, 1);
 	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
 	bytes_read = 1;
 	while (bytes_read > 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
-		if (byte_read == -1)
+		if (bytes_read == -1)
 		{
 			free(buffer);
 			return (NULL);

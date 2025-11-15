@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:53 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/11 15:02:37 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/15 18:52:46 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,4 +127,19 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	}
 	sub_string[t] = '\0';
 	return (sub_string);
+}
+
+void	ft_bzero(void *s, size_t n)
+{
+	size_t			t;
+	unsigned char	*str;
+
+	str = (unsigned char *)s;
+	t = 0;
+	while (t < n)
+	{
+		str[t] = '\0';
+		t++;
+	}
+	return ;
 }
