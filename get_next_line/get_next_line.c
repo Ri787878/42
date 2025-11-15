@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/11 15:33:49 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/13 15:21:49 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,9 +61,9 @@ char	*read_and_append(int fd, char *overflow)
 		}
 		buffer[bytes_read] = '\0';
 		res = ft_free(res, buffer);
-		
+
 	}
-	return (read_str)
+	return (read_str);
 }
 
 char	*get_next_line(int fd)
@@ -80,7 +80,6 @@ char	*get_next_line(int fd)
 
 int	main(void)
 {
-	
 	int	fd;
 	int	size;
 
@@ -91,6 +90,6 @@ int	main(void)
 		return (-1);
 	}
 	print_file_line(fd);
-	
+
 	return (0);
 }

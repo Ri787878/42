@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 15:29:08 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/14 00:07:30 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/15 18:40:04 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	ft_putpointer(size_t pointer)
 	int		counter;
 
 	if (pointer == 0)
-		return (ft_putstr("0x0"));
+		return (ft_putstr("(nil)"));
 	counter = 0;
 	counter += ft_putstr("0x");
 	counter += ft_put_hexa_nbr(pointer);
