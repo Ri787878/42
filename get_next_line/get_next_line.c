@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/15 18:54:06 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/15 22:34:03 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,50 @@
 #include <fcntl.h>
 #include <stdio.h>
 
+char	*ft_substr(char const *s, unsigned int start, size_t len)
+{
+	size_t	t;
+	char	*sub_string;
+
+	if (!s)
+		return (NULL);
+	if (start > ft_strlen(s))
+		return (ft_strdup(""));
+	if ((ft_strlen(s) - start) < len)
+		len = ft_strlen(s) - start;
+	t = 0;
+	sub_string = malloc((len + 1) * sizeof(char));
+	if (!sub_string)
+		return (NULL);
+	while (t < len && start < ft_strlen(s))
+	{
+		sub_string[t] = s[t + (int)start];
+		t++;
+	}
+	sub_string[t] = '\0';
+	return (sub_string);
+}
+
+void	ft_bzero(void *s, size_t n)
+{
+	size_t			t;
+	unsigned char	*str;
+
+	str = (unsigned char *)s;
+	t = 0;
+	while (t < n)
+	{
+		str[t] = '\0';
+		t++;
+	}
+	return ;
+}
+
 void	*ft_calloc(size_t number, size_t size)
 {
 	void	*objects;
 
-	if (number == 0 | size == 0)
+	if (number == 0 || size == 0)
 		return (malloc(1));
 	if (number > (SIZE_MAX / size))
 		return (NULL);
@@ -29,55 +68,85 @@ void	*ft_calloc(size_t number, size_t size)
 	return (objects);
 }
 
-char	*extract_line(char **buffer)
+char	*read_and_append(int fd, char *buffer)
 {
-	int		index;
-	char	*overflow;
-
-	index = find_new_line(*buffer);
-	overflow = malloc((index + 2) * sizeof(char));
-	if (!overflow)
-		return (NULL);
-	ft_strlcpy(overflow, *buffer, index + 2);
-	return (overflow);
-}
-
-char	*read_and_append(int fd, char *overflow)
-{
-	char	*buffer;
+	char	*temp_buffer;
 	ssize_t	bytes_read;
+	char	*new_buffer;
 
-	if (!overflow)
-		overflow = ft_calloc(1, 1);
-	buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+	if (!buffer)
+		buffer = ft_calloc(1, 1);
 	bytes_read = 1;
 	while (bytes_read > 0)
 	{
-		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		temp_buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
+		bytes_read = read(fd, temp_buffer, BUFFER_SIZE);
 		if (bytes_read == -1)
 		{
+			free(temp_buffer);
 			free(buffer);
 			return (NULL);
 		}
-		buffer[bytes_read] = '\0';
-		res = ft_free(res, buffer);
-
+		temp_buffer[bytes_read] = '\0';
+		new_buffer = ft_strjoin(buffer, temp_buffer);
+		free(temp_buffer);
+		free(buffer);
+		buffer = new_buffer;
+		if (find_new_line(buffer) != -1)
+			return (buffer);
 	}
-	return (read_str);
+	return (buffer);
 }
 
 char	*get_next_line(int fd)
 {
 	static char	*buffer;
+	char		*line;
+	char		*temp;
+	int			index;
 
-	if (BUFFER_SIZE <= 0 || fd < 0 || read(fd, 0, 0) < 0)
+	if (BUFFER_SIZE <= 0 || fd < 0)
 		return (NULL);
-	buffer = read_and_append(fd, buffer);
-	if (!buffer)
-		return (NULL);
-	return (buffer);
+	if (buffer && find_new_line(buffer) != -1)
+	{
+		index = find_new_line(buffer) + 1;
+		line = ft_substr(buffer, 0, index);
+		temp = ft_substr(buffer, index, ft_strlen(buffer));
+		free(buffer);
+		buffer = temp;
+	}
+	else
+	{
+		if (read(fd, 0, 0) < 0)
+			return (NULL);
+		buffer = read_and_append(fd, buffer);
+		if (!buffer)
+			return (NULL);
+		if (buffer[0] == '\0')
+		{
+			free(buffer);
+			buffer = NULL;
+			return (NULL);
+		}
+		index = find_new_line(buffer) + 1;
+		if (index - 1 != -1)
+		{
+			line = ft_substr(buffer, 0, index);
+			temp = ft_substr(buffer, index, ft_strlen(buffer));
+			free(buffer);
+			buffer = temp;
+		}
+		else
+		{
+			line = buffer;
+			free(buffer);
+			buffer = NULL;
+		}
+	}
+	return (line);
 }
 
+/*
 int	main(void)
 {
 	int	fd;
@@ -93,3 +162,4 @@ int	main(void)
 
 	return (0);
 }
+*/

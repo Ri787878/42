@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:53 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/15 18:52:46 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/15 22:33:55 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,23 +24,7 @@ size_t	ft_strlen(const char *str)
 	return (n);
 }
 
-size_t	ft_strlcpy(char *dst, const char *src, size_t size)
-{
-	size_t	n;
-
-	n = 0;
-	if (size == 0)
-		return (ft_strlen(src));
-	while (n < size - 1 && src[n] != '\0')
-	{
-		dst[n] = src[n];
-		n++;
-	}
-	dst[n] = '\0';
-	return (ft_strlen(src));
-}
-
-size_t	find_new_line(const char *s)
+int	find_new_line(const char *s)
 {
 	size_t	t;
 
@@ -103,43 +87,4 @@ char	*ft_strjoin(const char *s1, const char *s2)
 	big_counter += ft_strlen(s2);
 	big_string[big_counter] = '\0';
 	return (big_string);
-}
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	size_t	t;
-	char	*sub_string;
-
-	if (!s)
-		return (NULL);
-	if (start > ft_strlen(s))
-		return (ft_strdup(""));
-	if ((ft_strlen(s) - start) < len)
-		len = ft_strlen(s) - start;
-	t = 0;
-	sub_string = malloc((len + 1) * sizeof(char));
-	if (!sub_string)
-		return (NULL);
-	while (t < len && start < ft_strlen(s))
-	{
-		sub_string[t] = s[t + (int)start];
-		t++;
-	}
-	sub_string[t] = '\0';
-	return (sub_string);
-}
-
-void	ft_bzero(void *s, size_t n)
-{
-	size_t			t;
-	unsigned char	*str;
-
-	str = (unsigned char *)s;
-	t = 0;
-	while (t < n)
-	{
-		str[t] = '\0';
-		t++;
-	}
-	return ;
 }

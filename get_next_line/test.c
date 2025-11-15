@@ -30,20 +30,6 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	return (ft_strlen(src));
 }
 
-size_t	find_new_line(const char *s)
-{
-	size_t	t;
-
-	t = 0;
-	while (s[t] != '\0')
-	{
-		if ((unsigned char)s[t] == '\n')
-			return (t);
-		t++;
-	}
-	return (-1);
-}
-
 char	*extract_line(char **buffer)
 {
 	int		index;
