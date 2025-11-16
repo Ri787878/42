@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/15 22:34:03 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/16 14:28:39 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
+static char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	size_t	t;
 	char	*sub_string;
@@ -118,7 +118,11 @@ char	*get_next_line(int fd)
 	else
 	{
 		if (read(fd, 0, 0) < 0)
+		{
+			free(buffer);
+			buffer = NULL;
 			return (NULL);
+		}
 		buffer = read_and_append(fd, buffer);
 		if (!buffer)
 			return (NULL);
@@ -132,6 +136,8 @@ char	*get_next_line(int fd)
 		if (index - 1 != -1)
 		{
 			line = ft_substr(buffer, 0, index);
+			if (!line)
+				return (NULL);
 			temp = ft_substr(buffer, index, ft_strlen(buffer));
 			free(buffer);
 			buffer = temp;
