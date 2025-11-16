@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:53 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/15 22:33:55 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/16 16:48:16 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,67 +24,32 @@ size_t	ft_strlen(const char *str)
 	return (n);
 }
 
-int	find_new_line(const char *s)
+void	ft_bzero(void *s, size_t n)
 {
-	size_t	t;
+	size_t			t;
+	unsigned char	*str;
 
+	str = (unsigned char *)s;
 	t = 0;
-	while (s[t] != '\0')
+	while (t < n)
 	{
-		if ((unsigned char)s[t] == '\n')
-			return (t);
+		str[t] = '\0';
 		t++;
 	}
-	return (-1);
+	return ;
 }
 
-char	*ft_strdup(const char *src)
+void	*ft_calloc(size_t number, size_t size)
 {
-	int		n;
-	char	*str;
+	void	*objects;
 
-	n = 0;
-	str = (char *)malloc((ft_strlen(src) + 1) * sizeof(char));
-	if (!str)
+	if (number == 0 || size == 0)
+		return (malloc(1));
+	if (number > (SIZE_MAX / size))
 		return (NULL);
-	while (src[n])
-	{
-		str[n] = src[n];
-		n++;
-	}
-	str[n] = '\0';
-	return (str);
-}
-
-static char	*pass_string(char *big_string, char const *string, int big_counter)
-{
-	int	t;
-
-	t = 0;
-	while (string[t] != '\0')
-	{
-		big_string[big_counter] = string[t];
-		t++;
-		big_counter++;
-	}
-	return (big_string);
-}
-
-char	*ft_strjoin(const char *s1, const char *s2)
-{
-	int		big_counter;
-	char	*big_string;
-
-	if (!s1 || !s2)
+	objects = malloc(number * size);
+	if (!objects)
 		return (NULL);
-	big_string = malloc(((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char)));
-	if (!big_string)
-		return (NULL);
-	big_counter = 0;
-	pass_string(big_string, s1, big_counter);
-	big_counter = ft_strlen(s1);
-	pass_string(big_string, s2, big_counter);
-	big_counter += ft_strlen(s2);
-	big_string[big_counter] = '\0';
-	return (big_string);
+	ft_bzero(objects, number * size);
+	return (objects);
 }

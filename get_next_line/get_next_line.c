@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/16 14:28:39 by ridias           ###   ########.fr       */
+/*   Updated: 2025/11/16 16:50:40 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,144 +14,99 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-static char	*ft_substr(char const *s, unsigned int start, size_t len)
+char	*read_line(int fd, char *buffer)
 {
-	size_t	t;
-	char	*sub_string;
-
-	if (!s)
-		return (NULL);
-	if (start > ft_strlen(s))
-		return (ft_strdup(""));
-	if ((ft_strlen(s) - start) < len)
-		len = ft_strlen(s) - start;
-	t = 0;
-	sub_string = malloc((len + 1) * sizeof(char));
-	if (!sub_string)
-		return (NULL);
-	while (t < len && start < ft_strlen(s))
-	{
-		sub_string[t] = s[t + (int)start];
-		t++;
-	}
-	sub_string[t] = '\0';
-	return (sub_string);
-}
-
-void	ft_bzero(void *s, size_t n)
-{
-	size_t			t;
-	unsigned char	*str;
-
-	str = (unsigned char *)s;
-	t = 0;
-	while (t < n)
-	{
-		str[t] = '\0';
-		t++;
-	}
-	return ;
-}
-
-void	*ft_calloc(size_t number, size_t size)
-{
-	void	*objects;
-
-	if (number == 0 || size == 0)
-		return (malloc(1));
-	if (number > (SIZE_MAX / size))
-		return (NULL);
-	objects = malloc(number * size);
-	if (!objects)
-		return (NULL);
-	ft_bzero(objects, number * size);
-	return (objects);
-}
-
-char	*read_and_append(int fd, char *buffer)
-{
-	char	*temp_buffer;
-	ssize_t	bytes_read;
 	char	*new_buffer;
+	int		index;
 
-	if (!buffer)
-		buffer = ft_calloc(1, 1);
-	bytes_read = 1;
-	while (bytes_read > 0)
+	new_buffer = ft_calloc((BUFFER_SIZE + 1), sizeof(char));
+	if (!new_buffer)
+		return (NULL);
+	index = 1;
+	while (!(find_new_line(buffer)) && index != 0)
 	{
-		temp_buffer = ft_calloc(BUFFER_SIZE + 1, sizeof(char));
-		bytes_read = read(fd, temp_buffer, BUFFER_SIZE);
-		if (bytes_read == -1)
+		index = read(fd, new_buffer, BUFFER_SIZE);
+		if (index < 0)
 		{
-			free(temp_buffer);
+			free(new_buffer);
 			free(buffer);
 			return (NULL);
 		}
-		temp_buffer[bytes_read] = '\0';
-		new_buffer = ft_strjoin(buffer, temp_buffer);
-		free(temp_buffer);
-		free(buffer);
-		buffer = new_buffer;
-		if (find_new_line(buffer) != -1)
-			return (buffer);
+		new_buffer[index] = 0;
+		buffer = ft_strjoin(buffer, new_buffer);
 	}
+	free(new_buffer);
 	return (buffer);
+}
+
+char	*get_line(char *buffer)
+{
+	int		i;
+	char	*line;
+
+	i = 0;
+	if (buffer[0] == '\0')
+		return (NULL);
+	while (buffer[i] && (buffer[i] != '\n'))
+		i++;
+	line = ft_calloc(i + 2, sizeof(char));
+	if (!line)
+		return (NULL);
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
+		line[i++] = buffer[i++];
+	if (buffer[i] == '\n')
+	{
+		line[i] = buffer[i];
+		i++;
+	}
+	line[i] = '\0';
+	return (line);
+}
+
+char	*get_overflow(char	*buffer)
+{
+	int		i;
+	int		overflow_index;
+	char	*overflow;
+
+	i = 0;
+	while (buffer[i] && buffer[i] != '\n')
+		i++;
+	if (!buffer[i])
+	{
+		free(buffer);
+		return (NULL);
+	}
+	overflow = malloc((ft_strlen(buffer) - i + 1) * sizeof(char));
+	if (!overflow)
+	{
+		free(overflow);
+		return (NULL);
+	}
+	i += 1;
+	overflow_index = 0;
+	while (buffer[i] && buffer[i] != '\n')
+		overflow[overflow_index++] = buffer[i++];
+	overflow[overflow_index] = '\0';
+	free(buffer);
+	return (overflow);
 }
 
 char	*get_next_line(int fd)
 {
 	static char	*buffer;
 	char		*line;
-	char		*temp;
-	int			index;
 
 	if (BUFFER_SIZE <= 0 || fd < 0)
 		return (NULL);
-	if (buffer && find_new_line(buffer) != -1)
-	{
-		index = find_new_line(buffer) + 1;
-		line = ft_substr(buffer, 0, index);
-		temp = ft_substr(buffer, index, ft_strlen(buffer));
-		free(buffer);
-		buffer = temp;
-	}
-	else
-	{
-		if (read(fd, 0, 0) < 0)
-		{
-			free(buffer);
-			buffer = NULL;
-			return (NULL);
-		}
-		buffer = read_and_append(fd, buffer);
-		if (!buffer)
-			return (NULL);
-		if (buffer[0] == '\0')
-		{
-			free(buffer);
-			buffer = NULL;
-			return (NULL);
-		}
-		index = find_new_line(buffer) + 1;
-		if (index - 1 != -1)
-		{
-			line = ft_substr(buffer, 0, index);
-			if (!line)
-				return (NULL);
-			temp = ft_substr(buffer, index, ft_strlen(buffer));
-			free(buffer);
-			buffer = temp;
-		}
-		else
-		{
-			line = buffer;
-			free(buffer);
-			buffer = NULL;
-		}
-	}
+	buffer = read_line(fd, buffer);
+	if (!buffer)
+		return (NULL);
+	line = get_line(buffer);
+	buffer = get_overflow(buffer);
 	return (line);
 }
-
 /*
 int	main(void)
 {
