@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 16:21:01 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/17 12:17:09 by ridias           ###   ########.fr       */
+/*   Updated: 2025/12/09 12:06:04 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ int	main(void)
 	ft_printf("The function woks hexa X = \"%X\".\n", u_int_v);
 	ft_printf("The function woks hexa x = \"%x\".\n", 1234567890);
 	ft_printf("The function woks hexa X = \"%X\".\n", 1234567890); */
-	
 	ft_printf("The function woks hexa X = \"%y\".\n", 1234567890);
 	printf("The function woks hexa X = \"%y\".\n", 1234567890);
 	ft_printf("The function woks hexa X = \"%c\".\n", 1);
