@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:48 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/16 16:50:17 by ridias           ###   ########.fr       */
+/*   Updated: 2025/12/09 19:37:34 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # include <stdlib.h>
+# include <stdlio.h>
 # include <unistd.h>
 
 # define BUFFER_SIZE 42

@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:53 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/16 16:48:16 by ridias           ###   ########.fr       */
+/*   Updated: 2025/12/09 22:49:37 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,4 +52,13 @@ void	*ft_calloc(size_t number, size_t size)
 		return (NULL);
 	ft_bzero(objects, number * size);
 	return (objects);
+}
+
+char	*fill_line(int fd, char * leftover, char * buffer)
+{
+	ssize_t	bytes_read;
+	char	*temp;
+
+	byte
+	//https://42-cursus.gitbook.io/guide/1-rank-01/get_next_line/commented-solution
 }

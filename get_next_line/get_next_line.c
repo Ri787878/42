@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/11/16 16:50:40 by ridias           ###   ########.fr       */
+/*   Updated: 2025/12/09 19:38:50 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,16 +95,26 @@ char	*get_overflow(char	*buffer)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*leftover;
 	char		*line;
+	char		*buffer;
 
-	if (BUFFER_SIZE <= 0 || fd < 0)
+	buffer = (char *)malloc(BUFFER_SIZE + 1) * sizeof(char);
+	if (BUFFER_SIZE <= 0 || fd < 0 || read(fd, 0, 0) < 0)
+	{
+		free(leftover);
+		free(buffer);
+		leftover = NULL;
+		buffer = NULL;
 		return (NULL);
-	buffer = read_line(fd, buffer);
+	}
 	if (!buffer)
 		return (NULL);
-	line = get_line(buffer);
-	buffer = get_overflow(buffer);
+	line = fill_line(fd, leftover, buffer);
+	free(buffer);
+	if (!line)
+		return (NULL);
+	leftover = set_line(line);
 	return (line);
 }
 /*
