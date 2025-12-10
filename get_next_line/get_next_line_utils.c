@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:53 by ridias            #+#    #+#             */
-/*   Updated: 2025/12/09 22:49:37 by ridias           ###   ########.fr       */
+/*   Updated: 2025/12/10 14:58:42 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,47 +18,70 @@ size_t	ft_strlen(const char *str)
 
 	n = 0;
 	while (str[n] != '\0')
-	{
 		n++;
-	}
 	return (n);
 }
 
-void	ft_bzero(void *s, size_t n)
+size_t	ft_strlen_nl(const char *str)
 {
-	size_t			t;
-	unsigned char	*str;
+	int	n;
 
-	str = (unsigned char *)s;
+	n = 0;
+	while (str[n] != '\0' && str[n] != '\n')
+		n++;
+	return (n);
+}
+
+static char	*pass_string(char *big_string, char const *string, int big_counter)
+{
+	int	t;
+
 	t = 0;
-	while (t < n)
+	while (string[t] != '\0')
 	{
-		str[t] = '\0';
+		big_string[big_counter] = string[t];
 		t++;
+		big_counter++;
 	}
-	return ;
+	return (big_string);
 }
 
-void	*ft_calloc(size_t number, size_t size)
+char	*ft_strjoin(const char *s1, const char *s2)
 {
-	void	*objects;
+	int		big_counter;
+	char	*big_string;
 
-	if (number == 0 || size == 0)
-		return (malloc(1));
-	if (number > (SIZE_MAX / size))
+	if (!s1 || !s2)
 		return (NULL);
-	objects = malloc(number * size);
-	if (!objects)
+	big_string = malloc(((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char)));
+	if (!big_string)
 		return (NULL);
-	ft_bzero(objects, number * size);
-	return (objects);
+	big_counter = 0;
+	pass_string(big_string, s1, big_counter);
+	big_counter = ft_strlen(s1);
+	pass_string(big_string, s2, big_counter);
+	big_counter += ft_strlen(s2);
+	big_string[big_counter] = '\0';
+	return (big_string);
 }
 
-char	*fill_line(int fd, char * leftover, char * buffer)
+int	clean_check_new_line(char *buffer)
 {
-	ssize_t	bytes_read;
-	char	*temp;
+	int	i;
+	int	j;
+	int	nl_found;
 
-	byte
-	//https://42-cursus.gitbook.io/guide/1-rank-01/get_next_line/commented-solution
+	i = 0;
+	j = 0;
+	nl_found = 0;
+	while (buffer[i] != '\0')
+	{
+		if (nl_found == 1)
+			buffer[j++] = buffer[i];
+		if (nl_found == 0)
+			nl_found = 1;
+		buffer[i] = '\0';
+		i++;
+	}
+	return (nl_found);
 }
