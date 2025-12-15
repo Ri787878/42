@@ -1,8 +1,6 @@
 *This project has been created as part of the 42 curriculum by ridias.*
 
 # Ft_printf
-
-## Description
 This project attempts to recreate a simplified version of the printf function from libc.
 The porpose of this function is to print a string, that could be or not interspaced with diferent variables of diferent types.
 
