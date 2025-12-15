@@ -30,7 +30,6 @@ $ ./result
 
 ## Resources
 
-https://www.geeksforgeeks.org/c/variadic-functions-in-c/
-https://linux.die.net/man/3/printf
-https://www.geeksforgeeks.org/c/printf-in-c/
-
+-	<https://www.geeksforgeeks.org/c/variadic-functions-in-c/>
+-	<https://linux.die.net/man/3/printf>
+-	<https://www.geeksforgeeks.org/c/printf-in-c/>
