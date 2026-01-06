@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:48 by ridias            #+#    #+#             */
-/*   Updated: 2025/12/10 15:02:34 by ridias           ###   ########.fr       */
+/*   Updated: 2026/01/05 14:26:24 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@
 # include <stdio.h>
 # include <unistd.h>
 
-# define BUFFER_SIZE 42
-
 char	*get_next_line(int fd);
-int		clean_check_new_line(char *buffer);
 size_t	ft_strlen(const char *str);
+char	*ft_strjoin_nl(char *s1, char *s2);
+int		fill_buffer(int fd, char *buffer);
+int		ft_is_nl(char *buffer);
 
 #endif

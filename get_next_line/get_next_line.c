@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2025/12/10 15:01:56 by ridias           ###   ########.fr       */
+/*   Updated: 2026/01/05 14:24:49 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,13 @@ char	*get_next_line(int fd)
 	if (BUFFER_SIZE <= 0 || fd < 0)
 		return (NULL);
 	line = NULL;
-	while (1)
+	bytes = 0;
+	while (!bytes && fill_buffer(fd, buffer))
 	{
-		bytes = read(fd, buffer, BUFFER_SIZE);
-		if (bytes == 0)
-			return (clean_check_new_line(buffer), free(line), NULL);
-		else if (bytes == 0)
-			break ;
-		buffer[bytes] = '\0';
-		line = ft_strjoin(line, buffer);
-		if (clean_check_new_line(buffer))
-			break ;
+		line = ft_strjoin_nl(line, buffer);
+		if (!line)
+			return (free(line), NULL);
+		bytes = ft_is_nl(buffer);
 	}
 	return (line);
 }
