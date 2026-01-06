@@ -6,13 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:56 by ridias            #+#    #+#             */
-/*   Updated: 2026/01/05 14:24:49 by ridias           ###   ########.fr       */
+/*   Updated: 2026/01/06 16:33:33 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <fcntl.h>
-#include <stdio.h>
 
 char	*get_next_line(int fd)
 {
@@ -33,20 +31,19 @@ char	*get_next_line(int fd)
 	}
 	return (line);
 }
+
 /*
-int	main(void)
+int main(void)
 {
-	int	fd;
-	int	size;
-
-	fd = open("ink.txt", O_RDONLY);
-	if (fd < 0)
+	int fd = open("ink.txt", O_RDONLY);
+	char *line;
+	while ((line = get_next_line(fd)) != NULL)
 	{
-		ft_putstr("Error in fd assining.\n");
-		return (-1);
+		printf("%s", line);
+		free(line);
 	}
-	print_file_line(fd);
-
-	return (0);
-}
-*/
+	free(line);
+	close(fd);
+	return 0;
+	printf("\n");
+}*/

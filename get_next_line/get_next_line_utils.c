@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/08 11:06:53 by ridias            #+#    #+#             */
-/*   Updated: 2026/01/05 14:30:01 by ridias           ###   ########.fr       */
+/*   Updated: 2026/01/06 16:31:17 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ size_t	ft_strlen(const char *str)
 	int	n;
 
 	n = 0;
+	if (!str)
+		return (0);
 	while (str[n] != '\0')
 		n++;
 	return (n);
@@ -30,7 +32,7 @@ char	*ft_strjoin_nl(char *s1, char *s2)
 
 	if (!s2 || s2[0] == '\0')
 		return (s1);
-	big_string = malloc(((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char)));
+	big_string = malloc(((ft_strlen(s1) + ft_strlen(s2)) + 1) * sizeof(char));
 	if (!big_string)
 		return (free(s1), NULL);
 	i = 0;
