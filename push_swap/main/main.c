@@ -6,96 +6,38 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/13 11:45:14 by ridias            #+#    #+#             */
-/*   Updated: 2026/02/13 13:00:40 by ridias           ###   ########.fr       */
+/*   Updated: 2026/02/16 13:01:52 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "../push_swap.h"
 
-typedef	struct	Node
+void	push_swap(char	*arg_list)
 {
-	int	data;
-	struct	Node	*next;
-	struct	Node	*prev;
-}	Node;
+	t_list	*lst;
+	char	*lst_cmds;
 
-Node	*createNode(int data)
-{
-	Node	*newNode = (Node *)malloc(sizeof(Node));
-
-	newNode->data = data;
-	newNode->next = NULL;
-	newNode->prev = NULL;
-	return newNode;
-}
-
-Node	*addstart(Node **head, int data)
-{
-	Node	*newNode;
+	//Check parameters of function
+	//If there are no parameters return an empty prompt
+	if (is_empty(arg_list))
+		return ;	
+	//Separate the arguments into the list of ints
+	//NEED to change split to create args inside of a linked list
+	//List order is FIFO
+	//In case of error display "Error\n"
+	//Error examples:
+	//		some arguments not being ints
+	//		some arguments exceedeing int limits
+	//		and / or presene of duplicates
+	if (!split(arg_list, lst))
+		{
+			//NOT SURE if i need to free here or not 
+			ft_printf("Error\n");
+			return(0);
+		}
+	lst_cmds = ft_sort(lst);
+	//Print used cmds list by order seperated by '\n' char
+	ft_printf("%s", lst_cmds);
 	
-	newNode = createNode(data);
-	if (*head == NULL)
-	{
-		*head = newNode;
-		return;
-	}
-	newNode->next = *head;
-	(*head)->prev = newNode;
-	*head = newNode;
-}
-
-Node	*add_end(Node **head, int data)
-{
-	Node	*newNode;
-	Node	*temp;
 	
-	newNode = createNode(data);
-	temp = *head;
-	if(*head == NULL)
-	{
-		*head = newNode;
-		//add free of the temp node
-		return;
-	}
-	while (temp->next != NULL)
-	{
-		temp = temp->next;
-	}
-	temp->next = newNode;
-	newNode->prev = temp;
-}
-
-Node *addmiddle(Node **head, int data, int position)
-{
-	Node	*newNode;
-	Node	*temp;
-	int		i;
-
-	//Error if position is the head 
-	if (position < 1)
-		return;
-	if (position == 1)
-	{
-		addstart(head, data);
-		//free newNode and temp
-		return;
-	}
-	newNode = createNode(data);
-	temp = *head;
-	i = 0;
-	while (temp != NULL && i < position - 1)
-	{
-		temp = temp->next;
-		i++;
-	}
-	//Error if position is bigger than number of nodes.
-	if(temp == NULL)
-		return;
-	newNode->next = temp->next;
-	newNode->prev = temp;
-	//Need to review this if it is weird
-	if (temp->next != NULL)
-		temp->next->prev = newNode;
-	temp->next = newNode;
 }
