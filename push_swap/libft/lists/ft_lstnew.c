@@ -1,21 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstadd_front_bonus.c                            :+:      :+:    :+:   */
+/*   ft_lstnew.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/24 16:25:50 by andqueir          #+#    #+#             */
-/*   Updated: 2026/02/16 12:28:40 by ridias           ###   ########.fr       */
+/*   Created: 2025/10/24 14:57:29 by andqueir          #+#    #+#             */
+/*   Updated: 2026/02/25 12:43:18 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../push_swap.h"
+#include "../../push_swap.h"
 
-void	ft_lstadd_front(t_list **lst, t_list *new)
+t_list	*ft_lstnew(void *content)
 {
-	if (!lst || !new)
-		return ;
-	new->next = *lst;
-	*lst = new;
+	t_list	*new;
+
+	new = malloc(sizeof(t_list));
+	if (!new)
+		return (NULL);
+	new->content = content;
+	new->next = NULL;
+	return (new);
 }

@@ -1,25 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstnew_bonus.c                                  :+:      :+:    :+:   */
+/*   ft_isalnum.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/24 14:57:29 by andqueir          #+#    #+#             */
-/*   Updated: 2026/02/16 12:27:58 by ridias           ###   ########.fr       */
+/*   Created: 2025/10/17 16:03:06 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/29 17:05:22 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../push_swap.h"
+#include "libft.h"
 
-t_list	*ft_lstnew(void *content)
+int	ft_isalnum(int c)
 {
-	t_list	*new;
-
-	new = malloc(sizeof(t_list));
-	if (!new)
-		return (NULL);
-	new->content = content;
-	new->next = NULL;
-	return (new);
+	if ((('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'))
+		|| ('0' <= c && c <= '9'))
+		return (1);
+	else
+		return (0);
 }

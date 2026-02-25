@@ -1,38 +1,23 @@
-#ifndef PUSH_SWAP_H
-# define PUSH_SWAP_H
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   libft.h                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/29 16:46:39 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/31 14:36:49 by ridias           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-# include <stdio.h>
+#ifndef LIBFT_H
+# define LIBFT_H
+
+# include <unistd.h>
 # include <stdlib.h>
+# include <stdio.h>
+# include <stdint.h>
 
-typedef	struct	s_list
-{
-	void	*content;
-	struct	s_list	*next;
-}	t_list;
-
-typedef struct s_ps_struct
-{
-	char	*cmds;
-	int		cmd_count;
-	t_list	*head;
-	t_list	*temp_node;
-	//need to get clearer image on where and what are stacks a and b 
-	t_list *a;
-	t_list *b;
-}	t_ps_struct;
-
-//linked lists
-t_list	*ft_lstnew(void *content);
-t_list	*ft_lstlast(t_list *lst);
-t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
-int		ft_lstsize(t_list *lst);
-void	ft_lstadd_back(t_list **lst, t_list *new);
-void	ft_lstadd_front(t_list **lst, t_list *new);
-void	ft_lstiter(t_list *lst, void (*f)(void *));
-void	ft_lstclear(t_list **lst, void (*del)(void*));
-void	ft_lstdelone(t_list *lst, void (*del)(void*));
-
-//libft
 int		ft_atoi(const char *str);
 void	ft_bzero(void *s, size_t n);
 void	*ft_calloc(size_t number, size_t size);
@@ -67,17 +52,5 @@ char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 int		ft_tolower(int c);
 int		ft_toupper(int c);
-t_list	*ft_lstnew(void *content);
-void	ft_lstadd_front(t_list **lst, t_list *new);
-int		ft_lstsize(t_list *lst);
-t_list	*ft_lstlast(t_list *lst);
-void	ft_lstadd_back(t_list **lst, t_list *new);
-void	ft_lstdelone(t_list *lst, void (*del)(void *));
-void	ft_lstclear(t_list **lst, void (*del)(void *));
-void	ft_lstiter(t_list *lst, void (*f)(void *));
-t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
-
-//ft_printf
-int	ft_printf(const char *format, ...);
 
 #endif

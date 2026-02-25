@@ -1,29 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstclear_bonus.c                                :+:      :+:    :+:   */
+/*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/31 10:22:23 by andqueir          #+#    #+#             */
-/*   Updated: 2026/02/16 12:28:35 by ridias           ###   ########.fr       */
+/*   Created: 2025/10/23 19:55:33 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/30 17:16:25 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../push_swap.h"
+#include "libft.h"
 
-void	ft_lstclear(t_list **lst, void (*del)(void*))
+char	*ft_strdup(const char *src)
 {
-	t_list	*node;
+	int		n;
+	char	*str;
 
-	if (!lst || !del)
-		return ;
-	while (*lst)
+	n = 0;
+	str = (char *)malloc((ft_strlen(src) + 1) * sizeof(char));
+	if (!str)
+		return (NULL);
+	while (src[n])
 	{
-		node = (*lst)->next;
-		ft_lstdelone(*lst, del);
-		*lst = node;
+		str[n] = src[n];
+		n++;
 	}
-	free(*lst);
-	*lst = NULL;
+	str[n] = '\0';
+	return (str);
 }

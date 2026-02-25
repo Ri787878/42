@@ -1,20 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstsize_bonus.c                                 :+:      :+:    :+:   */
+/*   ft_isalpha.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/24 16:36:58 by andqueir          #+#    #+#             */
-/*   Updated: 2026/02/16 12:28:06 by ridias           ###   ########.fr       */
+/*   Created: 2025/10/17 15:23:51 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/29 17:05:26 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../push_swap.h"
+#include "libft.h"
 
-int	ft_lstsize(t_list *lst)
+int	ft_isalpha(int c)
 {
-	if (!lst)
+	if (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z'))
+		return (1);
+	else
 		return (0);
-	return (1 + ft_lstsize(lst->next));
 }
