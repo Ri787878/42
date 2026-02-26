@@ -2,7 +2,7 @@
 make re
 make clean
 
-clear
+#clear
 
 echo "cc -Wall -Wextra -Werror push_swap.a -o test"
 cc -Wall -Wextra -Werror push_swap.a -o test

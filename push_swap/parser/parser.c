@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 15:14:02 by ridias            #+#    #+#             */
-/*   Updated: 2026/02/25 17:25:03 by ridias           ###   ########.fr       */
+/*   Updated: 2026/02/26 12:11:25 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,41 +24,12 @@ char	*parser(char *args)
 }
 */
 
-void	ps_init(t_ps_struct *ps)
-{
-	ps->cmds = NULL;
-	ps->cmd_count = 0;
-	ps->head = NULL;
-	ps->temp_node = NULL;
-}
-
-void	print_content(void *content)
-{
-	ft_printf("%s\n", (char *)content);
-}
-
-int	main(int argc, char **argv)
-{
-	t_ps_struct	ps;
-	int			i;
-
-	ps_init(&ps);
-	if (argc < 2)
-		return (0);
-	else if (collect_tokens(argc, argv, &ps) != 0)
-	{
-		ft_printf("Error\n");
-		return (1);
-	}
-	ft_lstclear(&ps.head, free);
-}
-
-static void	free_split(char **parts)
+static void	clrs(char **parts)
 {
 	int	k;
 
 	if (!parts)
-		return;
+		return ;
 	k = 0;
 	while (parts[k])
 		free(parts[k++]);
@@ -82,22 +53,22 @@ int	collect_tokens(int argc, char **argv, t_ps_struct *ps)
 		while (parts[j])
 		{
 			dup = ft_strdup(parts[j]);
-			if(!dup)
-				return (free_split(parts), ft_lstclear(&ps->head, free), -1);
+			if (!dup)
+				return (clrs(parts), ft_lstclear(&ps->a, free), -1);
 			ps->temp_node = ft_lstnew(dup);
 			if (!ps->temp_node)
-				return (free(dup), free_split(parts), ft_lstclear(&ps->head, free), -1);
-			ft_lstadd_back(&ps->head, ps->temp_node);
+				return (free(dup), clrs(parts), ft_lstclear(&ps->a, free), -1);
+			ft_lstadd_back(&ps->a, ps->temp_node);
 			j++;
 		}
-		free_split(parts);
+		clrs(parts);
 		i++;
 	}
 	return (0);
 }
 
-
-/*int main(void)
+/*
+int main(void)
 {
 	size_t i = 0;
 	char **strf = ft_split(NULL, 'c');
@@ -113,17 +84,4 @@ int	collect_tokens(int argc, char **argv, t_ps_struct *ps)
 	}
 	free (strf);
 	return (0);
-}
-
-
-	t_list	*head = ft_lstnew("Hello");
-	t_list	*n1 = ft_lstnew("world");
-	t_list **lst = &head;
-	ft_lstadd_back(NULL, n1);
-	t_list	*tmp = *lst;
-	while (tmp != NULL)
-	{
-		printf("%s\n", (char *)tmp->content);
-		tmp = tmp->next;
-	}
-*/
+}*/

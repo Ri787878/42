@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/13 11:45:14 by ridias            #+#    #+#             */
-/*   Updated: 2026/02/25 17:02:24 by ridias           ###   ########.fr       */
+/*   Updated: 2026/02/26 12:02:22 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,27 @@ void	push_swap(char	*arg_list)
 	ft_printf("%s", lst_cmds);
 
 
+}*/
+
+static	void	ps_init(t_ps_struct *ps)
+{
+	ps->cmds = NULL;
+	ps->cmd_count = 0;
+	ps->head = NULL;
+	ps->temp_node = NULL;
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	return (0);
+	t_ps_struct	ps;
+
+	ps_init(&ps);
+	if (argc < 2)
+		return (0);
+	else if (collect_tokens(argc, argv, &ps) != 0)
+	{
+		ft_printf("Error\n");
+		return (1);
+	}
+	ft_lstclear(&ps.head, free);
 }
-*/

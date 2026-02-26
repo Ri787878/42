@@ -1,13 +1,25 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   push_swap.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/26 12:12:51 by ridias            #+#    #+#             */
+/*   Updated: 2026/02/26 12:17:12 by ridias           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
 
 # include <stdio.h>
 # include <stdlib.h>
 
-typedef	struct	s_list
+typedef struct s_list
 {
-	void	*content;
-	struct	s_list	*next;
+	void			*content;
+	struct s_list	*next;
 }	t_list;
 
 typedef struct s_ps_struct
@@ -16,9 +28,8 @@ typedef struct s_ps_struct
 	int		cmd_count;
 	t_list	*head;
 	t_list	*temp_node;
-	//need to get clearer image on where and what are stacks a and b 
-	t_list *a;
-	t_list *b;
+	t_list	*a;
+	t_list	*b;
 }	t_ps_struct;
 
 //linked lists
@@ -78,6 +89,9 @@ void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
 //ft_printf
-int	ft_printf(const char *format, ...);
+int		ft_printf(const char *format, ...);
+
+//parser
+int		collect_tokens(int argc, char **argv, t_ps_struct *ps);
 
 #endif
