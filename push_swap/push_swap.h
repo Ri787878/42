@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 12:12:51 by ridias            #+#    #+#             */
-/*   Updated: 2026/02/26 12:17:12 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/02 17:14:37 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 # include <stdio.h>
 # include <stdlib.h>
+# include <unistd.h>
+# include <limits.h>
 
 typedef struct s_list
 {
@@ -26,7 +28,6 @@ typedef struct s_ps_struct
 {
 	char	*cmds;
 	int		cmd_count;
-	t_list	*head;
 	t_list	*temp_node;
 	t_list	*a;
 	t_list	*b;
@@ -78,15 +79,7 @@ char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 int		ft_tolower(int c);
 int		ft_toupper(int c);
-t_list	*ft_lstnew(void *content);
-void	ft_lstadd_front(t_list **lst, t_list *new);
-int		ft_lstsize(t_list *lst);
-t_list	*ft_lstlast(t_list *lst);
-void	ft_lstadd_back(t_list **lst, t_list *new);
-void	ft_lstdelone(t_list *lst, void (*del)(void *));
-void	ft_lstclear(t_list **lst, void (*del)(void *));
-void	ft_lstiter(t_list *lst, void (*f)(void *));
-t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+
 
 //ft_printf
 int		ft_printf(const char *format, ...);

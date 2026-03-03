@@ -6,49 +6,36 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/13 11:45:14 by ridias            #+#    #+#             */
-/*   Updated: 2026/02/26 12:02:22 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/03 16:48:24 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
 
-/*
-void	push_swap(char	*arg_list)
-{
-	t_list	*lst;
-	char	*lst_cmds;
-
-	//Check parameters of function
-	//If there are no parameters return an empty prompt
-	if (is_empty(arg_list))
-		return ;
-	//Separate the arguments into the list of ints
-	//NEED to change split to create args inside of a linked list
-	//List order is FIFO
-	//In case of error display "Error\n"
-	//Error examples:
-	//		some arguments not being ints
-	//		some arguments exceedeing int limits
-	//		and / or presene of duplicates
-	if (!split(arg_list, lst))
-		{
-			//NOT SURE if i need to free here or not
-			ft_printf("Error\n");
-			return(0);
-		}
-	lst_cmds = ft_sort(lst);
-	//Print used cmds list by order seperated by '\n' char
-	ft_printf("%s", lst_cmds);
-
-
-}*/
-
 static	void	ps_init(t_ps_struct *ps)
 {
 	ps->cmds = NULL;
 	ps->cmd_count = 0;
-	ps->head = NULL;
 	ps->temp_node = NULL;
+	ps->a = NULL;
+	ps->b = NULL;
+}
+
+void	print_content(void	*content)
+{
+	ft_printf("%d ", *(int *)content);
+}
+
+int	check_repeat_ints(t_list *lst)
+{
+	(void)lst;
+	return (0);
+}
+
+int	is_sorted(t_list *lst)
+{
+	(void)lst;
+	return (0);
 }
 
 int	main(int argc, char **argv)
@@ -58,10 +45,14 @@ int	main(int argc, char **argv)
 	ps_init(&ps);
 	if (argc < 2)
 		return (0);
-	else if (collect_tokens(argc, argv, &ps) != 0)
-	{
-		ft_printf("Error\n");
-		return (1);
-	}
-	ft_lstclear(&ps.head, free);
+	if (collect_tokens(argc, argv, &ps) != 0)
+		return (ft_putstr_fd("Error\n", 2), 1);
+	if (check_repeat_ints(ps.a))
+		return (ft_lstclear(&ps.a, free), ft_putstr_fd("Error\n", 2), 1);
+	if (is_sorted(ps.a))
+		return (ft_lstclear(&ps.a, free), 0);
+	ft_printf("\t");
+	ft_lstiter(ps.a, print_content);
+	ft_lstclear(&ps.a, free);
+	return (0);
 }
