@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 15:14:02 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/03 16:37:54 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/05 13:09:33 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,55 +42,50 @@ static int	check_digits(const char *s)
 	return (1);
 }
 
-int	parse_int_strict(const char *s, int *out)
+int	is_duplicate(t_list *stack, int num)
 {
-	int		i;
-	int		sign;
-	long	result;
-
-	if (s == NULL || *s == '\0' || out == NULL || check_digits(s) == 0)
+	if (!stack)
 		return (0);
-	i = 0;
-	sign = 1;
-	result = 0;
-	if (s[i] == '+' || s[i] == '-')
+	while (stack)
 	{
-		if (s[i] == '-')
-			sign = -1;
-		i++;
+		if (*(int *)stack->content == num)
+			return (1);
+		stack = stack->next;
 	}
-	while (s[i] >= '0' && s[i] <= '9')
-	{
-		result = result * 10 + (s[i] - '0');
-		i++;
-	}
-	*out = (int)(result * sign);
-	return (1);
+	return (0);
 }
-int	create_int_node(char **parts, t_ps_struct *ps)
+
+int	ft_filter(t_ps_struct *ps)
 {
-	int	j;
-	int	*p;
-	int	value;
+	char	**parts;
+	long	res;
+	int	i;
+	int *p;
 
-	j = 0;
-	while (parts[j])
+	if (ps->ac == 2)
+		parts = ft_split(ps->av[1], ' ');
+	else
+		parts = ps->av + 1; // ELABORATE ON THIS CODE
+	p = (int *)malloc(sizeof(int));
+	if (!p)
+		return (clrs(parts), 0);
+	*p = (int)res;
+		i = -1;
+	while (parts[++i])
 	{
-		if (!parse_int_strict(parts[j], &value))
-			return (-1);
-		p = (int *)malloc(sizeof(int));
-		if (!p)
-			return (-1);
-		*p = value;
-		ps->temp_node = ft_lstnew(p);
-		if (!ps->temp_node)
-			return (free(p), -1);
-		ft_lstadd_back(&ps->a, ps->temp_node);
-		j++;
+		if (!check_digits(parts[i]))
+			return (clrs(parts), 0);
+		res = ft_atoi(parts[i]);
+		if (res < -2147483648 || res > 2147483647)
+			return (clrs(parts), 0);
+		if (is_duplicate(ps->a, (int)res))
+			return (clrs(parts), 0);
+		ft_lstadd_back(&ps->a, ft_lstnew((int)res));
 	}
+	if (ps->ac == 2)
+		clrs(parts);
 	return (1);
 }
-
 int	collect_tokens(int argc, char **argv, t_ps_struct *ps)
 {
 	char	**parts;

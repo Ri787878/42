@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 12:12:51 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/02 17:14:37 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/05 12:42:20 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ typedef struct s_list
 typedef struct s_ps_struct
 {
 	char	*cmds;
+	int		ac;
+	char	**av;
 	int		cmd_count;
 	t_list	*temp_node;
 	t_list	*a;
