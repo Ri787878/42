@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/13 11:45:14 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/03 16:48:24 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/05 12:15:54 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,24 @@ void	print_content(void	*content)
 
 int	check_repeat_ints(t_list *lst)
 {
-	(void)lst;
-	return (0);
+	int		i;
+	int		j;
+	int		list_size;
+	t_list	*temp;
+
+	i = 0;
+	j = 0;
+	temp = lst;
+	while (i < list_size)
+	{
+		while (j < list_size)
+		{
+			if ()
+			j++;
+		}
+		i++;
+	}
+	return (1);
 }
 
 int	is_sorted(t_list *lst)
