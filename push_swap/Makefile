@@ -51,6 +51,7 @@ SRCS =	ft_printf/ft_printf.c \
 		libft/lists/ft_lstsize.c \
 		libft/lists/ft_lstclear.c \
 		libft/lists/ft_lstdelone.c \
+		parser/ft_atol.c \
 		parser/parser.c \
 		main/main.c
 

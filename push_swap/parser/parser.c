@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 15:14:02 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/05 13:09:33 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/11 14:18:36 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,44 +65,43 @@ int	ft_filter(t_ps_struct *ps)
 	if (ps->ac == 2)
 		parts = ft_split(ps->av[1], ' ');
 	else
-		parts = ps->av + 1; // ELABORATE ON THIS CODE
-	p = (int *)malloc(sizeof(int));
-	if (!p)
-		return (clrs(parts), 0);
-	*p = (int)res;
-		i = -1;
+		parts = ps->av + 1;
+	if (!parts)
+		return (0);
+	i = -1;
 	while (parts[++i])
 	{
 		if (!check_digits(parts[i]))
-			return (clrs(parts), 0);
-		res = ft_atoi(parts[i]);
+		{
+			if (ps->ac == 2)
+				clrs(parts);
+			return (0);
+		}
+		res = ft_atol(parts[i]);
 		if (res < -2147483648 || res > 2147483647)
-			return (clrs(parts), 0);
+		{
+			if (ps->ac == 2)
+				clrs(parts);
+			return (0);
+		}
 		if (is_duplicate(ps->a, (int)res))
-			return (clrs(parts), 0);
-		ft_lstadd_back(&ps->a, ft_lstnew((int)res));
+		{
+			if (ps->ac == 2)
+				clrs(parts);
+			return (0);
+		}
+		p = (int *)malloc(sizeof(int));
+		if (!p)
+		{
+			if (ps->ac == 2)
+				clrs(parts);
+			ft_lstclear(&ps->a, free);
+			return (0);
+		}
+		*p = (int)res;
+		ft_lstadd_back(&ps->a, ft_lstnew(p));
 	}
 	if (ps->ac == 2)
 		clrs(parts);
 	return (1);
-}
-int	collect_tokens(int argc, char **argv, t_ps_struct *ps)
-{
-	char	**parts;
-	int	i;
-	int	res;
-
-	i = 1;
-	while (i < argc)
-	{
-		parts = ft_split(argv[i], ' ');
-		if (!parts)
-			return (ft_lstclear(&ps->a, free), -1);
-		res = create_int_node(parts, ps);
-		if (res == -1)
-			return (clrs(parts), ft_lstclear(&ps->a, free), -1);
-		clrs(parts);
-		i++;
-	}
-	return (0);
 }

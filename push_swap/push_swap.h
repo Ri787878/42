@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 12:12:51 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/05 12:42:20 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/11 13:58:04 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,9 @@ int		ft_toupper(int c);
 int		ft_printf(const char *format, ...);
 
 //parser
-int		collect_tokens(int argc, char **argv, t_ps_struct *ps);
+int		ft_filter(t_ps_struct *ps);
+long	ft_atol(const char *s);
+
+
 
 #endif

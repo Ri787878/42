@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/13 11:45:14 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/05 13:02:24 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/11 14:49:57 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,10 @@ int	main(int argc, char **argv)
 	ps_init(&ps);
 	ps.ac = argc;
 	ps.av = argv;
-	if (ps->ac < 2 || !ps->av[1][0])
-		return (1);
-	if (!ft_filter(ps))
-		return (ft_putstr_fd("Error\n", 2), 1);
+	if (ps.ac < 2 || !ps.av[1][0])
+		return (0);
+	if (!ft_filter(&ps))
+		return (ft_lstclear(&ps.a, free), ft_putstr_fd("Error\n", 2), 1);
 	if (is_sorted(ps.a))
 		return (ft_lstclear(&ps.a, free), 0);
 	ft_printf("\t");
