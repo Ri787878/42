@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/13 11:45:14 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/11 14:49:57 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/12 18:09:42 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 static	void	ps_init(t_ps_struct *ps)
 {
-	ps->cmds = NULL;
 	ps->ac = 0;
 	ps->av = NULL;
 	ps->cmd_count = 0;
@@ -41,14 +40,35 @@ int	main(int argc, char **argv)
 	ps_init(&ps);
 	ps.ac = argc;
 	ps.av = argv;
-	if (ps.ac < 2 || !ps.av[1][0])
+	if (ps.ac < 2)
 		return (0);
+	if (!ps.av[1][0])
+		return (ft_putstr_fd("Error\n", 2), 1);
 	if (!ft_filter(&ps))
 		return (ft_lstclear(&ps.a, free), ft_putstr_fd("Error\n", 2), 1);
 	if (is_sorted(ps.a))
 		return (ft_lstclear(&ps.a, free), 0);
-	ft_printf("\t");
+	ft_printf("stack A: ");
 	ft_lstiter(ps.a, print_content);
+	ft_printf("\nstack B: ");
+	ft_lstiter(ps.b, print_content);
+	ft_printf("\n");
+	//sb(&ps);
+	//ss(&ps);
+
+	int i = 0;
+	while (i < 10)
+	{
+		ra(&ps);
+		i++;
+	}
+
+
+	ft_printf("stack A: ");
+	ft_lstiter(ps.a, print_content);
+	ft_printf("\nstack B: ");
+	ft_lstiter(ps.b, print_content);
 	ft_lstclear(&ps.a, free);
+	ft_lstclear(&ps.b, free);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 15:14:02 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/11 14:18:36 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/12 16:45:32 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static void	clrs(char **parts)
 	int	k;
 
 	if (!parts)
-		return;
+		return ;
 	k = 0;
 	while (parts[k])
 		free(parts[k++]);
@@ -59,8 +59,8 @@ int	ft_filter(t_ps_struct *ps)
 {
 	char	**parts;
 	long	res;
-	int	i;
-	int *p;
+	int		i;
+	int		*p;
 
 	if (ps->ac == 2)
 		parts = ft_split(ps->av[1], ' ');

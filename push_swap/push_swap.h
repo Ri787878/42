@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 12:12:51 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/11 13:58:04 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/12 18:09:50 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ typedef struct s_list
 
 typedef struct s_ps_struct
 {
-	char	*cmds;
 	int		ac;
 	char	**av;
 	int		cmd_count;
@@ -89,6 +88,20 @@ int		ft_printf(const char *format, ...);
 //parser
 int		ft_filter(t_ps_struct *ps);
 long	ft_atol(const char *s);
+
+//Push Swap Oficial Moves
+void	sa(t_ps_struct *ps);
+void	sb(t_ps_struct *ps);
+void	ss(t_ps_struct *ps);
+void	pa(t_ps_struct *ps);
+void	pb(t_ps_struct *ps);
+void	ra(t_ps_struct *ps);
+void	rb(t_ps_struct *ps);
+void	rr(t_ps_struct *ps);
+void	rra(t_ps_struct *ps);
+void	rrb(t_ps_struct *ps);
+void	rrr(t_ps_struct *ps);
+
 
 
 
