@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/13 11:45:14 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/12 18:09:42 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/16 15:06:21 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ static	void	ps_init(t_ps_struct *ps)
 
 void	print_content(void	*content)
 {
-	ft_printf("%d ", *(int *)content);
+	ft_printf("%d ", ((t_num *)content)->value);
 }
 
 int	is_sorted(t_list *lst)
@@ -48,26 +48,18 @@ int	main(int argc, char **argv)
 		return (ft_lstclear(&ps.a, free), ft_putstr_fd("Error\n", 2), 1);
 	if (is_sorted(ps.a))
 		return (ft_lstclear(&ps.a, free), 0);
-	ft_printf("stack A: ");
-	ft_lstiter(ps.a, print_content);
-	ft_printf("\nstack B: ");
-	ft_lstiter(ps.b, print_content);
-	ft_printf("\n");
-	//sb(&ps);
-	//ss(&ps);
-
-	int i = 0;
-	while (i < 10)
-	{
-		ra(&ps);
-		i++;
-	}
-
-
-	ft_printf("stack A: ");
-	ft_lstiter(ps.a, print_content);
-	ft_printf("\nstack B: ");
-	ft_lstiter(ps.b, print_content);
+	//ft_printf("stack A: ");
+	//ft_lstiter(ps.a, print_content);
+	//ft_printf("\nstack B: ");
+	//ft_lstiter(ps.b, print_content);
+	//ft_printf("\n");
+	normalize_stack(ps.a);
+	radixsort(&ps);
+	//ft_printf("stack A: ");
+	//ft_lstiter(ps.a, print_content);
+	//ft_printf("\nstack B: ");
+	//ft_lstiter(ps.b, print_content);
+	//ft_printf("\n");
 	ft_lstclear(&ps.a, free);
 	ft_lstclear(&ps.b, free);
 	return (0);

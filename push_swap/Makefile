@@ -53,6 +53,7 @@ SRCS =	ft_printf/ft_printf.c \
 		libft/lists/ft_lstdelone.c \
 		parser/ft_atol.c \
 		parser/parser.c \
+		sorter/sorter.c \
 		moves/push.c \
 		moves/reverse.c \
 		moves/rotate_simple.c \

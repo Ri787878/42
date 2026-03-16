@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 13:59:59 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/12 17:57:38 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/14 18:15:48 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,9 @@ void	rb(t_ps_struct *ps)
 
 void	rr(t_ps_struct *ps)
 {
-	int	rotated_a;
-	int	rotated_b;
-
-	rotated_a = rotate_a(ps);
-	rotated_b = rotate_b(ps);
-	if (rotated_a && rotated_b)
-		ft_printf("rr\n");
+	if (!ps || !ps->a || !ps->a->next || !ps->b || !ps->b->next)
+		return ;
+	rotate_a(ps);
+	rotate_b(ps);
+	ft_printf("rr\n");
 }

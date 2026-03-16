@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 14:00:00 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/12 17:59:14 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/16 15:14:23 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,6 @@ void	pa(t_ps_struct *ps)
 	if (push_a(ps))
 		ft_printf("pa\n");
 }
-
-
 
 void	pb(t_ps_struct *ps)
 {

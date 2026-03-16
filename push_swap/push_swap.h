@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 12:12:51 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/12 18:09:50 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/16 14:48:51 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,12 @@ typedef struct s_list
 	void			*content;
 	struct s_list	*next;
 }	t_list;
+
+typedef struct s_num
+{
+	int value;
+	int index;
+}	t_num;
 
 typedef struct s_ps_struct
 {
@@ -88,6 +94,11 @@ int		ft_printf(const char *format, ...);
 //parser
 int		ft_filter(t_ps_struct *ps);
 long	ft_atol(const char *s);
+
+//Sorter
+void	radixsort(t_ps_struct *ps);
+void	normalize_stack(t_list *stack);
+
 
 //Push Swap Oficial Moves
 void	sa(t_ps_struct *ps);

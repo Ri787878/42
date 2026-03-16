@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 15:14:02 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/12 16:45:32 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/16 14:49:27 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int	ft_filter(t_ps_struct *ps)
 	char	**parts;
 	long	res;
 	int		i;
-	int		*p;
+	t_num	*num;
 
 	if (ps->ac == 2)
 		parts = ft_split(ps->av[1], ' ');
@@ -90,16 +90,16 @@ int	ft_filter(t_ps_struct *ps)
 				clrs(parts);
 			return (0);
 		}
-		p = (int *)malloc(sizeof(int));
-		if (!p)
+		num = (t_num *)malloc(sizeof(t_num));
+		if (!num)
 		{
 			if (ps->ac == 2)
 				clrs(parts);
 			ft_lstclear(&ps->a, free);
 			return (0);
 		}
-		*p = (int)res;
-		ft_lstadd_back(&ps->a, ft_lstnew(p));
+		num->value = (int)res;
+		ft_lstadd_back(&ps->a, ft_lstnew(num));
 	}
 	if (ps->ac == 2)
 		clrs(parts);
