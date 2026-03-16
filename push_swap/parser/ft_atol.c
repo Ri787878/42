@@ -6,11 +6,11 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/11 13:53:19 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/11 14:07:04 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/16 15:17:18 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../push_swap.h"
+#include "../push_swap.h"
 
 long	ft_atol(const char *s)
 {

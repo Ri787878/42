@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/14 19:15:58 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/16 14:47:28 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/16 15:18:33 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,10 +94,10 @@ void	normalize_stack(t_list *stack)
 
 void	radixsort(t_ps_struct *ps)
 {
-	int	size;
-	int	max_bits;
-	int	bit;
-	int	i;
+	int		size;
+	int		max_bits;
+	int		bit;
+	int		i;
 	t_num	*node;
 
 	if (!ps || !ps->a || !ps->a->next)
@@ -122,4 +122,3 @@ void	radixsort(t_ps_struct *ps)
 		bit++;
 	}
 }
-

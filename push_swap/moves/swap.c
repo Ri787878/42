@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 14:00:03 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/12 17:35:49 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/16 15:16:49 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ void	ss(t_ps_struct *ps)
 
 	swaped_a = swap_a(ps);
 	swaped_b = swap_b(ps);
-
 	if (swaped_a && swaped_b)
 		ft_printf("ss\n");
 }

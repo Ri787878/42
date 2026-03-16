@@ -6,16 +6,16 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/12 13:59:59 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/14 18:53:43 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/16 15:16:31 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
 
-static int reverse_rotate_a(t_ps_struct *ps)
+static int	reverse_rotate_a(t_ps_struct *ps)
 {
-	t_list*prev;
-	t_list*last;
+	t_list	*prev;
+	t_list	*last;
 
 	if (!ps || !ps->a || !ps->a->next)
 		return (0);
@@ -32,10 +32,10 @@ static int reverse_rotate_a(t_ps_struct *ps)
 	return (1);
 }
 
-static int reverse_rotate_b(t_ps_struct *ps)
+static int	reverse_rotate_b(t_ps_struct *ps)
 {
-	t_list*prev;
-	t_list*last;
+	t_list	*prev;
+	t_list	*last;
 
 	if (!ps || !ps->b || !ps->b->next)
 		return (0);
