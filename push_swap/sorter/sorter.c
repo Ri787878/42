@@ -12,16 +12,6 @@
 
 #include "../push_swap.h"
 
-static int	get_max_bits(int max_value)
-{
-	int	bits;
-
-	bits = 0;
-	while ((max_value >> bits) != 0)
-		bits++;
-	return (bits);
-}
-
 static void	get_index(t_list *stack, int *arr, int size)
 {
 	t_list	*ptr;
@@ -92,33 +82,38 @@ void	normalize_stack(t_list *stack)
 	free(arr);
 }
 
+static void	do_bit_pass(t_ps_struct *ps, int bit, int size)
+{
+	int		i;
+	t_num	*node;
+
+	i = 0;
+	while (i < size)
+	{
+		node = (t_num *)ps->a->content;
+		if (((node->index >> bit) & 1) == 1)
+			ra(ps);
+		else
+			pb(ps);
+		i++;
+	}
+	while (ps->b)
+		pa(ps);
+}
+
 void	radixsort(t_ps_struct *ps)
 {
 	int		size;
 	int		max_bits;
 	int		bit;
-	int		i;
-	t_num	*node;
 
 	if (!ps || !ps->a || !ps->a->next)
 		return ;
 	size = ft_lstsize(ps->a);
-	max_bits = get_max_bits(size - 1);
-	bit = 0;
-	while (bit < max_bits)
-	{
-		i = 0;
-		while (i < size)
-		{
-			node = (t_num *)ps->a->content;
-			if (((node->index >> bit) & 1) == 1)
-				ra(ps);
-			else
-				pb(ps);
-			i++;
-		}
-		while (ps->b)
-			pa(ps);
-		bit++;
-	}
+	max_bits = 0;
+	while ((size - 1) >> max_bits)
+		max_bits++;
+	bit = -1;
+	while (++bit < max_bits)
+		do_bit_pass(ps, bit, size);
 }
