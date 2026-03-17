@@ -54,6 +54,9 @@ SRCS =	ft_printf/ft_printf.c \
 		parser/ft_atol.c \
 		parser/parser.c \
 		sorter/sorter.c \
+		sorter/simple_sorter.c \
+		sorter/get_lst_max.c \
+		sorter/get_lst_min.c \
 		moves/push.c \
 		moves/reverse.c \
 		moves/rotate_simple.c \

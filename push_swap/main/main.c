@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/13 11:45:14 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/16 15:15:56 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/17 12:52:23 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static	void	ps_init(t_ps_struct *ps)
 {
 	ps->ac = 0;
 	ps->av = NULL;
-	ps->cmd_count = 0;
+	ps->stack_size = 0;
 	ps->temp_node = NULL;
 	ps->a = NULL;
 	ps->b = NULL;
@@ -27,10 +27,17 @@ void	print_content(void	*content)
 	ft_printf("%d ", ((t_num *)content)->value);
 }
 
-int	is_sorted(t_list *lst)
+int	is_sorted(t_list *ls)
 {
-	(void)lst;
-	return (0);
+	if (!ls)
+		return (1);
+	while (ls->next)
+	{
+		if (((t_num *)ls->content)->value > ((t_num *)ls->next->content)->value)
+			return (0);
+		ls = ls->next;
+	}
+	return (1);
 }
 
 int	main(int argc, char **argv)
@@ -49,7 +56,7 @@ int	main(int argc, char **argv)
 	if (is_sorted(ps.a))
 		return (ft_lstclear(&ps.a, free), 0);
 	normalize_stack(ps.a);
-	radixsort(&ps);
+	organized_sort(&ps);
 	ft_lstclear(&ps.a, free);
 	ft_lstclear(&ps.b, free);
 	return (0);

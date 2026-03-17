@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/26 12:12:51 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/16 15:19:10 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/17 12:49:43 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ typedef struct s_ps_struct
 {
 	int		ac;
 	char	**av;
-	int		cmd_count;
+	int		stack_size;
 	t_list	*temp_node;
 	t_list	*a;
 	t_list	*b;
@@ -50,6 +50,8 @@ void	ft_lstadd_front(t_list **lst, t_list *new);
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void*));
 void	ft_lstdelone(t_list *lst, void (*del)(void*));
+int		get_lst_max(t_list *stack);
+int		get_lst_min(t_list *stack);
 
 //libft
 int		ft_atoi(const char *str);
@@ -97,6 +99,11 @@ long	ft_atol(const char *s);
 //Sorter
 void	radixsort(t_ps_struct *ps);
 void	normalize_stack(t_list *stack);
+void	organized_sort(t_ps_struct *ps);
+void	sort_3(t_ps_struct *ps);
+void	sort_4(t_ps_struct *ps);
+void	sort_5(t_ps_struct *ps);
+int		is_sorted(t_list *lst);
 
 //Push Swap Oficial Moves
 void	sa(t_ps_struct *ps);
