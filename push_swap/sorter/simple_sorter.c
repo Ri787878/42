@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/17 12:14:39 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/17 12:50:59 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/17 13:06:28 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void	organized_sort(t_ps_struct *ps)
 {
-	ps->stack_size = ft_lstsize(ps->a);
 	if (ps->stack_size == 2)
 	{
 		if (!is_sorted(ps->a))
@@ -35,8 +34,6 @@ void	organized_sort(t_ps_struct *ps)
 		if (!is_sorted(ps->a))
 			sort_5(ps);
 	}
-	else
-		radixsort(ps);
 }
 
 int	get_node_index(t_list *stack, int target_value)
@@ -97,6 +94,7 @@ void	sort_4(t_ps_struct *ps)
 		rra(ps);
 	pb(ps);
 	sort_3(ps);
+	pa(ps);
 }
 
 void	sort_5(t_ps_struct *ps)
