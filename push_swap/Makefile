@@ -1,8 +1,7 @@
-NAME = push_swap.a
+NAME = push_swap
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-AR = ar rcs
 RM = rm -f
 
 SRCS =	ft_printf/ft_printf.c \
@@ -66,13 +65,10 @@ SRCS =	ft_printf/ft_printf.c \
 
 OBJECTS = $(SRCS:.c=.o)
 
-INCLUDES = ft_printf.h
-
-
 all: $(NAME)
 
 $(NAME): $(OBJECTS)
-	$(AR) $(NAME) $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
