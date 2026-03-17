@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/23 15:14:02 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/17 11:34:37 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/17 18:30:20 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,24 +82,26 @@ int	ft_filter(t_ps_struct *ps)
 {
 	char	**parts;
 	int		i;
+	int		j;
 
-	if (ps->ac == 2)
-		parts = ft_split(ps->av[1], ' ');
-	else
-		parts = ps->av + 1;
-	if (!parts)
-		return (0);
+	ps->av = ps->av + 1;
 	i = -1;
-	while (parts[++i])
+	while (ps->av[++i])
 	{
-		if (!parse_one(ps, parts, i))
-		{
-			if (ps->ac == 2)
-				clrs(parts);
+		parts = ft_split(ps->av[i], ' ');
+		if (!parts)
 			return (0);
+		j = 0;
+		while (parts[j])
+		{
+			if (!parse_one(ps, parts, j))
+			{
+				clrs(parts);
+				return (0);
+			}
+			j++;
 		}
-	}
-	if (ps->ac == 2)
 		clrs(parts);
+	}
 	return (1);
 }

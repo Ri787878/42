@@ -6,7 +6,7 @@
 /*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/17 12:15:24 by ridias            #+#    #+#             */
-/*   Updated: 2026/03/17 12:48:58 by ridias           ###   ########.fr       */
+/*   Updated: 2026/03/17 18:24:39 by ridias           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,22 +28,4 @@ int	get_lst_max(t_list *stack)
 		temp = temp->next;
 	}
 	return (max);
-}
-
-int	get_lst_min(t_list *stack)
-{
-	int		min;
-	t_list	*temp;
-
-	if (!stack)
-		return (0);
-	temp = stack;
-	min = ((t_num *)temp->content)->value;
-	while (temp)
-	{
-		if (((t_num *)temp->content)->value < min)
-			min = ((t_num *)temp->content)->value;
-		temp = temp->next;
-	}
-	return (min);
 }
