@@ -6,7 +6,7 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:13:03 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:13:04 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/19 19:02:10 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,13 +18,13 @@ class GardenManager():
 		self.Garden = Garden(name)
 
 	def add_plant(self, plant_instance):
-		self.garden.add_to_stock(plant_instance)
+		self.Garden.add_to_stock(plant_instance)
 
 	def garden_report(self):
 		print(f"=== {self.Garden.name}'s Garden Report ===")
 		print(f"Plants in garden:")
 		for plant in self.Garden.plant_stock:
-			if
+			print(plant)
 
 	class GardensStats:
 		@classmethod
@@ -43,19 +43,19 @@ class Garden():
 	def add_to_stock(self, plant_instance):
 		self.plant_stock.append(plant_instance)
 		self.total_plants += 1
-		print(f"Added {plant_instance.name} to {self.name}'s garden")
+		print(f"Added {plant_instance.plant_name} to {self.name}'s garden")
 
 
 class Plant(Garden):
-	def __init__(self, garden_owner_name, plant_name, height, days):
-		super().__init__(self, garden_owner_name)
+	def __init__(self, plant_name, height, days):
+		super().__init__(None)
 		self.inicial_height = height
 		self.height = height
 		self.days = days
-		self.add_to_stock(self, plant_name)
+		self.plant_name = plant_name
 
 	def __str__(self):
-		return super().__str__()
+		return f"- {self.plant_name}: {self.height}cm"
 
 	def grow(self, growth: int):
 		self.height += growth
@@ -64,14 +64,17 @@ class Plant(Garden):
 		self.days += days
 
 	def current_growth(self):
-		for plant in self.plant_stock:
-			growth = self.height - self.inicial_height
-			print(f"123")
+		growth = self.height - self.inicial_height
+		print(f"THIS IS MY GROWTH: {growth} NEED TO FIX!!")
 
 class Flower(Plant):
 	def __init__(self, name, height, days, color):
 		super().__init__(name, height, days)
 		self.color = color
+
+	def __str__(self):
+		base_str = super().__str__()
+		return f"{base_str}, {self.color} flowers (blooming)"
 
 	def bloom(self):
 		print(f"{self.name} is blooming beautifully!")
@@ -110,11 +113,15 @@ class FloweringPlant(Plant):
 		super().__init__(garden_owner_name, plant_name, height, days)
 		self.flowering_plants += 1
 
-class PrizeFlower(FloweringPlant):
-	def __init__(self, garden_owner_name, plant_name, height, days):
-		super().__init__(garden_owner_name, plant_name, height, days)
-		self.prize_flower += 1
+class PrizeFlower(Flower):
+	def __init__(self, name, height, days, color, prize_points=10):
+		super().__init__(name, height, days, color)
+		self.prize_points = prize_points
+		#self.prize_flower += 1
 
+	def __str__(self):
+		base_str = super().__str__()
+		return f"{base_str}, Prize points: {self.prize_points}"
 
 	def create_garden_network():
 		pass
@@ -124,10 +131,16 @@ class PrizeFlower(FloweringPlant):
 if __name__ == "__main__":
 	print(f"=== Garden Management System Demo ===")
 	Alice = GardenManager("Alice")
-	Alice.add_plant("Oak Tree")
-	Alice.add_plant("Rose")
-	Alice.add_plant("Sunflower")
 
+	oak = Plant("Oak Tree", 101, 0)
+	rose = Flower("Rose", 26, 0, "red")
+	sunflower = PrizeFlower("Sunflower", 51, 0, "yellow", prize_points=10)
+
+	Alice.add_plant(oak)
+	Alice.add_plant(rose)
+	Alice.add_plant(sunflower)
+
+	Alice.garden_report()
 
 #Added Oak Tree to Alice's garden
 #Added Rose to Alice's garden

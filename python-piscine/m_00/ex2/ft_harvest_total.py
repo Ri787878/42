@@ -6,7 +6,7 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:14:27 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:14:28 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/19 18:40:41 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,3 +18,5 @@ def ft_harvest_total():
 	day_3 = int(input("Day 3 harvest: "))
 	total = int(day_1 + day_2 + day_3)
 	print(f"Total harvest: {total}")
+
+
