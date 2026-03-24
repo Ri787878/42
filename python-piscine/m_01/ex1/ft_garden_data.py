@@ -6,7 +6,7 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:12:46 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:12:47 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/24 16:32:55 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,10 @@ class Plant:
 	name: str
 	height: int
 	age: int
+
+	def show(self) -> None:
+		print(f"{self.name}: {self.height}cm, {self.age} days old")
+
 
 if __name__ == "__main__":
 	print(f"=== Garden Plant Registry ===")
@@ -31,6 +35,7 @@ if __name__ == "__main__":
 	Cactus.name = "Cactus"
 	Cactus.height = 15
 	Cactus.age = 120
-	print(f"{Rose.name}: {Rose.height}cm, {Rose.age} days old")
-	print(f"{Sunflower.name}: {Sunflower.height}cm, {Sunflower.age} days old")
-	print(f"{Cactus.name}: {Cactus.height}cm, {Cactus.age} days old")
+
+	Rose.show()
+	Sunflower.show()
+	Cactus.show()
