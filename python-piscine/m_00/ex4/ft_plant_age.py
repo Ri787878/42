@@ -1,20 +1,18 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    ft_water_reminder.py                               :+:      :+:    :+:    #
+#    ft_plant_age.py                                    :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/03/19 18:14:35 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:14:36 by ridias           ###   ########.fr        #
+#    Created: 2026/03/24 16:03:20 by ridias            #+#    #+#              #
+#    Updated: 2026/03/24 16:05:04 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-#!/usr/bin/env python3
-
-def ft_water_reminder():
-	days = int(input("Days since last watering: "))
-	if days > 2:
-		print(f"Water the plants!")
+def ft_plant_age() -> None:
+	age = int(input("Enter plant age in days: "))
+	if age > 60:
+		print(f"Plant is ready to harvest!")
 	else:
-		print(f"Plants are fine")
+		print(f"Plant needs more time to grow.")

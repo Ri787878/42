@@ -6,11 +6,9 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:14:15 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:14:17 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/24 15:58:51 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-#!/usr/bin/env python3
-
-def ft_hello_garden():
+def ft_hello_garden() -> None:
 	print(f"Hello, Garden Community!")

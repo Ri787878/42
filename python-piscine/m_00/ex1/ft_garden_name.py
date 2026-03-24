@@ -1,21 +1,17 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    ft_plot_area.py                                    :+:      :+:    :+:    #
+#    ft_garden_name.py                                  :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2026/03/19 18:14:20 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:14:22 by ridias           ###   ########.fr        #
+#    Created: 2026/03/24 15:42:19 by ridias            #+#    #+#              #
+#    Updated: 2026/03/24 15:47:27 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-#!/usr/bin/env python3
-
-def ft_plot_area():
-	lenght = int(input("Enter lengh: "))
-	width = int(input("Enter width: "))
-	print(lenght)
-	print(width)
-	area = int(lenght * width)
-	print(f"Plot area: {area}")
+def ft_garden_name() -> None:
+	garden_name =input("Enter garden name: ")
+	status_message = "Growing well!"
+	print(f"Garden: {garden_name}")
+	print(f"Status: {status_message}")

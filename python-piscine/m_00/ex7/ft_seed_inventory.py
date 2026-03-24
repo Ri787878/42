@@ -6,18 +6,24 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:14:50 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:14:51 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/24 16:17:25 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-#!/usr/bin/env python3
-
-def ft_seed_inventory(vegetable, nbr, unit):
+def ft_seed_inventory(seed_type: str, quantity: int, unit: str) -> None:
 	if unit == "packets":
-		print(f"{vegetable.capitalize()} seeds: {nbr} {unit} available")
-	if unit == "grams":
-		print(f"{vegetable.capitalize()} seeds: {nbr} {unit} total")
-	if unit == "area":
-		print(f"{vegetable.capitalize()} seeds: covers {nbr} square meters")
+		print(f"{seed_type.capitalize()} seeds: {quantity} {unit} available")
+	elif unit == "grams":
+		print(f"{seed_type.capitalize()} seeds: {quantity} {unit} total")
+	elif unit == "area":
+		print(f"{seed_type.capitalize()} seeds: covers {quantity} square meters")
 	else:
 		print(f"Unknown unit type")
+
+if __name__ == "__main__":
+	ft_seed_inventory("tomato", 15, "packets")
+	print()
+	ft_seed_inventory("carrot", 8, "grams")
+	print()
+	ft_seed_inventory("lettuce", 12, "area")
+	print()
