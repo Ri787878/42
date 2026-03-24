@@ -6,32 +6,47 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:12:53 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:12:54 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/24 19:16:22 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-#!/usr/bin/env python3
-
 class Plant:
-	def __init__(self, name, height, days):
+	name: str
+	height: float
+	age: int
+
+	def __init__(self, name, height, days) -> None:
 		self.name = name
 		self.height = height
 		self.days = days
-		print(f"Created: {self.name} ({self.height}cm, {self.days} days)")
+		print(f"Created: {self.name} {round(self.height, 1)}cm, {self.days} days old")
 
-	def grow(self, growth: int):
+	def show(self) -> None:
+		print(f"{self.name}: {self.height}cm, {self.age} days old")
+
+	def grow(self, growth: int) -> None:
 		self.height += growth
+		self.height = round(self.height, 1)
 
-	def age(self, days):
-		self.days += days
+	def age(self) -> None:
+		self.days += 1
 
-	def get_info(self, info: str):
+	def get_info(self, info: str) -> None:
 		if info == "name":
 			return self.name
 		if info == "days":
 			return self.days
 		if info == "height":
 			return self.height
+
+	def simulate_growth(self, days: int, growth: int) -> None:
+		count  = 1
+		while count <= days:
+			print(f"=== Day {count} ===")
+			print(f"{self.name}: {self.height}cm, {self.days} days old")
+			self.age()
+			self.grow(growth)
+			count += 1
 
 
 
@@ -46,4 +61,3 @@ if __name__ == "__main__":
 	Sunflower = Plant("Sunflower", 80, 45)
 	Fern = Plant("Fern", 15, 120)
 	print()
-	print(f"Total plants created: 5")
