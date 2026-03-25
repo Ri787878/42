@@ -6,22 +6,61 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:13:01 by ridias            #+#    #+#              #
-#    Updated: 2026/03/19 18:13:02 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/25 17:14:01 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #!/usr/bin/env python3
 
 class Plant:
-	def __init__(self, name, height, days):
-		self.name = name
-		self.height = height
-		self.days = days
-	def grow(self, growth: int):
-		self.height += growth
+	def __init__(self, name: str, height: float, days: int) -> None:
+		self.__name = name
+		self.__height = height
+		self.__days = days
+		print(f"Plant created: {self.__name}: {self.__height:.1f}cm, {self.__days} days old")
 
-	def age(self, days):
-		self.days += days
+	def show(self) -> None:
+		print(f"Current state: {self.__name}: {self.__height:.1f}cm, {self.__days} days old")
+
+	def grow(self, growth: int) -> None:
+		self.__height += growth
+		self.__height = round(self.__height, 1)
+
+	def age(self) -> None:
+		self.__days += 1
+
+	def set_height(self, height: float):
+		if height >= 0:
+			self.__height = height
+			print(f"Height updated: {height}cm")
+		else:
+			print(f"{self.__name}: height can't be negative")
+			print(f"Height update rejected")
+
+	def set_age(self, age):
+		if age >= 0:
+			self.__days = age
+			print(f"Age updated: {age} days")
+		else:
+			print(f"Rose: Error, age can't be negative")
+			print(f"Age update rejected")
+
+	def get_info(self, info: str) -> None:
+		if info == "name":
+			return self.__name
+		if info == "days":
+			return self.__days
+		if info == "height":
+			return self.__height
+
+	def simulate_growth(self, days: int, growth: int) -> None:
+		count  = 1
+		while count <= days:
+			print(f"=== Day {count} ===")
+			print(f"{self.__name}: {self.__height}cm, {self.__days} days old")
+			self.age()
+			self.grow(growth)
+			count += 1
 
 class Flower(Plant):
 	def __init__(self, name, height, days, color):
@@ -30,9 +69,6 @@ class Flower(Plant):
 
 	def bloom(self):
 		print(f"{self.name} is blooming beautifully!")
-
-	def get_info(self):
-		print(f"{self.name} (Flower): {self.height}cm, {self.days} days, {self.color} color")
 
 class Tree(Plant):
 	def __init__(self, name, height, days, trunk_size):
@@ -47,21 +83,11 @@ class Tree(Plant):
 		shade = (radius ** 2) * 3.12
 		print(f"Oak provides {int(shade)} square meters of shade")
 
-	def get_info(self):
-		print(f"{self.name} (Tree): {self.height}cm, {self.days} days, {self.trunk_diameter}cm diameter")
-
-
 class Vegetable(Plant):
 	def __init__(self, name, height, days, harvest_season, nutritional_value):
 		super().__init__(name, height, days)
 		self.harvest_season = harvest_season
 		self.nutritional_value = nutritional_value
-	def get_info(self):
-		print(f"{self.name} (Vegetable): {self.height}cm, {self.days} days, {self.harvest_season} harvest")
-		print(f"{self.name} is rich in {self.nutritional_value}")
-
-
-
 
 if __name__ == "__main__":
 	print(f"=== Garden Plant Types ===")
