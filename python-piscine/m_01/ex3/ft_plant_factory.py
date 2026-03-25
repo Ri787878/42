@@ -6,7 +6,7 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:12:53 by ridias            #+#    #+#              #
-#    Updated: 2026/03/24 19:16:22 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/25 16:29:58 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,14 +15,14 @@ class Plant:
 	height: float
 	age: int
 
-	def __init__(self, name, height, days) -> None:
+	def __init__(self, name: str, height: float, days: int) -> None:
 		self.name = name
 		self.height = height
 		self.days = days
-		print(f"Created: {self.name} {round(self.height, 1)}cm, {self.days} days old")
+		self.show()
 
 	def show(self) -> None:
-		print(f"{self.name}: {self.height}cm, {self.age} days old")
+		print(f"Plant created: {self.name}: {round(self.height, 1)}cm, {self.days} days old")
 
 	def grow(self, growth: int) -> None:
 		self.height += growth
@@ -55,9 +55,9 @@ class Plant:
 if __name__ == "__main__":
 	print(f"=== Plant Factory Output ===")
 
-	Rose = Plant("Rose", 25, 30)
-	Oak = Plant("Oak", 200, 365)
-	Cactus = Plant("Cactus", 5, 90)
-	Sunflower = Plant("Sunflower", 80, 45)
-	Fern = Plant("Fern", 15, 120)
+	Rose = Plant("Rose", 25.0, 30)
+	Oak = Plant("Oak", 200.0, 365)
+	Cactus = Plant("Cactus", 5.0, 90)
+	Sunflower = Plant("Sunflower", 80.0, 45)
+	Fern = Plant("Fern", 15.0, 120)
 	print()
