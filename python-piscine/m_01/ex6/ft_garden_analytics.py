@@ -6,7 +6,7 @@
 #    By: ridias <ridias@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/03/19 18:13:03 by ridias            #+#    #+#              #
-#    Updated: 2026/03/26 18:41:00 by ridias           ###   ########.fr        #
+#    Updated: 2026/03/26 18:43:33 by ridias           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -81,7 +81,7 @@ class Plant:
 		grows_calls = 0
 		age_calls = 0
 		show_calls = 0
-		
+
 		def get_
 
 class Flower(Plant):
