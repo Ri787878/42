@@ -1,61 +1,85 @@
 import sys
 
 
+class InvalidInputError(Exception):
+    def __init__(self):
+        message = ("No scores provided. "
+                   "Usage: python3 "
+                   "ft_score_analytics.py <score1> <score2> ...\n")
+        super().__init__(message)
+
+
 class InputError(Exception):
     def __init__(self, message):
         self.message = message
         super().__init__(message)
 
 
-class InvalidInputError(Exception):
-    def __init__(self):
-        message = ("No scores provided. "
-                   "Usage: python3 ft_score_analytics.py <score1> <score2> ..."
-                   )
-        super().__init__(message)
-
-
-def get_arguments(argv_list: list) -> None:
-    for argument in sys.argv:
+def get_scores(argv_list: list) -> None:
+    for argument in sys.argv[1:]:
         argv_list.append(argument)
 
 
-def convert_list_int(argv_list: list) -> list:
-    int_list: list = []
-
-    # add if statement for if not alphanumeric to raise InputError
-    # raise "Invalid parameter: {argv_list[count]}")
-    for count in range(len(argv_list)):
-        int_list.append(int(argv_list[count]))
-
-
-def count_total_score(list: list) -> int:
+def get_total_score(scores_list: list) -> int:
     total: int = 0
 
-    for score in list:
+    for score in scores_list:
         total += score
 
     return total
 
 
-if __name__ == "__main__":
+def get_avg_score(scores_list: list, player_count: int) -> float:
+    sum: int = get_total_score(scores_list)
+    result: float = sum / player_count
+
+    return result
+
+
+def get_score_range(scores_list: list) -> int:
+    max_score = max(scores_list)
+    min_score = min(scores_list)
+    range: int = max_score - min_score
+
+    return range
+
+
+def test_score_analytics() -> None:
     print("=== Player Score Analytics ===")
 
     argv_list: list = []
-    count: int = 1
-    list_size: int
+    scores_list: list = []
+    player_count: int = 0
 
-    get_arguments(argv_list)
-    list_size = len(argv_list)
+    get_scores(argv_list)
+    player_count = len(argv_list)
+
     try:
-        if list_size == 1:
+        if player_count == 0:
             raise InvalidInputError()
-        else:
-            print(f"Total players: {list_size - 1}")
-        for count in range(1, list_size):
-            print(f"Argument {count}: {argv_list[count]}")
-            count += 1
-    except InputError as e:
-        print(f"Invalid parameter: {e}")
+        for score in argv_list:
+            try:
+                number: int = int(score)
+            except ValueError:
+                raise InputError(f"Invalid parameter: {score}")
+            scores_list.append(number)
+
     except InvalidInputError as e:
         print(f"{e}")
+
+    except InputError as e:
+        print(f"{e}")
+
+    else:
+        print(f"Scores processed: {scores_list}")
+        print(f"Total players: {player_count}")
+        print(f"Total score: {sum(scores_list)}")
+        print(
+            f"Average score: "f"{get_avg_score(scores_list, player_count)}")
+        print(f"High score: {max(scores_list)}")
+        print(f"Low score: {min(scores_list)}")
+        print(f"Score range: {get_score_range(scores_list)}\n")
+
+
+if __name__ == "__main__":
+    test_score_analytics()
