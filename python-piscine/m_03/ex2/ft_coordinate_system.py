@@ -1,4 +1,4 @@
-import math
+# import math
 
 
 class InvalidInputError(Exception):
@@ -35,9 +35,9 @@ def test_game_coordenates_system():
     except (InvalidInputError, InvalidCoordinatesError) as error:
         print(error)
 
+
 if __name__ == "__main__":
     test_game_coordenates_system()
-
 
     """print coordenates
     print(f"Got a first tuple: "
