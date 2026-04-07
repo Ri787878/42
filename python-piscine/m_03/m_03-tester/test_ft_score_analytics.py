@@ -4,7 +4,8 @@ import ft_score_analytics as app
 
 def test_get_scores_reads_sys_argv(monkeypatch):
     args = ["10", "20", "30"]
-    print(f"Scenario: read scores from sys.argv | args: {args}", file=sys.stderr)
+    print(f"Scenario: read scores from sys.argv"
+          f" | args: {args}", file=sys.stderr)
     monkeypatch.setattr(
         app.sys, "argv", ["ft_score_analytics.py", *args])
 
@@ -36,8 +37,7 @@ def test_test_score_analytics_valid_output(monkeypatch, capsys):
     args = ["5", "15", "25"]
     with capsys.disabled():
         print(f"Scenario: CLI valid input | args: {args}", file=sys.stderr)
-        monkeypatch.setattr(
-        app.sys, "argv", ["ft_score_analytics.py", *args])
+        monkeypatch.setattr(app.sys, "argv", ["ft_score_analytics.py", *args])
 
     app.test_score_analytics()
 
@@ -66,14 +66,12 @@ def test_test_score_analytics_invalid_output(monkeypatch, capsys):
     assert "Scores processed:" not in output
 
 
-
-
 def test_test_score_analytics_large_numbers(monkeypatch, capsys):
     args = ["1500", "2300", "1800", "2100", "1950"]
     with capsys.disabled():
-        print(f"Scenario: CLI large valid numbers | args: {args}", file=sys.stderr)
-        monkeypatch.setattr(
-        app.sys, "argv", ["ft_score_analytics.py", *args])
+        print("Scenario: CLI large valid numbers | "
+              f"args: {args}", file=sys.stderr)
+        monkeypatch.setattr(app.sys, "argv", ["ft_score_analytics.py", *args])
 
     app.test_score_analytics()
 
@@ -88,12 +86,11 @@ def test_test_score_analytics_large_numbers(monkeypatch, capsys):
     assert "Score range: 800" in output
 
 
-
-
 def test_test_score_analytics_decimal_avg_1(monkeypatch, capsys):
     args = ["10", "20", "30", "35"]
     with capsys.disabled():
-        print(f"Scenario: CLI decimal average (23.75) | args: {args}", file=sys.stderr)
+        print("Scenario: CLI decimal average (23.75) "
+              f"| args: {args}", file=sys.stderr)
     monkeypatch.setattr(
         app.sys, "argv", ["ft_score_analytics.py", *args])
 
@@ -113,7 +110,8 @@ def test_test_score_analytics_decimal_avg_1(monkeypatch, capsys):
 def test_test_score_analytics_decimal_avg_2(monkeypatch, capsys):
     args = ["5", "8", "12"]
     with capsys.disabled():
-        print(f"Scenario: CLI decimal average (8.333...) | args: {args}", file=sys.stderr)
+        print(f"Scenario: CLI decimal average (8.333...) |"
+              f" args: {args}", file=sys.stderr)
     monkeypatch.setattr(
         app.sys, "argv", ["ft_score_analytics.py", *args])
 
