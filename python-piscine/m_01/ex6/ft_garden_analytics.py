@@ -1,6 +1,6 @@
 class Plant:
     class Stats():
-        def __init__(self):
+        def __init__(self) -> None:
             self._grow_calls = 0
             self._age_calls = 0
             self._show_calls = 0
@@ -48,7 +48,7 @@ class Plant:
         self._days += days
         self._stats.increase_age_call()
 
-    def set_height(self, height: float):
+    def set_height(self, height: float) -> None:
         if height >= 0:
             self._height = height
             print(f"Height updated: {height}cm")
@@ -56,7 +56,7 @@ class Plant:
             print(f"{self._name}: height can't be negative")
             print("Height update rejected")
 
-    def set_age(self, age):
+    def set_age(self, age: int) -> None:
         if age >= 0:
             self._days = age
             print(f"Age updated: {age} days")
@@ -78,7 +78,7 @@ class Plant:
         while count <= days:
             print(f"=== Day {count} ===")
             print(f"{self._name}: {self._height}cm, {self._days} days old")
-            self.age()
+            self.age(1)
             self.grow(growth)
             count += 1
 
@@ -92,13 +92,13 @@ class Plant:
             return False
 
     @classmethod
-    def create_anonymous(cls, name):
+    def create_anonymous(cls: type[Plant], name: str) -> Plant:
         instance: Plant = cls(name, 0, 0)
         return instance
 
 
 class Flower(Plant):
-    def __init__(self, name: str, height: int, days: int, color: str):
+    def __init__(self, name: str, height: float, days: int, color: str):
         print("=== Flower")
         super().__init__(name, height, days)
         self._color = color
@@ -110,6 +110,9 @@ class Flower(Plant):
             return
         else:
             self._bloom = True
+
+    def get_bloom(self) -> bool:
+        return self._bloom
 
     def is_blomming(self) -> None:
         if (self._bloom):
@@ -128,7 +131,7 @@ class Flower(Plant):
 
 class Seed(Flower):
     def __init__(
-            self, name: str, height: int, days: int, color: str,
+            self, name: str, height: float, days: int, color: str,
             total_seeds: int):
         self._total_seeds = total_seeds
         super().__init__(name, height, days, color)
@@ -144,8 +147,8 @@ class Seed(Flower):
         super().bloom()
         self.set_seeds(42)
 
-    def set_seeds(self, seeds) -> None:
-        if self.bloom:
+    def set_seeds(self, seeds: int) -> None:
+        if self.get_bloom():
             self._total_seeds = seeds
         else:
             return
@@ -153,7 +156,7 @@ class Seed(Flower):
 
 class Tree(Plant):
     class Stats(Plant.Stats):
-        def __init__(self):
+        def __init__(self) -> None:
             super().__init__()
             self._shade_calls = 0
 
@@ -174,7 +177,7 @@ class Tree(Plant):
         self._shade = 0
         self.show()
 
-    def produce_shade(self):
+    def produce_shade(self) -> None:
         self._stats.increase_shade_call()
         print(
             f"Tree {self.get_name()} now produces "

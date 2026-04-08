@@ -1,27 +1,19 @@
 class Plant:
     name: str
     height: float
-    age: int
+    days: int
 
     def show(self) -> None:
         print(f"{self.name}: {self.height}cm, {self.age} days old")
 
-    def grow(self, growth: int) -> None:
-        self.height += growth
+    def grow(self, growth: float) -> None:
+        self.height += round(growth)
         self.height = round(self.height, 1)
 
     def age(self) -> None:
         self.days += 1
 
-    def get_info(self, info: str) -> None:
-        if info == "name":
-            return self.name
-        if info == "days":
-            return self.days
-        if info == "height":
-            return self.height
-
-    def simulate_growth(self, days: int, growth: int) -> None:
+    def simulate_growth(self, days: int, growth: float) -> None:
         count = 1
         while count <= days:
             print(f"=== Day {count} ===")

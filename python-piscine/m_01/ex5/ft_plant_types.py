@@ -18,7 +18,7 @@ class Plant:
     def age(self, days: int) -> None:
         self._days += days
 
-    def set_height(self, height: float):
+    def set_height(self, height: float) -> None:
         if height >= 0:
             self._height = height
             print(f"Height updated: {height}cm")
@@ -26,7 +26,7 @@ class Plant:
             print(f"{self._name}: height can't be negative")
             print("Height update rejected")
 
-    def set_age(self, age):
+    def set_age(self, age: int) -> None:
         if age >= 0:
             self._days = age
             print(f"Age updated: {age} days")
@@ -48,15 +48,15 @@ class Plant:
         while count <= days:
             print(f"=== Day {count} ===")
             print(f"{self._name}: {self._height}cm, {self._days} days old")
-            self.age()
+            self.age(days)
             self.grow(growth)
             count += 1
 
 
 class Flower(Plant):
-    def __init__(self, name, height, days, color):
+    def __init__(self, name: str, hgt: float, days: int, color: str) -> None:
         print("=== Flower")
-        super().__init__(name, height, days)
+        super().__init__(name, hgt, days)
         self._color = color
         self._bloom = False
         print(f" Color: {self.get_color()}")
@@ -84,13 +84,13 @@ class Flower(Plant):
 
 
 class Tree(Plant):
-    def __init__(self, name, height, days, trunk_size):
+    def __init__(self, name: str, height: float, days: int, trunk_size: float):
         print("=== Tree")
         super().__init__(name, height, days)
         self._trunk_diameter = trunk_size
         print(f" Trunk diameter: {self.get_trunk_diameter():.1f}cm")
 
-    def produce_shade(self):
+    def produce_shade(self) -> None:
         print(
             f"Tree {self.get_name()} now produces "
             + f"a shade of {self.get_height():.1f}cm long"
@@ -105,10 +105,10 @@ class Tree(Plant):
 
 
 class Vegetable(Plant):
-    def __init__(self, name, height, days, harvest_season):
+    def __init__(self, name: str, height: float, days: int, harv_season: str):
         print("=== Vegetable")
         super().__init__(name, height, days)
-        self._harvest_season = harvest_season
+        self._harvest_season = harv_season
         self._nutritional_value = 0
         print(f" Harvest season: {self.get_harvest_season()}")
         print(f" Nutritional value: {self.get_nutricional_value()}")

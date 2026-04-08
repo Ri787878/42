@@ -1,7 +1,7 @@
 class Plant:
     name: str
     height: float
-    age: int
+    days: int
 
     def __init__(self, name: str, height: float, days: int) -> None:
         self.name = name
@@ -19,14 +19,6 @@ class Plant:
 
     def age(self) -> None:
         self.days += 1
-
-    def get_info(self, info: str) -> None:
-        if info == "name":
-            return self.name
-        if info == "days":
-            return self.days
-        if info == "height":
-            return self.height
 
     def simulate_growth(self, days: int, growth: int) -> None:
         count = 1
