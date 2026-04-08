@@ -1,0 +1,374 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+// ex00
+void ft_putchar(char c)
+{
+	write(1, &c, 1);
+}
+
+// ex01
+void ft_print_alphabet(void)
+{
+	write(1, "abcdefghijklmnopqrstuvwxyz", 26);
+}
+
+// ex02
+void ft_print_reverse_alphabet(void)
+{
+	write(1, "zyxwvutsrqponmlkjihgfedcba", 26);
+}
+
+// ex03
+void ft_print_numbers(void)
+{
+	write(1, "0123456789", 10);
+}
+
+// ex04
+void ft_is_negative(int n)
+{
+	if (n < 0)
+		write(1, "N", 1);
+	else if (n >= 0)
+		write(1, "P", 1);
+}
+
+// extra stuff
+char int_to_char(int n)
+{
+	char c;
+
+	c = n + '0';
+	return c;
+}
+
+// ex05
+void write_number(int cen, int dez, int uni)
+{
+	ft_putchar(cen + '0');
+	ft_putchar(dez + '0');
+	ft_putchar(uni + '0');
+	ft_putchar(',');
+	ft_putchar(' ');
+}
+
+void ft_print_comb(void)
+{
+	int centenas;
+	int dezenas;
+	int unidades;
+
+	centenas = 0;
+	dezenas = 1;
+	unidades = 2;
+	while (centenas < dezenas && centenas <= 9)
+	{
+		while (dezenas < unidades && dezenas <= 9)
+		{
+			while (unidades <= 9)
+			{
+				write_number(centenas, dezenas, unidades);
+				unidades += 1;
+			}
+			dezenas += 1;
+			unidades = dezenas + 1;
+		}
+		centenas += 1;
+		dezenas = centenas + 1;
+		unidades = dezenas + 1;
+	}
+}
+
+// ex06
+void write_number2(int num1, int num2)
+{
+	int mil;
+	int cen;
+	int dez;
+	int uni;
+
+	mil = num1 / 10;
+	cen = num1 % 10;
+	dez = num2 / 10;
+	uni = num2 % 10;
+	ft_putchar(mil + '0');
+	ft_putchar(cen + '0');
+	ft_putchar(' ');
+	ft_putchar(dez + '0');
+	ft_putchar(uni + '0');
+	if (num1 != 98)
+		write(1, ", ", 2);
+}
+
+void ft_print_comb2(void)
+{
+	int num1;
+	int num2;
+
+	num1 = 0;
+	num2 = 1;
+	while (num1 < num2)
+	{
+		while (num2 <= 99)
+		{
+			write_number2(num1, num2);
+			num2 += 1;
+		}
+		num1 += 1;
+		num2 = num1 + 1;
+	}
+}
+
+// ex07
+int int_number_counter(int n)
+{
+	int count;
+
+	count = 0;
+	while (n != 0)
+	{
+		n /= 10;
+		count += 1;
+	}
+	return count;
+}
+
+int find_sign(int nb, int size)
+{
+
+	if (nb > 0)
+		return size;
+	if (nb < 0)
+		return size + 1;
+	return 0;
+}
+
+const char *int_to_string(int nb, int size)
+{
+	int counter;
+	char *string;
+
+	string = malloc(find_sign(nb, size));
+	if (find_sign(nb, size) == 0)
+		return "0";
+	counter = 0;
+	while (size >= 0)
+	{
+		string[counter] = nb / (10 * (size - 1));
+		size -= 1;
+		counter += 1;
+	}
+	return string;
+}
+
+int ft_power(int base, int exp)
+{
+	int total;
+	total = 1;
+
+	while (exp != 0)
+	{
+		total *= base;
+		exp--;
+	}
+	return total;
+}
+
+int test_number(int nb){
+	int	res;
+
+	res = 0;
+	if (nb < 0)
+	{
+		res = -nb;
+		ft_putchar('-');
+	}
+	return (res);
+}
+
+void ft_putnbr(int nb)
+{
+	int n;
+
+	int nb_lenght;
+	int res;
+
+	
+	nb_lenght = int_number_counter(nb);
+	n = 1;
+	if (nb == -2147483647)
+	{
+		write(1, "-2147483647", 11);
+		return ;
+	}
+	if (nb == 0)
+	{
+		ft_putchar('0');
+		return;
+	}
+	if(nb < 0)
+		nb = test_number(nb);
+	while (n <= nb_lenght)
+	{
+		res = nb / ft_power(10, nb_lenght - n);
+		ft_putchar(res + '0');
+		nb = nb - (res * ft_power(10, nb_lenght - n));
+		n += 1;
+	}
+}
+
+int main(void)
+{
+	int n;
+
+	n = -2147483647;
+	ft_putnbr(n);
+	ft_putchar('\n');
+	n = 748363347;
+	ft_putnbr(n);
+	ft_putchar('\n');
+	n = 0;
+	ft_putnbr(n);
+	ft_putchar('\n');
+	return (0);
+}
+
+// main for ex00
+/*
+int main()
+{
+	char c;
+
+	c = '4';
+	ft_putchar(c);
+	return 0;
+}
+
+//main ex01
+
+int main ()
+{
+		ft_print_alphabet();
+		return 0;
+}
+
+
+//main for ex02
+int main()
+{
+	ft_print_reverse_alphabet();
+	return 0;
+}
+
+
+//main for ex03
+int main()
+{
+	ft_print_numbers();
+	return 0;
+}
+
+
+//main for ex04
+int	main(void)
+{
+	int	pos;
+	int	neg;
+	int	zero;
+
+	pos = 10;
+	neg = -10;
+	zero = 0;
+	ft_is_negative(pos);
+	write(1, "\n", 1);
+	ft_is_negative(neg);
+	write(1, "\n", 1);
+	ft_is_negative(zero);
+	return (0);
+}
+
+//main for ex05
+int	main(void)
+{
+	ft_print_comb();
+	return (0);
+}
+
+//main for ex06
+int	main(void)
+{
+	ft_print_comb2();
+	return (0);
+}
+
+//main for ex07
+int main(void)
+{
+	int n;
+
+	n = -2147483647;
+	ft_putnbr(n);
+	ft_putchar('\n');
+	n = -748363347;
+	ft_putnbr(n);
+	ft_putchar('\n');
+	n = 0;
+	ft_putnbr(n);
+	ft_putchar('\n');
+	return (0);
+}
+
+
+
+
+int main ()
+{
+	int num = 12;
+	int centenas;
+	int dezenas ;
+	int unidades;
+
+	centenas = cal_cen(num);
+	dezenas = cal_dez(num);
+	unidades = cal_uni(num);
+	char c = 0;
+	while (centenas < 10)
+	{
+		while (dezenas != 0)
+		{
+			while ( unidades != 0)
+			{
+				c = int_to_char(centenas);
+				write(1, &c, 1);
+				c = int_to_char(dezenas);
+				write(1, &c, 1);
+				c = int_to_char(unidades);
+				write(1, &c, 1);
+				write(1, ", ", 2);
+				num += 1;
+				unidades = cal_uni(num);
+
+			}
+			num = num + dezenas + 1;
+			unidades = cal_uni(num);
+			dezenas = cal_dez(num);
+		}
+		num = num + centenas + 1;
+		unidades = cal_uni(num);
+		dezenas = cal_dez(num);
+		centenas = cal_cen(num);
+	}
+	return 0;
+}
+*/
+
+/*
+	printf("You have entered %d arguments:\n", argc - 1);
+		while   ( i < argc)
+		{
+				printf("%s\n", argv[i]);
+				i++;
+		}
+ * */
