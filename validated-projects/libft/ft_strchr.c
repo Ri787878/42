@@ -1,0 +1,29 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_strchr.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/21 15:44:58 by ridias            #+#    #+#             */
+/*   Updated: 2025/10/31 14:32:29 by ridias           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "libft.h"
+
+char	*ft_strchr(const char *s, int c)
+{
+	int	t;
+
+	t = 0;
+	while (s[t] != '\0')
+	{
+		if ((unsigned char)s[t] == (unsigned char)c)
+			return ((char *)&s[t]);
+		t++;
+	}
+	if ((unsigned char)c == '\0')
+		return ((char *)&s[t]);
+	return (NULL);
+}

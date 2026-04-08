@@ -1,0 +1,121 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   push_swap.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/26 12:12:51 by ridias            #+#    #+#             */
+/*   Updated: 2026/03/17 12:49:43 by ridias           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef PUSH_SWAP_H
+# define PUSH_SWAP_H
+
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
+# include <limits.h>
+
+typedef struct s_list
+{
+	void			*content;
+	struct s_list	*next;
+}	t_list;
+
+typedef struct s_num
+{
+	int	value;
+	int	index;
+}	t_num;
+
+typedef struct s_ps_struct
+{
+	int		ac;
+	char	**av;
+	int		stack_size;
+	t_list	*temp_node;
+	t_list	*a;
+	t_list	*b;
+}	t_ps_struct;
+
+//linked lists
+t_list	*ft_lstnew(void *content);
+t_list	*ft_lstlast(t_list *lst);
+t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+int		ft_lstsize(t_list *lst);
+void	ft_lstadd_back(t_list **lst, t_list *new);
+void	ft_lstadd_front(t_list **lst, t_list *new);
+void	ft_lstiter(t_list *lst, void (*f)(void *));
+void	ft_lstclear(t_list **lst, void (*del)(void*));
+void	ft_lstdelone(t_list *lst, void (*del)(void*));
+int		get_lst_max(t_list *stack);
+int		get_lst_min(t_list *stack);
+
+//libft
+int		ft_atoi(const char *str);
+void	ft_bzero(void *s, size_t n);
+void	*ft_calloc(size_t number, size_t size);
+int		ft_isalnum(int c);
+int		ft_isalpha(int c);
+int		ft_isascii(int c);
+int		ft_isdigit(int c);
+int		ft_isprint(int c);
+char	*ft_itoa(int n);
+void	*ft_memchr(const void *s, int c, size_t n);
+int		ft_memcmp(const void *s1, const void *s2, size_t n);
+void	*ft_memcpy(void *dest, const void *src, size_t n);
+void	*ft_memmove(void *dest, const void *src, size_t n);
+void	*ft_memset(void *s, int c, size_t n);
+void	ft_putchar_fd(char c, int fd);
+void	ft_putendl_fd(char *s, int fd);
+void	ft_putnbr_fd(int n, int fd);
+void	ft_putstr_fd(char *s, int fd);
+char	**ft_split(char const *s, char c);
+char	*ft_strchr(const char *s, int c);
+char	*ft_strdup(const char *src);
+void	ft_striteri(char *s, void (*f)(unsigned int, char*));
+char	*ft_strjoin(const char *s1, const char *s2);
+size_t	ft_strlcat(char *dst, const char *src, size_t size);
+size_t	ft_strlcpy(char *dst, const char *src, size_t size);
+size_t	ft_strlen(const char *str);
+char	*ft_strmapi(char const *s, char (*f)(unsigned int, char));
+int		ft_strncmp(const char *s1, const char *s2, size_t n);
+char	*ft_strnstr(const char *str, const char *to_find, size_t len);
+char	*ft_strrchr(const char *s, int c);
+char	*ft_strtrim(char const *s1, char const *set);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
+int		ft_tolower(int c);
+int		ft_toupper(int c);
+
+//ft_printf
+int		ft_printf(const char *format, ...);
+
+//parser
+int		ft_filter(t_ps_struct *ps);
+long	ft_atol(const char *s);
+
+//Sorter
+void	radixsort(t_ps_struct *ps);
+void	normalize_stack(t_list *stack);
+void	organized_sort(t_ps_struct *ps);
+void	sort_3(t_ps_struct *ps);
+void	sort_4(t_ps_struct *ps);
+void	sort_5(t_ps_struct *ps);
+int		is_sorted(t_list *lst);
+
+//Push Swap Oficial Moves
+void	sa(t_ps_struct *ps);
+void	sb(t_ps_struct *ps);
+void	ss(t_ps_struct *ps);
+void	pa(t_ps_struct *ps);
+void	pb(t_ps_struct *ps);
+void	ra(t_ps_struct *ps);
+void	rb(t_ps_struct *ps);
+void	rr(t_ps_struct *ps);
+void	rra(t_ps_struct *ps);
+void	rrb(t_ps_struct *ps);
+void	rrr(t_ps_struct *ps);
+
+#endif
