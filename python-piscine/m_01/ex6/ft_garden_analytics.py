@@ -99,7 +99,6 @@ class Plant:
 
 class Flower(Plant):
     def __init__(self, name: str, height: float, days: int, color: str):
-        print("=== Flower")
         super().__init__(name, height, days)
         self._color = color
         self._bloom = False
@@ -167,7 +166,7 @@ class Tree(Plant):
             self._shade_calls += 1
 
         def display_extra_stats(self) -> None:
-            print(f"{self._shade_calls} shade")
+            print(f" {self._shade_calls} shade")
 
     def __init__(self, name: str, height: int, days: int, trunk_size: float):
         print("=== Tree")
@@ -242,6 +241,7 @@ if __name__ == "__main__":
     print()
 
     # Flower Part
+    print("=== Flower")
     Rose = Flower("Rose", 15, 10, "red")
     print("[statistics for Rose]")
     show_stats(Rose)
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     print()
 
     # Tree Part
-    Oak = Tree("Oak Tree", 200, 365, 5.0)
+    Oak = Tree("Oak", 200, 365, 5.0)
     print("[statistics for Oak]")
     show_stats(Oak)
     print("[asking the oak to produce shade]")
@@ -270,7 +270,9 @@ if __name__ == "__main__":
     Sunflower.age(20)
     Sunflower.bloom()
     Sunflower.show()
+    print("[statistics for Sunflower]")
     show_stats(Sunflower)
+    print()
 
     print("=== Anonymous")
     Anonymous = Plant.create_anonymous("Unknown plant")

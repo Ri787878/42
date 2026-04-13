@@ -4,10 +4,10 @@ class Plant:
     days: int
 
     def show(self) -> None:
-        print(f"{self.name}: {self.height}cm, {self.age} days old")
+        print(f"{self.name}: {self.height}cm, {self.days} days old")
 
     def grow(self, growth: float) -> None:
-        self.height += round(growth)
+        self.height += growth
         self.height = round(self.height, 1)
 
     def age(self) -> None:
@@ -17,19 +17,21 @@ class Plant:
         count = 1
         while count <= days:
             print(f"=== Day {count} ===")
-            print(f"{self.name}: {self.height}cm, {self.days} days old")
             self.age()
             self.grow(growth)
+            print(f"{self.name}: {self.height}cm, {self.days} days old")
             count += 1
 
 
 if __name__ == "__main__":
+    print("=== Garden Plant Growth ===")
     Rose = Plant()
     Rose.name = "Rose"
-    Rose.height = 25
+    Rose.height = 25.0
     Rose.days = 30
     days_passed = 7
     growth = 0.8
+    Rose.show()
 
     Rose.simulate_growth(days_passed, growth)
-    print(f"Growth this week: {round(growth * days_passed)}cm")
+    print(f"Growth this week: {round(growth * days_passed, 1)}cm")

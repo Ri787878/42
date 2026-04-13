@@ -10,8 +10,9 @@ class Plant:
         self.show()
 
     def show(self) -> None:
-        print(f"Plant created: {self.name}: {round(self.height, 1)}cm,"
-              + "{self.days} days old")
+        print(f"Plant created: {self.name}: "
+              f"{round(self.height, 1)}cm, "
+              f"{self.days} days old")
 
     def grow(self, growth: int) -> None:
         self.height += growth
@@ -38,4 +39,3 @@ if __name__ == "__main__":
     Cactus = Plant("Cactus", 5.0, 90)
     Sunflower = Plant("Sunflower", 80.0, 45)
     Fern = Plant("Fern", 15.0, 120)
-    print()

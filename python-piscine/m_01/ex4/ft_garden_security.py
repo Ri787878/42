@@ -4,12 +4,12 @@ class Plant:
         self._height = height
         self._days = days
         print(
-            f"Plant created: {self._name}:"
+            f"Plant created: {self._name}: "
             + f"{self._height:.1f}cm, {self._days} days old")
 
     def show(self) -> None:
         print(
-            f"Current state: {self._name}:"
+            f"Current state: {self._name}: "
             + f"{self._height:.1f}cm, {self._days} days old")
 
     def grow(self, growth: int) -> None:
