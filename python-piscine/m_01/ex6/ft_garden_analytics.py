@@ -92,8 +92,8 @@ class Plant:
             return False
 
     @classmethod
-    def create_anonymous(cls: type[Plant], name: str) -> Plant:
-        instance: Plant = cls(name, 0, 0)
+    def create_anonymous(cls: type["Plant"], name: str) -> "Plant":
+        instance: "Plant" = cls(name, 0, 0)
         return instance
 
 
@@ -172,7 +172,7 @@ class Tree(Plant):
     def __init__(self, name: str, height: int, days: int, trunk_size: float):
         print("=== Tree")
         super().__init__(name, height, days)
-        self._stats = self.Stats()
+        self._stats: Tree.Stats = self.Stats()
         self._trunk_diameter = trunk_size
         self._shade = 0
         self.show()
