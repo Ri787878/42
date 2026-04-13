@@ -37,10 +37,8 @@ class Plant:
         print(f"{self._name}: {self._height:.1f}cm, {self._days} days old")
         self._stats.increase_show_call()
 
-    def grow(self, growth: int) -> None:
-        total_growth: float
-        total_growth = growth
-        self._height += total_growth
+    def grow(self, growth: float) -> None:
+        self._height += growth
         self._height = round(self._height, 1)
         self._stats.increase_grow_call()
 
@@ -202,7 +200,7 @@ class Vegetable(Plant):
         self._nutritional_value = 0
         self.show()
 
-    def grow(self, days: int) -> None:
+    def grow(self, days: float) -> None:
         super().grow(days)
 
     def age(self, days: int) -> None:
