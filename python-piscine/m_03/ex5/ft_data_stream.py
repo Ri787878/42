@@ -19,7 +19,7 @@ def gen_event() -> typing.Generator[tuple[str, str], None, None]:
 
 
 def consume_event() -> typing.Generator[tuple[str, str], list[tuple[str, str]], None]:
-    actions_log = yield
+    actions_log = yield ("", "")
     while actions_log:
         log_index = random.randint(0, len(actions_log) - 1)
         yield actions_log.pop(log_index)
