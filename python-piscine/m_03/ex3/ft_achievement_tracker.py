@@ -37,16 +37,6 @@ def test_achievement_tracker_system() -> None:
     charlie_achv: set = gen_player_achievements(achievs_list)
     dylan_achv: set = gen_player_achievements(achievs_list)
 
-    # alice_achv: set = set(["Crafting Genius", "World Savior",
-    # "Master Explorer", "Collector Supreme", "Untouchable", "Boss Slayer"])
-    # bob_achv: set = set(["Crafting Genius", "Strategist", "World Savior",
-    # "Master Explorer", "Unstoppable", "Collector Supreme", "Untouchable"])
-    # charlie_achv: set = set(["Strategist", "Speed Runner", "Survivor",
-    # "Master Explorer", "Treasure Hunter", "First Steps", "Collector Supreme",
-    # "Untouchable", "Sharp Mind"])
-    # dylan_achv: set = set(["Strategist", "Speed Runner", "Unstoppable",
-    # "Untouchable", "Boss Slayer"])
-
     print(f"Player Alice: {alice_achv}")
     print(f"Player Bob: {bob_achv}")
     print(f"Player Charlie: {charlie_achv}")

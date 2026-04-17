@@ -2,16 +2,10 @@ import sys
 
 
 class InvalidInputError(Exception):
-    def __init__(self):
+    def __init__(self) -> None:
         message = ("No scores provided. "
                    "Usage: python3 "
                    "ft_score_analytics.py <score1> <score2> ...\n")
-        super().__init__(message)
-
-
-class InputError(Exception):
-    def __init__(self, message):
-        self.message = message
         super().__init__(message)
 
 
@@ -60,25 +54,24 @@ def test_score_analytics() -> None:
         for score in argv_list:
             try:
                 number: int = int(score)
+                scores_list.append(number)
             except ValueError:
-                raise InputError(f"Invalid parameter: {score}")
-            scores_list.append(number)
+                print(f"Invalid parameter: {score}")
 
     except InvalidInputError as e:
         print(f"{e}")
 
-    except InputError as e:
-        print(f"{e}")
-
     else:
-        print(f"Scores processed: {scores_list}")
-        print(f"Total players: {player_count}")
-        print(f"Total score: {sum(scores_list)}")
-        print(
-            f"Average score: "f"{get_avg_score(scores_list, player_count)}")
-        print(f"High score: {max(scores_list)}")
-        print(f"Low score: {min(scores_list)}")
-        print(f"Score range: {get_score_range(scores_list)}\n")
+        if scores_list:
+            print(f"Scores processed: {scores_list}")
+            print(f"Total players: {len(scores_list)}")
+            print(f"Total score: {sum(scores_list)}")
+            print(
+                f"Average score: "
+                f"{get_avg_score(scores_list, len(scores_list))}")
+            print(f"High score: {max(scores_list)}")
+            print(f"Low score: {min(scores_list)}")
+            print(f"Score range: {get_score_range(scores_list)}\n")
 
 
 if __name__ == "__main__":
