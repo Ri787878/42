@@ -40,8 +40,8 @@ while IFS= read -r -d '' file; do
   autopep8 --diff --exit-code "${file}"
   autopep8_exit=$?
 
-  echo "[mypy]"
-  mypy "${file}"
+  echo "[mypy] --warn-return-any --warn-unused-ignores --ignore-missing-import --disallow-untyped-defs --check-untyped-defs"
+  mypy --warn-return-any --warn-unused-ignores --ignore-missing-import --disallow-untyped-defs --check-untyped-defs "${file}"
   mypy_exit=$?
 
   if [[ ${autopep8_exit} -eq 0 && ${mypy_exit} -eq 0 ]]; then
