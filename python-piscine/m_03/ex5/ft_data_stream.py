@@ -1,4 +1,4 @@
-import typing
+from typing import Generator
 import random
 
 
@@ -6,7 +6,7 @@ import random
 # 1. return type of the generator,
 # 2. what can be sent to the gen via .send() aka parameters
 # 3. final return after completing the gen (so never because "While True")
-def gen_event() -> typing.Generator[tuple[str, str], None, None]:
+def gen_event() -> Generator[tuple[str, str], None, None]:
     players_list: list = ["alice", "bob", "dylan", "charlie"]
     actions_list: list = [
         "run", "eat", "sleep", "grab", "move",
@@ -18,7 +18,7 @@ def gen_event() -> typing.Generator[tuple[str, str], None, None]:
         yield name, action
 
 
-def consume_event() -> typing.Generator[tuple[str, str], list[tuple[str, str]], None]:
+def consume_event() -> Generator[tuple[str, str], list[tuple[str, str]], None]:
     actions_log = yield ("", "")
     while actions_log:
         log_index = random.randint(0, len(actions_log) - 1)
