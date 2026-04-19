@@ -17,7 +17,7 @@ def read_file(path: str) -> typing.Optional[str]:
         f.close()
         return text
     except OSError as e:
-        print(f"Error opening file '{path}': {e}")
+        print(f"[STDERR] Error opening file '{path}': {e}")
         return None
 
 
@@ -35,7 +35,7 @@ def transform_content(file_content: str) -> str:
     return transformed
 
 
-def test_m4_ex1() -> None:
+def test_m4_ex2() -> None:
     files_path: list = get_argv()
 
     if len(files_path) != 1:
@@ -59,12 +59,17 @@ def test_m4_ex1() -> None:
             # add a option to not save if not waanted by the user
             print("Not saving data.")
         else:
-            print(f"Saving data to '{new_file_name}'")
-            new_file = open(new_file_name, 'w+')
-            new_file.write(transformed_content)
-            new_file.close()
-            print(f"Data saved in file '{new_file_name}'.")
+            try:
+                print(f"Saving data to '{new_file_name}'")
+                new_file = open(new_file_name, 'w+')
+                new_file.write(transformed_content)
+                new_file.close()
+                print(f"Data saved in file '{new_file_name}'.")
+            except OSError as e:
+                print(
+                    f"[STDERR] Error opening file '{new_file_name}': {e}"
+                    f"\nData not saved.")
 
 
 if __name__ == "__main__":
-    test_m4_ex1()
+    test_m4_ex2()
