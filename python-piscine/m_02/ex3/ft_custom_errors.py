@@ -20,6 +20,7 @@ def check_water_level(water_level: int) -> None:
     if water_level < 5:
         raise WaterError("Not enough water in the tank!")
 
+
 def check_plant_status(plant_name: str) -> None:
     if plant_name == "tomato":
         raise PlantError("The tomato plant is wilting!")
