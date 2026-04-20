@@ -14,7 +14,7 @@ def test_temperature() -> None:
     except ValueError:
         print(
             f"Caught input_temperature error:"
-            f" invalid literal for int() with base 10: {test1}")
+            f" invalid literal for int() with base 10: '{test1}'")
         print()
     try:
         print(f"Input data is '{test2}'")
@@ -24,12 +24,11 @@ def test_temperature() -> None:
     except ValueError:
         print(
             f"Caught input_temperature error:"
-            f" invalid literal for int() with base 10: {test2}")
+            f" invalid literal for int() with base 10: '{test2}'")
         print()
     print("All tests completed - program didn't crash!")
 
 
 if __name__ == "__main__":
-    print("=== Garden Temperature ===")
-    print("")
+    print("=== Garden Temperature ===\n")
     test_temperature()

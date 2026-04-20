@@ -32,7 +32,7 @@ def garden_operations(operation_number) -> None:
     except ZeroDivisionError as e:
         print(f"Caught ZeroDivisionError: {e}")
     except FileNotFoundError as e:
-        print(f"Caught FileExistsError: {e}")
+        print(f"Caught  FileNotFoundError: {e}")
     except TypeError as e:
         print(f"Caught TypeError: {e}")
 
