@@ -18,11 +18,11 @@ def gen_event() -> Generator[tuple[str, str], None, None]:
         yield name, action
 
 
-def consume_event() -> Generator[tuple[str, str], list[tuple[str, str]], None]:
-    actions_log = yield ("", "")
-    while actions_log:
-        log_index = random.randint(0, len(actions_log) - 1)
-        yield actions_log.pop(log_index)
+def consume_event(act_log: list[tuple[str, str]]) -> Generator[tuple[str, str],
+                                                               None, None]:
+    while len(act_log) > 0:
+        log_index = random.randrange(len(act_log))
+        yield act_log.pop(log_index)
 
 
 def test_data_stream() -> None:
@@ -34,10 +34,7 @@ def test_data_stream() -> None:
     actions_log: list = [next(g) for i in range(10)]
     print(f"Built list of 10 events: {actions_log}")
 
-    x = consume_event()
-    next(x)
-    for i in range(len(actions_log)):
-        log: tuple[str, str] = x.send(actions_log)
+    for log in consume_event(actions_log):
         print(f"Got event from list: {log}")
         print(f"Remains in list: {actions_log}")
 
