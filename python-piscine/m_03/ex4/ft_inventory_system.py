@@ -36,6 +36,8 @@ def parse_one_item(item: str, inventory: dict[str, int]) -> tuple[str, int]:
 
     try:
         qty: int = int(qty_text)
+        if int(qty_text) <= 0:
+            raise InputError(f"Invalid quantity of items '{qty_text}'.")
     except ValueError as e:
         raise InputError(f"Quantity error for '{item_name}': {e}")
 
@@ -68,19 +70,33 @@ def print_percentages(inventory: dict[str, int]) -> None:
         print(f"Item {item_name} represents {round(percentage, 1)}%")
 
 
+def print_empty_inventory(inventory: dict) -> None:
+    print(f"Got inventory: {inventory}")
+    print(f"Item list: {list(inventory.keys())}")
+    print(
+        f"Total quantity of the {len(inventory)}"
+        f" items: {sum(inventory.values())}")
+    inventory.update({"magic_item": 1})
+    print(f"Updated inventory: {inventory}")
+
+
 def test_inventory_system() -> None:
     print("=== Inventory System Analysis ===")
     raw_inventory: list = get_argv()
     inventory: dict = {}
     errors: list[str] = []
 
+    # Check if no arguments are passed
+    if not raw_inventory:
+        print_empty_inventory(inventory)
+        return
     inventory, errors = parse_inventory(raw_inventory)
 
     for error in errors:
         print(error)
 
     print(f"Got inventory: {inventory}")
-    print(f"Item list: {inventory.keys()}")
+    print(f"Item list: {list(inventory.keys())}")
 
     print(
         f"Total quantity of the {len(inventory)}"
@@ -99,7 +115,7 @@ def test_inventory_system() -> None:
     min_value: int
     min_key, min_value = min(inventory.items(), key=lambda kv: kv[1])
     print(
-        f"Item most abundant: {min_key}"
+        f"Item least abundant: {min_key}"
         f" with quantity {min_value}")
 
     inventory.update({"magic_item": 1})

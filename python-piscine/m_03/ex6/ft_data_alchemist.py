@@ -8,7 +8,7 @@ def generate_int_list(size: int, min_value: int, max_value: int) -> list[int]:
 def generate_scores_dict(plrs_list: list, min_v: int, max_v: int) -> dict:
     new_dict: dict = {}
     scores_list: list = generate_int_list(len(plrs_list), min_v, max_v)
-    for i in range(min(len(plrs_list), len(scores_list))):
+    for i in range(len(plrs_list)):
         new_dict[plrs_list[i]] = scores_list[i]
     return new_dict
 

@@ -57,6 +57,8 @@ def test_score_analytics() -> None:
                 scores_list.append(number)
             except ValueError:
                 print(f"Invalid parameter: {score}")
+        if len(scores_list) == 0:
+            raise InvalidInputError()
 
     except InvalidInputError as e:
         print(f"{e}")
