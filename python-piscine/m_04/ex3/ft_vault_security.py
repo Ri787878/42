@@ -2,7 +2,7 @@ import typing
 
 
 def read_file(path: str) -> tuple[bool, typing.Optional[str]]:
-    output: tuple[bool,  typing.Optional[str]]
+    output: tuple[bool, typing.Optional[str]]
     try:
         with open(path, "r") as f:
             text = f.read()
