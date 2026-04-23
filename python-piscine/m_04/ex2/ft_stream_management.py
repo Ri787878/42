@@ -2,8 +2,8 @@ import sys
 import typing
 
 
-def get_argv() -> list:
-    argv_list: list = []
+def get_argv() -> list[str]:
+    argv_list: list[str] = []
     for argument in sys.argv[1:]:
         argv_list.append(argument)
 
@@ -36,7 +36,7 @@ def transform_content(file_content: str) -> str:
 
 
 def test_m4_ex2() -> None:
-    files_path: list = get_argv()
+    files_path: list[str] = get_argv()
 
     if len(files_path) != 1:
         print("Usage: ft_ancient_text.py <file>\n")
@@ -53,8 +53,9 @@ def test_m4_ex2() -> None:
 
         transformed_content: str = transform_content(original_content)
         print(f"Transform data:\n---\n\n{transformed_content}\n---")
+        print("\nEnter new file name (or empty): ", end=" ")
 
-        new_file_name: str = input("Enter new file name (or empty): ")
+        new_file_name: str = sys.stdin.readline().strip()
         if not new_file_name:
             # add a option to not save if not waanted by the user
             print("Not saving data.")

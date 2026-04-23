@@ -1,8 +1,7 @@
-import typing
 
 
-def read_file(path: str) -> tuple[bool, typing.Optional[str]]:
-    output: tuple[bool, typing.Optional[str]]
+def read_file(path: str) -> tuple[bool, str]:
+    output: tuple[bool, str]
     try:
         with open(path, "r") as f:
             text = f.read()
@@ -27,10 +26,10 @@ def secure_archive(f_nm: str, mode: str, cont: str = "") -> tuple[bool, str]:
 
     if mode == "r":
         ok, data = read_file(f_nm)
-        output = (ok, data if data is not None else "")
+        output = (ok, data)
     elif mode == "w":
         ok, data = write_file(f_nm, cont)
-        output = (ok, data if data is not None else "")
+        output = (ok, data)
     return output
 
 
