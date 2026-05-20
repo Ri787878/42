@@ -106,75 +106,22 @@ class LogProcessor(DataProcessor):
             self.value = str(data)
 
 
-def test_m5_ex0() -> None:
-    print("=== Code Nexus - Data Processor ===")
+def test_m5_ex1() -> None:
+    print("=== Code Nexus - Data Stream ===")
 
-    print("\nTesting Numeric Processor...")
-    Number_processor = NumericProcessor()
-    num_test_1: Any = 42
-    print(f" Trying to validate input '{num_test_1}': "
-          f"{Number_processor.validate(num_test_1)}")
+    print("\nInitialize Data Stream...")
+    print("\n== DataStream statistics ==")
+    # ADD TEST FOR FOUNDING PROCESSORES, AND DATA
 
-    num_test_2: Any = "Hello"
-    print(f" Trying to validate input '{num_test_2}': "
-          f"{Number_processor.validate(num_test_2)}")
+    print("\nRegistering Numeric Processor")
+    # Number_processor = NumericProcessor()
 
-    test_3: Any = "foo"
-    print(" Test invalid ingestion of string 'foo' without prior validation:")
-    try:
-        Number_processor.ingest(test_3)
-    except Exception as e:
-        print(f' {e}')
-
-    test_list: list[int | float] = [1, 2, 3, 4, 5]
-    try:
-        print(" Processing data: [1, 2, 3, 4, 5]\n Extracting 3 values...")
-        Number_processor.ingest(test_list)
-        i: int = 0
-        while i < 3:
-            print(f" Numeric value {i}: {Number_processor.output()[1]}")
-            i += 1
-    except Exception as e:
-        print(f' {e}')
-
-    print("\nTesting Text Processor...")
-    Text_processor = TextProcessor()
-    text_test_1: int = 42
-    print(f" Trying to validate input '{text_test_1}': "
-          f"{Text_processor.validate(text_test_1)}")
-
-    text_test_2: list[str] = ['Hello', 'Nexus', 'World']
-    print(" Processing data: ['Hello', 'Nexus', 'World']\n"
-          " Extracting 1 value...")
-    try:
-        Text_processor.ingest(text_test_2)
-        print(f" Text value 0: {Text_processor.output()[1]}")
-    except Exception as e:
-        print(f' {e}')
+    print("\n")
+    # Text_processor = TextProcessor()
 
     print("\nTesting Log Processor...")
-    Log_processor = LogProcessor()
-
-    log_test_1 = 'Hello'
-    print(f" Trying to validate input 'Hello': "
-          f"{Log_processor.validate(log_test_1)}")
-
-    log_test_2: list[dict[str, str]] = [
-        {'log_level': 'NOTICE', 'log_message': 'Connection to server'},
-        {'log_level': 'ERROR', 'log_message': 'Unauthorized access!!'}]
-    try:
-        Log_processor.ingest(log_test_2)
-    except Exception as e:
-        print(f" {e}")
-    print(" Processing data: "
-          "[{'log_level': 'NOTICE', 'log_message': 'Connection to server'}, "
-          "{'log_level': 'ERROR', 'log_message': 'Unauthorized access!!'}]"
-          "\n Extracting 2 values...")
-    for i in range(2):
-        log_output1: tuple[int, str] = Log_processor.output()
-        log_output2: tuple[int, str] = Log_processor.output()
-        print(f" Log entry {i}: {log_output1[1]}: {log_output2[1]}")
+    # Log_processor = LogProcessor()
 
 
 if __name__ == "__main__":
-    test_m5_ex0()
+    test_m5_ex1()
