@@ -20,7 +20,6 @@ class DataProcessor(ABC):
         pass
 
     def output(self) -> tuple[int, str]:
-        self._rank -= 1
         return (self._storage.pop(0))
 
 
@@ -30,8 +29,9 @@ class NumericProcessor(DataProcessor):
             return True
         if isinstance(data, list):
             items = cast(list[Any], data)
-            return all(isinstance(x, (int, list)) and not isinstance(x, bool)
-                       for x in items)
+            return all(
+                isinstance(x, (int, float, list)) and not isinstance(x, bool)
+                for x in items)
         return False
 
     # ingests int float lists of both types including mixed
@@ -70,7 +70,9 @@ class TextProcessor(DataProcessor):
             self._storage.extend(nodes)
             self._rank += len(nodes)
         else:
-            self.value = str(data)
+            node: tuple[int, str] = (self._rank, str(data))
+            self._storage.append(node)
+            self._rank += 1
 
 
 class LogProcessor(DataProcessor):
@@ -98,12 +100,15 @@ class LogProcessor(DataProcessor):
         if isinstance(data, list):
             items = cast(list[Any], data)
             item_values: list[str] = []
-            item_values += [v for d in items for v in d.values()]
+            item_values += [f"{d['log_level']}: {d['log_message']}"
+                            for d in items]
             nodes = [(self._rank + i, v) for i, v in enumerate(item_values)]
             self._storage.extend(nodes)
             self._rank += len(nodes)
         else:
-            self.value = str(data)
+            node: tuple[int, str] = (self._rank, str(data))
+            self._storage.append(node)
+            self._rank += 1
 
 
 def test_m5_ex0() -> None:
@@ -172,8 +177,7 @@ def test_m5_ex0() -> None:
           "\n Extracting 2 values...")
     for i in range(2):
         log_output1: tuple[int, str] = Log_processor.output()
-        log_output2: tuple[int, str] = Log_processor.output()
-        print(f" Log entry {i}: {log_output1[1]}: {log_output2[1]}")
+        print(f" Log entry {i}: {log_output1[1]}")
 
 
 if __name__ == "__main__":
