@@ -249,10 +249,9 @@ def test_m5_ex2() -> None:
     stream: list[Any] = [
         'Hello world',
         [3.14, -1, 2.71],
-        [{
-            'log_level': 'WARNING',
-            'log_message': 'Telnet access! Use ssh instead'}, {
-             'log_level': 'INFO', 'log_message': 'User wil is connected'}],
+        [{'log_level': 'WARNING',
+          'log_message': 'Telnet access! Use ssh instead'},
+         {'log_level': 'INFO', 'log_message': 'User wil is connected'}],
         42, ['Hi', 'five']]
 
     print(
