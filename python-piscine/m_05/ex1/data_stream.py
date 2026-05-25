@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Any, cast
-# import typing
 
 
 class DataProcessor(ABC):
@@ -37,12 +36,10 @@ class NumericProcessor(DataProcessor):
         if isinstance(data, list):
             items = cast(list[Any], data)
             return all(
-                isinstance(x, (int, float, list)) and not isinstance(x, bool)
+                isinstance(x, (int, float)) and not isinstance(x, bool)
                 for x in items)
         return False
 
-    # ingests int float lists of both types including mixed
-    # then convert it to strings and store it internally
     def ingest(self, data: Any) -> None:
         if not self.validate(data):
             raise Exception("Got exception: Improper numeric data")
@@ -136,14 +133,12 @@ class LogProcessor(DataProcessor):
             self._rank += 1
 
 
-# routes information to correct processor
 class DataStream():
     def __init__(self) -> None:
         self.processors: list[DataProcessor] = []
         self.items_done_count: list[int] = []
         self.items_remaining_count: list[int] = []
 
-    # register new data processor to process the data stream
     def register_processor(self, proc: DataProcessor) -> None:
         self.processors.append((proc))
         self.items_remaining_count.append(int(0))
@@ -151,9 +146,6 @@ class DataStream():
         pass
 
     def process_stream(self, stream: list[Any]) -> None:
-        # code to pass through all the processores and check if it can
-        # pass though all of them create function to iterate a specific
-        # object though all of the processores and return True or false
         for item in stream:
             handled: bool = False
             for processor in self.processors:

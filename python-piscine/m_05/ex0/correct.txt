@@ -1,0 +1,25 @@
+=== Code Nexus - Data Processor ===
+
+Testing Numeric Processor...
+ Trying to validate input '42': True
+ Trying to validate input 'Hello': False
+ Test invalid ingestion of string 'foo' without prior validation:
+ Got exception: Improper numeric data
+ Processing data: [1, 2, 3, 4, 5]
+ Extracting 3 values...
+ Numeric value 0: 1
+ Numeric value 1: 2
+ Numeric value 2: 3
+
+Testing Text Processor...
+ Trying to validate input '42': False
+ Processing data: ['Hello', 'Nexus', 'World']
+ Extracting 1 value...
+ Text value 0: Hello
+
+Testing Log Processor...
+ Trying to validate input 'Hello': False
+ Processing data: [{'log_level': 'NOTICE', 'log_message': 'Connection to server'}, {'log_level': 'ERROR', 'log_message': 'Unauthorized access!!'}]
+ Extracting 2 values...
+ Log entry 0: NOTICE: Connection to server
+ Log entry 1: ERROR: Unauthorized access!!

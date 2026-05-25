@@ -177,14 +177,12 @@ class JSON_Export(ExportPlugin):
         print(f"{result}")
 
 
-# routes information to correct processor
 class DataStream():
     def __init__(self) -> None:
         self.processors: list[DataProcessor] = []
         self.items_done_count: list[int] = []
         self.items_remaining_count: list[int] = []
 
-    # register new data processor to process the data stream
     def register_processor(self, proc: DataProcessor) -> None:
         self.processors.append((proc))
         self.items_remaining_count.append(int(0))
@@ -192,9 +190,6 @@ class DataStream():
         pass
 
     def process_stream(self, stream: list[Any]) -> None:
-        # code to pass through all the processores and check if it can
-        # pass though all of them create function to iterate a specific
-        # object though all of the processores and return True or false
         for item in stream:
             handled: bool = False
             for processor in self.processors:

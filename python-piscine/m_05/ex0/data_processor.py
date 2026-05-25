@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Any, cast
-# import typing
 
 
 class DataProcessor(ABC):
@@ -8,13 +7,10 @@ class DataProcessor(ABC):
         self._storage: list[tuple[int, str]] = []
         self._rank: int = 0
 
-    # check whether the input data is right for the current data processor
     @abstractmethod
     def validate(self, data: Any) -> bool:
         pass
 
-    # process the input data
-    # needs to raise a Exception if user doesnt validate the data before hand
     @abstractmethod
     def ingest(self, data: Any) -> None:
         pass
@@ -30,12 +26,10 @@ class NumericProcessor(DataProcessor):
         if isinstance(data, list):
             items = cast(list[Any], data)
             return all(
-                isinstance(x, (int, float, list)) and not isinstance(x, bool)
+                isinstance(x, (int, float)) and not isinstance(x, bool)
                 for x in items)
         return False
 
-    # ingests int float lists of both types including mixed
-    # then convert it to strings and store it internally
     def ingest(self, data: Any) -> None:
         if not self.validate(data):
             raise Exception("Got exception: Improper numeric data")
@@ -116,15 +110,15 @@ def test_m5_ex0() -> None:
 
     print("\nTesting Numeric Processor...")
     Number_processor = NumericProcessor()
-    num_test_1: Any = 42
+    num_test_1: int = 42
     print(f" Trying to validate input '{num_test_1}': "
           f"{Number_processor.validate(num_test_1)}")
 
-    num_test_2: Any = "Hello"
+    num_test_2: str = "Hello"
     print(f" Trying to validate input '{num_test_2}': "
           f"{Number_processor.validate(num_test_2)}")
 
-    test_3: Any = "foo"
+    test_3: int = "foo"
     print(" Test invalid ingestion of string 'foo' without prior validation:")
     try:
         Number_processor.ingest(test_3)
