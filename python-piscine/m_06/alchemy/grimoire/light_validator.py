@@ -3,5 +3,5 @@ def validate_ingredients(ingredients: str) -> str:
     for ingredient in light_spell_allowed_ingredients():
         if (ingredient.lower() in ingredients.lower()):
             return "VALID"
-    
+
     return "INVALID"
