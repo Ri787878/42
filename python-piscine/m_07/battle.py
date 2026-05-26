@@ -1,7 +1,7 @@
 import ex0
 
 
-def creature_creation(factory: ex0.CreatureFactory) -> None:
+def test_factory_creature_creation(factory: ex0.CreatureFactory) -> None:
     base_creature = factory.create_base()
     evolved_creature = factory.create_evolved()
 
@@ -13,8 +13,8 @@ def creature_creation(factory: ex0.CreatureFactory) -> None:
     print(f"{evolved_creature.attack()}\n")
 
 
-def creature_combact(factory1: ex0.CreatureFactory,
-                     factory2: ex0.CreatureFactory) -> None:
+def test_factory_combat(factory1: ex0.CreatureFactory,
+                        factory2: ex0.CreatureFactory) -> None:
     flame_creature = factory1.create_base()
     aqua_creature = factory2.create_base()
 
@@ -29,10 +29,10 @@ def test_m7_ex0() -> None:
     Flame_factory: ex0.CreatureFactory = ex0.FlameFactory()
     Aqua_factory: ex0.CreatureFactory = ex0.AquaFactory()
 
-    creature_creation(Flame_factory)
-    creature_creation(Aqua_factory)
+    test_factory_creature_creation(Flame_factory)
+    test_factory_creature_creation(Aqua_factory)
 
-    creature_combact(Flame_factory, Aqua_factory)
+    test_factory_combat(Flame_factory, Aqua_factory)
 
 
 if __name__ == "__main__":
