@@ -1,16 +1,5 @@
-from abc import ABC, abstractmethod
-import typing
+from .utils import CreatureFactory
+from .creature_families.aqua_family import AquaFactory
+from .creature_families.flame_family import FlameFactory
 
-
-class Creature(ABC):
-    def __init__(self, name: str, type: str):
-        self._name = name
-        self._type = type
-
-    @abstractmethod
-    def attack(self) -> str:
-        pass
-
-    @abstractmethod
-    def describe(self) -> str:
-        pass
+__all__ = ["CreatureFactory", "FlameFactory", "AquaFactory"]
