@@ -3,7 +3,7 @@ from abc import abstractmethod, ABC
 
 class TransformCapability(ABC):
     @abstractmethod
-    def transform(self, attribute: str) -> str:
+    def transform(self) -> str:
         pass
 
     @abstractmethod

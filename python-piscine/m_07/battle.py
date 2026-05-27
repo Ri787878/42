@@ -19,7 +19,7 @@ def test_factory_combat(factory1: ex0.CreatureFactory,
     aqua_creature = factory2.create_base()
 
     print("Testing battle")
-    print(f"{flame_creature.describe()}\n")
+    print(f"{flame_creature.describe()}")
     print(f" vs.\n{aqua_creature.describe()}\n fight!")
     print(f"{flame_creature.attack()}")
     print(f"{aqua_creature.attack()}")

@@ -1,8 +1,6 @@
-from .utils import CreatureFactory
-from .creature_families.aqua_family import AquaFactory
-from .creature_families.flame_family import FlameFactory
-from .creature_families.healing_family import HealingCreatureFactory
-from .creature_families.transform_family import TransformCreatureFactory
+import ex0
+from .creature_families_gen2.healing_family import HealingCreatureFactory
+from .creature_families_gen2.transform_family import TransformCreatureFactory
 
 __all__ = [
     "CreatureFactory",

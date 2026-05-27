@@ -1,4 +1,4 @@
-from ..utils import Creature, CreatureFactory
+from ex0.utils import Creature, CreatureFactory
 from ..capabilities import TransformCapability
 
 
@@ -13,9 +13,9 @@ class Shiftling(Creature, TransformCapability):
         else:
             return "Shiftling attacks normally."
 
-    def transform(self, attribute: str) -> str:
+    def transform(self) -> str:
         self.transformed = True
-        return f"Shiftling shifts into a {attribute} form!"
+        return f"Shiftling shifts into a sharper form!"
 
     def revert(self) -> str:
         return "Shiftling returns to normal."
@@ -32,9 +32,9 @@ class Morphagon(Creature, TransformCapability):
         else:
             return "Morphagon attacks normally."
 
-    def transform(self, attribute: str) -> str:
+    def transform(self) -> str:
         self.transformed = True
-        return f"Morphagon morphs into a {attribute} form!"
+        return f"Morphagon morphs into a dragonic battle form!"
 
     def revert(self) -> str:
         self.transformed = False
