@@ -1,0 +1,49 @@
+from ..utils import Creature, CreatureFactory
+from ..capabilities import TransformCapability
+
+
+class Shiftling(Creature, TransformCapability):
+    def __init__(self) -> None:
+        super().__init__("Shiftling", "Normal")
+        self.transformed: bool = False
+
+    def attack(self) -> str:
+        if self.transformed:
+            return "Shiftling performs a boosted strike!"
+        else:
+            return "Shiftling attacks normally."
+
+    def transform(self, attribute: str) -> str:
+        self.transformed = True
+        return f"Shiftling shifts into a {attribute} form!"
+
+    def revert(self) -> str:
+        return "Shiftling returns to normal."
+
+
+class Morphagon(Creature, TransformCapability):
+    def __init__(self) -> None:
+        super().__init__("Morphagon", "Normal/Dragon")
+        self.transformed: bool = False
+
+    def attack(self) -> str:
+        if self.transformed:
+            return "Morphagon unleashes a devastating morph strike!"
+        else:
+            return "Morphagon attacks normally."
+
+    def transform(self, attribute: str) -> str:
+        self.transformed = True
+        return f"Morphagon morphs into a {attribute} form!"
+
+    def revert(self) -> str:
+        self.transformed = False
+        return "Morphagon stabilizes its form."
+
+
+class TransformCreatureFactory(CreatureFactory):
+    def create_base(self) -> Shiftling:
+        return Shiftling()
+
+    def create_evolved(self) -> Morphagon:
+        return Morphagon()
