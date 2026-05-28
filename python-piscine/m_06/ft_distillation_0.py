@@ -1,4 +1,4 @@
-from alchemy.potions import *
+from alchemy.potions import strength_potion, healing_potion
 
 print("=== Distillation 0 ===")
 print("Direct access to alchemy/potions.py")

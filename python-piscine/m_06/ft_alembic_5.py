@@ -1,4 +1,4 @@
-from alchemy import *
+from alchemy import create_air
 
 
 print("=== Alembic 5 ===")
