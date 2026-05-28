@@ -4,14 +4,34 @@ set -u
 
 TARGET_DIR="${1:-.}"
 
+cleanup_temp_folders() {
+  local root_dir
+
+  for root_dir in "${TARGET_DIR}" "."; do
+    if [[ -d "${root_dir}" ]]; then
+      find "${root_dir}" -type d \
+        \( -name '.mypy_cache' -o -name '__pycache__' -o -name '.pytest_cache' -o -name '.ruff_cache' \) \
+        -prune -exec rm -rf {} +
+    fi
+  done
+}
+
+trap cleanup_temp_folders EXIT
+
 clear
 
 echo "Python tester"
 echo "Target directory: ${TARGET_DIR}"
 echo "Commands:"
+echo "  flake8 <file>"
 echo "  autopep8 --diff --exit-code <file>"
 echo "  mypy <file>"
 echo
+
+if ! command -v flake8 >/dev/null 2>&1; then
+  echo "Error: flake8 is not available in PATH."
+  exit 127
+fi
 
 if ! command -v autopep8 >/dev/null 2>&1; then
   echo "Error: autopep8 is not available in PATH."
@@ -40,17 +60,21 @@ while IFS= read -r -d '' file; do
   autopep8 --diff --exit-code "${file}"
   autopep8_exit=$?
 
-  echo "[mypy] --warn-return-any --warn-unused-ignores --ignore-missing-import --disallow-untyped-defs --check-untyped-defs"
-  mypy --warn-return-any --warn-unused-ignores --ignore-missing-import --disallow-untyped-defs --check-untyped-defs "${file}"
+  echo "[mypy] --cache-dir=/dev/null --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs"
+  mypy --cache-dir=/dev/null --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs "${file}"
   mypy_exit=$?
 
-  if [[ ${autopep8_exit} -eq 0 && ${mypy_exit} -eq 0 ]]; then
-    echo "Status: OK (autopep8=0, mypy=0)"
+  echo "[flake8]"
+  flake8 "${file}"
+  flake8_exit=$?
+
+  if [[ ${autopep8_exit} -eq 0 && ${mypy_exit} -eq 0 && ${flake8_exit} -eq 0 ]]; then
+    echo "Status: OK (autopep8=0, mypy=0, flake8=0)"
   else
-    echo "Status: Issues found (autopep8=${autopep8_exit}, mypy=${mypy_exit})"
+    echo "Status: Issues found (autopep8=${autopep8_exit}, mypy=${mypy_exit}, flake8=${flake8_exit})"
   fi
 
-  if [[ ${autopep8_exit} -ne 0 || ${mypy_exit} -ne 0 ]]; then
+  if [[ ${autopep8_exit} -ne 0 || ${mypy_exit} -ne 0 || ${flake8_exit} -ne 0 ]]; then
     exit_code=1
   fi
 

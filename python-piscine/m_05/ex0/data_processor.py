@@ -118,7 +118,7 @@ def test_m5_ex0() -> None:
     print(f" Trying to validate input '{num_test_2}': "
           f"{Number_processor.validate(num_test_2)}")
 
-    test_3: int = "foo"
+    test_3: int = "foo" # type: ignore
     print(" Test invalid ingestion of string 'foo' without prior validation:")
     try:
         Number_processor.ingest(test_3)

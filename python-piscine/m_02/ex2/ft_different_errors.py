@@ -23,7 +23,7 @@ def garden_operations(operation_number) -> None:
                 file.read(42)
         elif operation_number == 3:
             name = "Maria"
-            name + 42
+            name + 42 # type: ignore
         else:
             print("Operation completed successfully\n")
             return

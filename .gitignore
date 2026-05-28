@@ -28,6 +28,7 @@ a.out
 
 # Python bytecode
 __pycache__/
+.mypy_cache/
 *.py[cod]
 *$py.class
 *.so
