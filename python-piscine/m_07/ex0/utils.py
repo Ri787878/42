@@ -6,6 +6,9 @@ class Creature(ABC):
         self._name = name
         self._type = type
 
+    def __repr__(self) -> str:
+        return self._name
+
     @abstractmethod
     def attack(self) -> str:
         pass

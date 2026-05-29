@@ -10,7 +10,7 @@ class Sproutling(Creature, HealCapability):
         return "Sproutling uses Vine Whip!"
 
     def heal(self) -> str:
-        return f"Sproutling heals itself for a small amount"
+        return "Sproutling heals itself for a small amount"
 
 
 class Bloomelle(Creature, HealCapability):
@@ -21,7 +21,7 @@ class Bloomelle(Creature, HealCapability):
         return "Bloomelle uses Petal Dance!"
 
     def heal(self) -> str:
-        return f"Bloomelle heals itself and others for a large amount"
+        return "Bloomelle heals itself and others for a large amount"
 
 
 class HealingCreatureFactory(CreatureFactory):
