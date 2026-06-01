@@ -23,7 +23,7 @@ clear
 echo "Python tester"
 echo "Target directory: ${TARGET_DIR}"
 echo "Commands:"
-echo "  flake8 <file>"
+echo "  flake8 --cache-dir=/dev/null --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs <file>"
 echo "  autopep8 --diff --exit-code <file>"
 echo "  mypy <file>"
 echo
@@ -60,13 +60,13 @@ while IFS= read -r -d '' file; do
   autopep8 --diff --exit-code "${file}"
   autopep8_exit=$?
 
-  echo "[mypy] --cache-dir=/dev/null --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs"
-  mypy --cache-dir=/dev/null --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs "${file}"
-  mypy_exit=$?
-
   echo "[flake8]"
   flake8 "${file}"
   flake8_exit=$?
+  
+  echo "[mypy]"
+  mypy --cache-dir=/dev/null --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs "${file}"
+  mypy_exit=$?
 
   if [[ ${autopep8_exit} -eq 0 && ${mypy_exit} -eq 0 && ${flake8_exit} -eq 0 ]]; then
     echo "Status: OK (autopep8=0, mypy=0, flake8=0)"
@@ -94,3 +94,4 @@ else
 fi
 
 exit "${exit_code}"
+
