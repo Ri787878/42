@@ -8,7 +8,7 @@ def is_modules_installed() -> bool:
         import pandas  # type: ignore
         print(f"[OK] pandas: ({pandas.__version__}) - Data manipulation ready")
         status_code += 0
-    except AttributeError:
+    except Exception:
         print("Import 'pandas' is not installed,"
               "\t\tTo install run: pip install pandas")
         status_code += 1
@@ -17,7 +17,7 @@ def is_modules_installed() -> bool:
         print(f"[OK] numpy: ({numpy.__version__}) "
               "- Numerical computation ready")
         status_code += 0
-    except AttributeError:
+    except Exception:
         print("Import 'numpy' is not installed,"
               "\t\tTo install run: pip install numpy")
         status_code += 0
@@ -26,7 +26,7 @@ def is_modules_installed() -> bool:
         print(f"[OK] matplotlib: ({matplotlib.__version__})"
               f" - Visualization ready")
         status_code += 0
-    except ModuleNotFoundError:
+    except Exception:
         print("Import 'matplotlib' is not installed,"
               "\t\tTo install run: pip install matplotlib")
         status_code += 1
@@ -99,3 +99,4 @@ def test_m8_ex1() -> None:
 if __name__ == "__main__":
     test_m8_ex1()
     # print(f"\n\n{sys.modules}")matrix_analysis.png
+
