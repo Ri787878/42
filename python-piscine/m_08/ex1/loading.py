@@ -14,7 +14,8 @@ def is_modules_installed() -> bool:
         status_code += 1
     try:
         import numpy  # type: ignore
-        print(f"[OK] numpy: ({numpy.__version__}) - Numerical computation ready")
+        print(f"[OK] numpy: ({numpy.__version__}) "
+              "- Numerical computation ready")
         status_code += 0
     except AttributeError:
         print("Import 'numpy' is not installed,"
@@ -34,9 +35,9 @@ def is_modules_installed() -> bool:
     else:
         print("\n[Warning] Missing dependencies!")
         print("\nTo install with pip:\n\tpip install -r requirements.txt")
-        print("[NOTE] Pip utilizes .txt file that can or not lock in a verimport ossion"
-              " of a module or just a limit(ex. >=2.0, meaning after or "
-              "including version 2.0)")
+        print("[NOTE] Pip utilizes .txt file that can or not lock in a "
+              "verimport ossion of a module or just a limit(ex. >=2.0, "
+              "meaning after or including version 2.0)")
         print("\nTo install with Poetry:\n\tpoetry install ")
         print("[NOTE] Poetry utilizes .toml file and locks module"
               " versions for reproducibility porposes")
@@ -51,7 +52,9 @@ def create_data() -> Any:
 
 def modify_data(data: Any) -> Any:
     import numpy as np
-    return data.astype(float) * 1.2 + np.random.randint(-20, 21, size=data.shape)
+    return data.astype(float) * 1.2 + np.random.randint(-20,
+                                                        21,
+                                                        size=data.shape)
 
 
 def sort_data(matrix: Any) -> Any:
@@ -61,8 +64,8 @@ def sort_data(matrix: Any) -> Any:
 
 def create_graph(matrix: Any) -> None:
     import pandas as pd
-    import matplotlib.pyplot as plt # type: ignore
-    
+    import matplotlib.pyplot as plt  # type: ignore
+
     df = pd.DataFrame(matrix)
 
     plt.figure(figsize=(8, 6))
@@ -74,11 +77,9 @@ def create_graph(matrix: Any) -> None:
     plt.close()
 
 
-
 def test_m8_ex1() -> None:
     print("\nLOADING STATUS: Loading programs...\n")
 
-    
     if is_modules_installed():
         data = create_data()
         print("\nAnalyzing Matrix data...")

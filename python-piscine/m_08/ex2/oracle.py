@@ -1,5 +1,4 @@
 import os
-import sys
 
 
 def safe_load_dotenv() -> bool:
@@ -70,40 +69,40 @@ def test_m8_ex2() -> None:
         if conf_mode == "development":
             print(f"Mode: {conf_mode}")
             if db_url == "127.0.0.1":
-                print(f"Database: Connected to local instance")
+                print("Database: Connected to local instance")
             else:
-                print(f"Database: Unable to connect to local instance")
+                print("Database: Unable to connect to local instance")
 
             if api_access == "dummy-12345":
-                print(f"API Access: Authenticated")
+                print("API Access: Authenticated")
             else:
                 print("API Access: Denied")
-            print(f"Log Level: {log_level}")
+            print("Log Level: {log_level}")
             if zion_connection == "https://example.invalid/api":
-                print(f"Zion Network: Online")
+                print("Zion Network: Online")
             else:
-                print(f"Zion Network: Offline")
-        
+                print("Zion Network: Offline")
+
         if conf_mode == "production":
             print(f"Mode: {conf_mode}")
             if db_url == "DATABASE_URL=redis://:dummy_pass@192.0.2.1:6379/0":
-                print(f"Database: Connected to production instance")
+                print("Database: Connected to production instance")
             else:
-                print(f"Database: Unable to connect to production instance")
+                print("Database: Unable to connect to production instance")
 
             if api_access == "secret123":
-                print(f"Production API Access: Authenticated")
+                print("Production API Access: Authenticated")
             else:
                 print("Production API Access: Denied")
             print(f"Log Level: {log_level}")
             if zion_connection == "https://real/api":
-                print(f"Production Zion Network: Online")
+                print("Production Zion Network: Online")
             else:
-                print(f"Production Zion Network: Offline")
+                print("Production Zion Network: Offline")
 
     print("\nEnvironment security check:")
     print("[OK] No hardcoded secrets detected")
-        
+
     if env_status:
         print("[OK] .env file properly configured")
     else:
@@ -114,7 +113,7 @@ def test_m8_ex2() -> None:
         print("[OK] Development overrides available")
     else:
         print("[KO] MATRIX_MODE overrides unavailable")
-    
+
     print("\nThe Oracle sees all configurations.")
 
 

@@ -31,7 +31,6 @@ def get_package_location() -> str:
 def test_m8_ex0() -> None:
     enviroment_status: bool = check_enviroment()
 
-
     print(f"\nMATRIX STATUS: {get_venv_status(enviroment_status)}\n")
 
     print(f"Current Python: {sys.executable}")
@@ -40,15 +39,17 @@ def test_m8_ex0() -> None:
     if enviroment_status:
 
         print("SUCCESS: You're in an isolated environment!\n"
-              "Safe to install packages without affecting the global system.\n")
+              "Safe to install packages without affecting "
+              "the global system.\n")
         print(f"Package installation path:\n{get_package_location()}")
-         
+
     else:
         print("To enter the construct, run:\n"
               "python -m venv matrix_env\n"
               "source matrix_env/bin/activate # On Unix\n"
-              "matrix_env\Scripts\activate # On Windows\n"
+              "matrix_env\\Scripts\\activate # On Windows\n"
               "\nThen run this program again.")
+
 
 if __name__ == "__main__":
     test_m8_ex0()
