@@ -98,9 +98,40 @@ def main() -> None:
         print(e.errors()[0]["msg"])
 
 
-if __name__ == "__main__":
-    main()
+def testwith_generator() -> None:
+    from pathlib import Path
+    import sys
 
+    try:
+        from generated_data import SPACE_STATIONS
+    except ModuleNotFoundError:
+        workspace_root = Path(__file__).resolve().parent.parent
+        sys.path.insert(0, str(workspace_root))
+        from generated_data import SPACE_STATIONS
+
+    for station_data in SPACE_STATIONS:
+        try:
+            station = SpaceStation(
+                input_id=station_data["station_id"],
+                input_name=station_data["name"],
+                input_size=station_data["crew_size"],
+                input_power=station_data["power_level"],
+                input_oxygen=station_data["oxygen_level"],
+                input_maintenance=datetime.fromisoformat(station_data["last_maintenance"]),
+                input_operacional_status=station_data["is_operational"],
+                input_notes=station_data["notes"],
+            )
+            print("Space Station Data Validation")
+            print("========================================")
+            station.print_info()
+            print("\n========================================")
+        except Exception as e:
+            print(e)
+
+
+if __name__ == "__main__":
+    # main()
+    testwith_generator()
     """
     def __init__(
         self, input_id: str,
