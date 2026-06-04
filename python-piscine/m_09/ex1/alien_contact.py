@@ -92,26 +92,26 @@ def main() -> None:
     invalid_message_received: str | None = None
     invalid_is_verified: bool = False
 
-    contact_1 = AlienContact(
-        valid_contact_id,
-        valid_timestamp,
-        valid_location,
-        valid_contact_type,
-        valid_signal_strength,
-        valid_duration_minutes,
-        valid_witness_count,
-        valid_message_received,
-        valid_is_verified,
-    )
-
-    print("Alien Contact Data Validation")
-    print("========================================")
-    print("Valid contact created:")
-    contact_1.show_info()
-    print("\n========================================")
-
-    print("Expected validation error:")
     try:
+        contact_1 = AlienContact(
+            valid_contact_id,
+            valid_timestamp,
+            valid_location,
+            valid_contact_type,
+            valid_signal_strength,
+            valid_duration_minutes,
+            valid_witness_count,
+            valid_message_received,
+            valid_is_verified,
+        )
+        print("Alien Contact Data Validation")
+        print("========================================")
+        print("Valid contact created:")
+        contact_1.show_info()
+        print("\n========================================")
+
+        print("Expected validation error:")
+
         contact_2 = AlienContact(
             invalid_contact_id,
             invalid_timestamp,
@@ -133,17 +133,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-"""CheatSheet
-    AlienContact Model
-    Create a Pydantic model with these fields:
-        • contact_id: String, 5-15 characters
-        • timestamp: DateTime of contact
-        • location: String, 3-100 characters
-        • contact_type: ContactType enum
-        • signal_strength: Float, 0.0-10.0 scale
-        • duration_minutes: Integer, 1-1440 (max 24 hours)
-        • witness_count: Integer, 1-100 people
-        • is_verified: Boolean, defaults to False
-        • message_received: Optional string, max 500 characters
-"""

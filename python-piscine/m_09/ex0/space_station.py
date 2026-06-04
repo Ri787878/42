@@ -64,25 +64,26 @@ def main() -> None:
     station_2_is_operational: bool = False
     station_2_notes: str | None = "Needs inspection"
 
-    station_1 = SpaceStation(
-        station_1_id,
-        station_1_name,
-        station_1_crew_size,
-        station_1_power_level,
-        station_1_oxygen_level,
-        station_1_last_maintenance,
-        station_1_is_operational,
-        station_1_notes,
-    )
-
-    print("Space Station Data Validation")
-    print("========================================")
-    print("Valid station created:")
-    station_1.print_info()
-    print("\n========================================")
-
-    print("Expected validation error:")
     try:
+        station_1 = SpaceStation(
+            station_1_id,
+            station_1_name,
+            station_1_crew_size,
+            station_1_power_level,
+            station_1_oxygen_level,
+            station_1_last_maintenance,
+            station_1_is_operational,
+            station_1_notes,
+        )
+
+        print("Space Station Data Validation")
+        print("========================================")
+        print("Valid station created:")
+        station_1.print_info()
+        print("\n========================================")
+
+        print("Expected validation error:")
+
         station_2 = SpaceStation(
             station_2_id,
             station_2_name,
@@ -98,57 +99,5 @@ def main() -> None:
         print(e.errors()[0]["msg"])
 
 
-def testwith_generator() -> None:
-    from pathlib import Path
-    import sys
-
-    try:
-        from generated_data import SPACE_STATIONS
-    except ModuleNotFoundError:
-        workspace_root = Path(__file__).resolve().parent.parent
-        sys.path.insert(0, str(workspace_root))
-        from generated_data import SPACE_STATIONS
-
-    for station_data in SPACE_STATIONS:
-        try:
-            station = SpaceStation(
-                input_id=station_data["station_id"],
-                input_name=station_data["name"],
-                input_size=station_data["crew_size"],
-                input_power=station_data["power_level"],
-                input_oxygen=station_data["oxygen_level"],
-                input_maintenance=datetime.fromisoformat(station_data["last_maintenance"]),
-                input_operacional_status=station_data["is_operational"],
-                input_notes=station_data["notes"],
-            )
-            print("Space Station Data Validation")
-            print("========================================")
-            station.print_info()
-            print("\n========================================")
-        except Exception as e:
-            print(e)
-
-
 if __name__ == "__main__":
-    # main()
-    testwith_generator()
-    """
-    def __init__(
-        self, input_id: str,
-        input_name: str,
-        input_size: int,
-        input_power: float, input_oxygen: float,
-        input_maintenance: datetime,
-        input_operacional_status: bool,
-        input_notes: str | None
-    ) -> None:
-
-        self.station_id = input_id
-        self.name = input_name
-        self.crew_size = input_size
-        self.power_level = input_power
-        self.oxygen_level = input_oxygen
-        self.last_maintenance = input_maintenance
-        self.is_operational = input_operacional_status
-        self.notes = input_notes
-    """
+    main()
