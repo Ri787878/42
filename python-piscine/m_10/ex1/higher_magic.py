@@ -1,7 +1,4 @@
-from typing import Callable
-"""
-def spell_sequence(spells: list[Callable]) -> Callable
-"""
+from collections.abc import Callable
 
 
 def heal(target: str, power: int) -> str:
@@ -16,31 +13,19 @@ def enhance(target: str, power: int) -> str:
     return f"Enhance increases streght of {target} by {power} Power"
 
 
-def spell_combiner(
-    spell1: Callable[[str, int], str],
-    spell2: Callable[[str, int], str]
-) -> Callable[[str, int], tuple[str, str]]:
-
-    def combined(target: str, power: int) -> tuple[str, str]:
-        return (spell2(target, power), spell1(target, power))
+def spell_combiner(spell1: Callable, spell2: Callable) -> Callable:
+    def combined(target: str, power: int) -> tuple:
+        return (spell1(target, power), spell2(target, power))
     return combined
 
 
-def power_amplifier(
-    base_spell: Callable[[str, int], str],
-    multiplier: int
-) -> Callable[[str, int], str]:
-
+def power_amplifier(base_spell: Callable, multiplier: int) -> Callable:
     def amplifier(target: str, power: int) -> str:
         return base_spell(target, power * multiplier)
     return amplifier
 
 
-def conditional_caster(
-    condition: Callable[[str], bool],
-    spell: Callable[[str, int], str]
-) -> Callable[[str, int], str]:
-
+def conditional_caster(condition: Callable, spell: Callable) -> Callable:
     def conditional(target: str, power: int) -> str:
         if condition(target):
             return spell(target, power)
@@ -59,6 +44,12 @@ def is_target_allowed(target: str) -> bool:
     return True
 
 
+def spell_sequence(spells: list[Callable]) -> Callable:
+    def sequencer(target: str, power: int) -> list:
+        return [spell(target, power) for spell in spells]
+    return sequencer
+
+
 if __name__ == "__main__":
     combo1 = spell_combiner(heal, explosion)
 
@@ -72,5 +63,9 @@ if __name__ == "__main__":
         print(mega_explosion("Arthur", 3))
         # mega_explosion = conditional_caster(is_target_allowed, explosion)
         # print(mega_explosion("Orc(enemy)", 45))
+        # long_spell = spell_sequence([explosion, heal, enhance])
+        # sequence = long_spell("Arthur", 15)
+        # for spell in sequence:
+        #     print(spell)
     except Exception as e:
         print(e)
