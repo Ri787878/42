@@ -61,11 +61,11 @@ if __name__ == "__main__":
 
         mega_explosion = power_amplifier(explosion, 10)
         print(mega_explosion("Arthur", 3))
-        # mega_explosion = conditional_caster(is_target_allowed, explosion)
-        # print(mega_explosion("Orc(enemy)", 45))
-        # long_spell = spell_sequence([explosion, heal, enhance])
-        # sequence = long_spell("Arthur", 15)
-        # for spell in sequence:
-        #     print(spell)
+        mega_explosion = conditional_caster(is_target_allowed, explosion)
+        print(mega_explosion("Orc(enemy)", 45))
+        long_spell = spell_sequence([explosion, heal, enhance])
+        sequence = long_spell("Arthur", 15)
+        for spell in sequence:
+            print(spell)
     except Exception as e:
         print(e)

@@ -30,10 +30,10 @@ def memory_vault() -> dict[str, Callable]:
 
     def store(key: str, value: object) -> None:
         storage[key] = value
-    
+
     def recall(key: str) -> object:
         return storage.get(key, "Memory not found")
-    
+
     return {"store": store, "recall": recall}
 
 

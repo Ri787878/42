@@ -35,4 +35,3 @@ if __name__ == "__main__":
     for spell in transformed_spells:
         print(f"{spell} ", end="")
     print()
-    pass
