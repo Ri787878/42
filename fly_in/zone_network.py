@@ -1,8 +1,17 @@
 from pydantic import BaseModel, Field, model_validator
 from typing import Tuple, Union
+from enum import Enum
 # , ValidationError
 
 valid_hub = Union[Tuple[str, int, int], Tuple[str, int, int, list[str]]]
+
+
+class Tags(Enum):
+    """Available tags for a hub."""
+    NORMAL = "normal"
+    BLOCKED = "blocked",
+    RESTRICTED = "restricted",
+    PRIORITY = "priority"
 
 
 class Zone_Network(BaseModel):
@@ -11,6 +20,9 @@ class Zone_Network(BaseModel):
     end_hub: valid_hub
     hub: list[valid_hub]
     connection: list[tuple[str, str]] = Field()
+    turn_cost: int = 1
+    is_blocked: bool = False
+    prioritized: bool = False
 
     def __init__(
         self,
@@ -29,6 +41,32 @@ class Zone_Network(BaseModel):
             connection=input_connection
         )
 
+    def existing_tags(self, tags: list[str]) -> list[str]:
+        existing_tags: list[str] = []
+        for metadata in tags:
+            if "zone" in metadata:
+                existing_tags.append("zone")
+            if "color" in metadata:
+                existing_tags.append("color")
+            if "max_drones" in metadata:
+                existing_tags.append("hub")
+            if "tags" in metadata:
+                existing_tags.append("tags")
+        return existing_tags
+
+    def check_metadata(self, tags: list[str]) -> None:
+        existing_metadata: list[str] = self.existing_tags(tags)
+
+        if Tags.NORMAL in existing_metadata:
+            self.turn_cost = 1
+        if Tags.BLOCKED in existing_metadata:
+            self.is_blocked = True
+        if Tags.RESTRICTED in existing_metadata:
+            self.turn_cost = 2
+        if Tags.PRIORITY in existing_metadata:
+            self.turn_cost = 1
+            self.prioritized = True
+
     def is_valid_hub(self, hub_list: list | tuple) -> None:
         checked_zones: list[str] = []
 
@@ -42,21 +80,8 @@ class Zone_Network(BaseModel):
                     f"[ERROR] Hub {hub[0]} coordenates are invalid"
                     f" ({hub[1]},{hub[2]}).")
             if len(hub) > 3:
-                checked_metadata: list[str] = []
-                for metadata in hub[3]:
-                    if "zone" in metadata:
-                        checked_metadata.append("zone")
-                    if "color" in metadata:
-                        checked_metadata.append("color")
-                        pass
-                    if "max_drones" in metadata:
-                        checked_metadata.append("hub")
-                        pass
-                    if "tags" in metadata:
-                        checked_metadata.append("tags")
-                        pass
-
-                pass
+                metadata_list: list[str] = hub[3]
+                self.check_metadata(tag_list)
             else:
                 checked_zones.append(hub[0])
 
