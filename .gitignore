@@ -131,3 +131,13 @@ Thumbs.db
 
 piscine/main
 libft/francinette
+
+
+# For Fly-In
+# Cache
+/__pycache__
+/.mypy_cache
+
+#Virtual Enviroment
+venv/
+

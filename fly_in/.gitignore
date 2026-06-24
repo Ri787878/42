@@ -1,0 +1,6 @@
+# Cache
+/__pycache__
+/.mypy_cache
+
+#Virtual Enviroment
+venv/
