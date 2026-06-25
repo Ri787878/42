@@ -18,7 +18,7 @@ if __name__ == "__main__":
         # print(start_hub.x_coord)
 
         project_configuration: dict = file_interpreter(sys.argv[1])
-        #print(project_configuration)
+        # print(project_configuration)
 
         # Fixed: Outer double quotes, inner single quotes
         print(f"Start hub has conf:{project_configuration['start_hub']}")
