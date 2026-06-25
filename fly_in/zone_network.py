@@ -3,19 +3,28 @@ from enum import Enum
 # , ValidationError
 
 
-class Tags(Enum):
-    """Available tags for a hub."""
+class Approved_tags(str, Enum):
+    """Approved tags as individual Enum members."""
     NORMAL = "normal"
-    BLOCKED = "blocked",
-    RESTRICTED = "restricted",
+    BLOCKED = "blocked"
+    RESTRICTED = "restricted"
     PRIORITY = "priority"
 
 
+class InvalidConfiguration(Exception):
+    def __init__(self, error: str) -> None:
+        super().__init__(f"Input Error: {error}")
+
+
 class Hub(BaseModel):
-    # Base Values
+    """Represents a Hub"""
+    # Inputted Values
     name: str = Field(min_length=1)
     x_coord: int = Field(ge=0)
     y_coord: int = Field(ge=0)
+    metadata: list[str] | None = None
+
+    # Base Hidden values
     movement_cost: int = Field(default=1)
     is_blocked: bool = Field(default=False)
     prefered_zone: bool = Field(default=False)
@@ -24,21 +33,20 @@ class Hub(BaseModel):
     zone: str = Field(default="normal")
     color: str = Field(default="white")
     max_drones: int = Field(default=1)
-    metadata: list[str] | None = None
 
     @model_validator(mode="after")
     def validate_hub(self) -> "Hub":
         # Check Errors in Inputed values
         if "-" in self.name or " " in self.name:
-            raise ValueError(
+            raise InvalidConfiguration(
                 f"[ERROR] Hub {self.name} can't have ' ' or '-'.")
         if " " in self.color:
-            raise ValueError(
+            raise InvalidConfiguration(
                 f"[ERROR] Hub {self.name} can't have multi word colors"
                 f" '{self.color}'.")
 
         if (self.x_coord < 0) or (self.y_coord < 0):
-            raise ValueError(
+            raise InvalidConfiguration(
                 f"[ERROR] Hub {self.name} coordenates are invalid"
                 f" ({self.x_coord},{self.y_coord}).")
 
@@ -53,12 +61,17 @@ class Hub(BaseModel):
             return
         else:
             for metadata in self.metadata:
-                if "zone" in metadata:
-                    self.zone = metadata[5:]
-                if "color" in metadata:
-                    self.zone = metadata[6:]
-                if "max_drones" in metadata:
-                    self.zone = metadata[10:]
+                if metadata.startswith("zone"):
+                    if metadata[5:] in [tag.value for tag in Approved_tags]:
+                        self.zone = metadata[5:]
+                    else:
+                        raise InvalidConfiguration(
+                            f"[ERROR] Hub '{self.name}'"
+                            f" has invalid zone '{metadata[5:]}'.")
+                elif "color" in metadata:
+                    self.color = metadata[6:]
+                elif "max_drones" in metadata:
+                    self.max_drones = int(metadata[10:])
 
     def apply_zone_qualifiers(self) -> None:
         if self.zone == "normal":
