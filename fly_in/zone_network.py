@@ -1,9 +1,6 @@
 from pydantic import BaseModel, Field, model_validator
-from typing import Tuple, Union
 from enum import Enum
 # , ValidationError
-
-valid_hub = Union[Tuple[str, int, int], Tuple[str, int, int, list[str]]]
 
 
 class Tags(Enum):
@@ -14,80 +11,75 @@ class Tags(Enum):
     PRIORITY = "priority"
 
 
+class Hub(BaseModel):
+    # Base Values
+    name: str = Field(min_length=1)
+    x_coord: int = Field(ge=0)
+    y_coord: int = Field(ge=0)
+    movement_cost: int = Field(default=1)
+    is_blocked: bool = Field(default=False)
+    prefered_zone: bool = Field(default=False)
+
+    # Metadata
+    zone: str = Field(default="normal")
+    color: str = Field(default="white")
+    max_drones: int = Field(default=1)
+    metadata: list[str] | None = None
+
+    @model_validator(mode="after")
+    def validate_hub(self) -> "Hub":
+        # Check Errors in Inputed values
+        if "-" in self.name or " " in self.name:
+            raise ValueError(
+                f"[ERROR] Hub {self.name} can't have ' ' or '-'.")
+        if " " in self.color:
+            raise ValueError(
+                f"[ERROR] Hub {self.name} can't have multi word colors"
+                f" '{self.color}'.")
+
+        if (self.x_coord < 0) or (self.y_coord < 0):
+            raise ValueError(
+                f"[ERROR] Hub {self.name} coordenates are invalid"
+                f" ({self.x_coord},{self.y_coord}).")
+
+        # Apply configurations depending on existing Metadata
+        self.apply_metadata()
+        self.apply_zone_qualifiers()
+
+        return self
+
+    def apply_metadata(self) -> None:
+        if not self.metadata:
+            return
+        else:
+            for metadata in self.metadata:
+                if "zone" in metadata:
+                    self.zone = metadata[5:]
+                if "color" in metadata:
+                    self.zone = metadata[6:]
+                if "max_drones" in metadata:
+                    self.zone = metadata[10:]
+
+    def apply_zone_qualifiers(self) -> None:
+        if self.zone == "normal":
+            pass
+        elif self.zone == "blocked":
+            self.is_blocked = True
+        elif self.zone == "restricted":
+            self.movement_cost = 2
+        elif self.zone == "priority":
+            self.movement_cost = 1
+            self.prefered_zone = True
+
+
 class Zone_Network(BaseModel):
     nb_drones: int = Field(ge=1)
-    start_hub: valid_hub
-    end_hub: valid_hub
-    hub: list[valid_hub]
+    start_hub: Hub
+    end_hub: Hub
+    hub: list[Hub]
     connection: list[tuple[str, str]] = Field()
-    turn_cost: int = 1
-    is_blocked: bool = False
-    prioritized: bool = False
-
-    def __init__(
-        self,
-        input_nb_drones,
-        input_start_hub,
-        input_end_hub,
-        input_hub,
-        input_connection
-    ) -> None:
-
-        super().__init__(
-            nb_drones=input_nb_drones,
-            start_hub=input_start_hub,
-            end_hub=input_end_hub,
-            hub=input_hub,
-            connection=input_connection
-        )
-
-    def existing_tags(self, tags: list[str]) -> list[str]:
-        existing_tags: list[str] = []
-        for metadata in tags:
-            if "zone" in metadata:
-                existing_tags.append("zone")
-            if "color" in metadata:
-                existing_tags.append("color")
-            if "max_drones" in metadata:
-                existing_tags.append("hub")
-            if "tags" in metadata:
-                existing_tags.append("tags")
-        return existing_tags
-
-    def check_metadata(self, tags: list[str]) -> None:
-        existing_metadata: list[str] = self.existing_tags(tags)
-
-        if Tags.NORMAL in existing_metadata:
-            self.turn_cost = 1
-        if Tags.BLOCKED in existing_metadata:
-            self.is_blocked = True
-        if Tags.RESTRICTED in existing_metadata:
-            self.turn_cost = 2
-        if Tags.PRIORITY in existing_metadata:
-            self.turn_cost = 1
-            self.prioritized = True
-
-    def is_valid_hub(self, hub_list: list | tuple) -> None:
-        checked_zones: list[str] = []
-
-        for hub in hub_list:
-            if "-" in hub[0] or " " in hub[0]:
-                raise ValueError(
-                    f"[ERROR] Hub {hub[0]} can't have ' ' or '-'.")
-
-            if (hub[1] < 0) or (hub[2] < 0):
-                raise ValueError(
-                    f"[ERROR] Hub {hub[0]} coordenates are invalid"
-                    f" ({hub[1]},{hub[2]}).")
-            if len(hub) > 3:
-                metadata_list: list[str] = hub[3]
-                self.check_metadata(tag_list)
-            else:
-                checked_zones.append(hub[0])
 
     @model_validator(mode="after")
     def check_inputs(self) -> "Zone_Network":
-        self.is_valid_hub(self.start_hub)
-        self.is_valid_hub(self.end_hub)
-
+        # TODO: add a check for unique start and end zone coordenates
         return self
