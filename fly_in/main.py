@@ -41,103 +41,94 @@ def start_display(network: Zone_Network) -> None:
     pygame.init()
     pygame.font.init()
 
-    # Constants
     WIDTH, HEIGHT = 800, 600
     SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Zone Network Visualizer")
     CLOCK = pygame.time.Clock()
     FONT = pygame.font.SysFont("Arial", 14)
+    SMALL_FONT = pygame.font.SysFont("Arial", 12)
 
-    # --- Fixed Camera State ---
-    zoom_scale = 1.0
-    pan_x = 0.0
-    pan_y = 0.0
-    is_dragging = False
-    drag_start_x, drag_start_y = 0, 0
+    BG_COLOR = (30, 30, 40)
+    GRID_COLOR = (55, 55, 70)
+    AXIS_COLOR = (95, 95, 120)
+    LINE_COLOR = (180, 180, 180)
+    TEXT_COLOR = (255, 255, 255)
+    START_COLOR = (50, 205, 50)
+    END_COLOR = (220, 20, 60)
+    HUB_COLOR = (70, 130, 180)
 
-    def world_to_screen(world_x, world_y):
-        """Transforms raw Hub coordinates to screen space based on zoom and pan."""
-        # Scale from the center of the screen to make zooming feel natural
-        screen_x = (world_x - WIDTH // 2) * zoom_scale + WIDTH // 2 + pan_x
-        screen_y = (world_y - HEIGHT // 2) * zoom_scale + HEIGHT // 2 + pan_y
-        return int(screen_x), int(screen_y)
-    
-    def reset_camera_to_network():
-        """Calculates the center of all hubs and centers the camera on them."""
-        global zoom_scale, pan_x, pan_y
-        if not network.hub:
-            return
-        # Find the middle point of your network bounding box
-        all_x = [h.x_coord for h in network.hub]
-        all_y = [h.y_coord for h in network.hub]
-        
-        avg_x = sum(all_x) / len(all_x)
-        avg_y = sum(all_y) / len(all_y)
-        
-        # Reset values
-        zoom_scale = 1.0
-        # Offset the pan so that the average coordinate lands precisely in the center of the screen
-        pan_x = -avg_x
-        pan_y = -avg_y
-    
-    # Run auto-center once at startup
-    reset_camera_to_network()
+    nodes = [network.start_hub, network.end_hub, *network.hub]
+    min_x = min(node.x_coord for node in nodes)
+    max_x = max(node.x_coord for node in nodes)
+    min_y = min(node.y_coord for node in nodes)
+    max_y = max(node.y_coord for node in nodes)
 
-    # Color Palette
-    BG_COLOR = (30, 30, 40)       # Dark slate
-    LINE_COLOR = (150, 150, 150)   # Light gray for connections
-    TEXT_COLOR = (255, 255, 255)   # White for labels
-    START_COLOR = (50, 205, 50)    # Lime Green
-    END_COLOR = (220, 20, 60)      # Crimson
-    HUB_COLOR = (70, 130, 180)     # Steel Blue
+    margin = 70
+    span_x = max(1, max_x - min_x)
+    span_y = max(1, max_y - min_y)
 
-    # Create a quick lookup dictionary to find Hub coordinates by their names
-    hub_lookup = {h.name: (h.x_coord, h.y_coord) for h in network.hub}
+    cell_size = min(
+        (WIDTH - 2 * margin) / span_x,
+        (HEIGHT - 2 * margin) / span_y,
+    )
+    cell_size = max(30, int(cell_size))
+
+    content_width = span_x * cell_size
+    content_height = span_y * cell_size
+    offset_x = (WIDTH - content_width) / 2 - min_x * cell_size
+    offset_y = (HEIGHT - content_height) / 2 - min_y * cell_size
+
+    def world_to_screen(world_x: int, world_y: int) -> tuple[int, int]:
+        screen_x = int(offset_x + world_x * cell_size)
+        screen_y = int(HEIGHT - (offset_y + world_y * cell_size))
+        return screen_x, screen_y
+
+    def get_node_style(node: object) -> tuple[tuple[int, int, int], str]:
+        if node.name == network.start_hub.name:
+            return START_COLOR, " (Start)"
+        if node.name == network.end_hub.name:
+            return END_COLOR, " (Goal)"
+        return HUB_COLOR, ""
 
     running = True
     while running:
-        # Event Handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Clear screen
         SCREEN.fill(BG_COLOR)
 
-        # --- Draw Connections (Lines) ---
+        hub_lookup = {
+            node.name: world_to_screen(node.x_coord, node.y_coord)
+            for node in nodes
+        }
+
         for start_name, end_name in network.connection:
             if start_name in hub_lookup and end_name in hub_lookup:
-                start_pos = hub_lookup[start_name]
-                end_pos = hub_lookup[end_name]
-                pygame.draw.line(SCREEN, LINE_COLOR, start_pos, end_pos, 3)
+                pygame.draw.line(
+                    SCREEN,
+                    LINE_COLOR,
+                    hub_lookup[start_name],
+                    hub_lookup[end_name],
+                    3,
+                )
 
-        # --- Draw Hubs (Nodes) ---
-        for h in network.hub:
-            pos = (h.x_coord, h.y_coord)
+        for node in nodes:
+            pos = world_to_screen(node.x_coord, node.y_coord)
+            node_color, label_suffix = get_node_style(node)
 
-            # Color code hubs based on their role
-            if h.name == network.start_hub.name:
-                node_color = START_COLOR
-                label_suffix = " (Start)"
-            elif h.name == network.end_hub.name:
-                node_color = END_COLOR
-                label_suffix = " (Goal)"
-            else:
-                node_color = HUB_COLOR
-                label_suffix = ""
-
-            # Draw the outer ring and filled center for the hub
             pygame.draw.circle(SCREEN, node_color, pos, 16)
-            pygame.draw.circle(SCREEN, (20, 20, 20), pos, 12)  # Hollow center effect
+            pygame.draw.circle(SCREEN, (20, 20, 20), pos, 12)
             pygame.draw.circle(SCREEN, node_color, pos, 6)
 
-            # Render and draw Text Label
-            text_surface = FONT.render(f"{h.name}{label_suffix}", True, TEXT_COLOR)
-            # Position text slightly above the hub node
-            text_rect = text_surface.get_rect(center=(h.x_coord, h.y_coord - 25))
+            text_surface = FONT.render(
+                f"{node.name}{label_suffix} ({node.x_coord}, {node.y_coord})",
+                True,
+                TEXT_COLOR,
+            )
+            text_rect = text_surface.get_rect(center=(pos[0], pos[1] - 26))
             SCREEN.blit(text_surface, text_rect)
 
-        # Update display
         pygame.display.flip()
         CLOCK.tick(60)
 

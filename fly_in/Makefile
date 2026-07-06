@@ -2,7 +2,7 @@ install:
 		pip install -r requirements.txt
 
 run:
-		python3 main.py
+		python3 main.py test-files/easy/01_linear_path.txt
 
 debug:
 		python3 -m pdb main.py test-files/easy/01_linear_path.txt
