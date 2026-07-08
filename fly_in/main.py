@@ -1,4 +1,4 @@
-from zone_network import Zone_Network, InvalidConfiguration
+from zone_network import Zone_Network, InvalidConfiguration, Hub
 from pydantic import ValidationError
 import sys
 import pygame
@@ -46,11 +46,8 @@ def start_display(network: Zone_Network) -> None:
     pygame.display.set_caption("Zone Network Visualizer")
     CLOCK = pygame.time.Clock()
     FONT = pygame.font.SysFont("Arial", 14)
-    SMALL_FONT = pygame.font.SysFont("Arial", 12)
 
     BG_COLOR = (30, 30, 40)
-    GRID_COLOR = (55, 55, 70)
-    AXIS_COLOR = (95, 95, 120)
     LINE_COLOR = (180, 180, 180)
     TEXT_COLOR = (255, 255, 255)
     START_COLOR = (50, 205, 50)
@@ -83,7 +80,7 @@ def start_display(network: Zone_Network) -> None:
         screen_y = int(HEIGHT - (offset_y + world_y * cell_size))
         return screen_x, screen_y
 
-    def get_node_style(node: object) -> tuple[tuple[int, int, int], str]:
+    def get_node_style(node: Hub) -> tuple[tuple[int, int, int], str]:
         if node.name == network.start_hub.name:
             return START_COLOR, " (Start)"
         if node.name == network.end_hub.name:
@@ -114,7 +111,7 @@ def start_display(network: Zone_Network) -> None:
                 )
 
         for node in nodes:
-            pos = world_to_screen(node.x_coord, node.y_coord)
+            pos: tuple[int, int] = world_to_screen(node.x_coord, node.y_coord)
             node_color, label_suffix = get_node_style(node)
 
             pygame.draw.circle(SCREEN, node_color, pos, 16)
