@@ -70,14 +70,22 @@ def start_display(network: Zone_Network) -> None:
     )
     cell_size = max(30, int(cell_size))
 
-    content_width = span_x * cell_size
-    content_height = span_y * cell_size
-    offset_x = (WIDTH - content_width) / 2 - min_x * cell_size
-    offset_y = (HEIGHT - content_height) / 2 - min_y * cell_size
+    content_width = max(WIDTH, int(span_x * cell_size + (2 * margin)))
+    content_height = max(HEIGHT, int(span_y * cell_size + (2 * margin)))
+
+    world_surface = pygame.Surface((content_width, content_height))
+
+    offset_x = margin - min_x * cell_size
+    offset_y = margin - min_y * cell_size
+
+    # Camera and Zoom settings
+    camera_x = 0
+    camera_y = 0
+    zoom_level = 1.0
 
     def world_to_screen(world_x: int, world_y: int) -> tuple[int, int]:
         screen_x = int(offset_x + world_x * cell_size)
-        screen_y = int(HEIGHT - (offset_y + world_y * cell_size))
+        screen_y = int(content_height - (offset_y + world_y * cell_size))
         return screen_x, screen_y
 
     def get_node_style(node: Hub) -> tuple[tuple[int, int, int], str]:
@@ -93,7 +101,27 @@ def start_display(network: Zone_Network) -> None:
             if event.type == pygame.QUIT:
                 running = False
 
-        SCREEN.fill(BG_COLOR)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:
+                    zoom_level = min(4.0, zoom_level + 0.1)
+                elif event.button == 5:
+                    min_zoom_x = WIDTH / content_width
+                    min_zoom_y = HEIGHT / content_height
+                    absolute_min_zoom = max(0.2, max(min_zoom_x, min_zoom_y))
+                    zoom_level = max(absolute_min_zoom, zoom_level - 0.1)
+
+        # Keyboard panning controls
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            camera_x -= 10
+        if keys[pygame.K_RIGHT]:
+            camera_x += 10
+        if keys[pygame.K_UP]:
+            camera_y -= 10
+        if keys[pygame.K_DOWN]:
+            camera_y += 10
+
+        world_surface.fill(BG_COLOR)
 
         hub_lookup = {
             node.name: world_to_screen(node.x_coord, node.y_coord)
@@ -103,29 +131,52 @@ def start_display(network: Zone_Network) -> None:
         for start_name, end_name in network.connection:
             if start_name in hub_lookup and end_name in hub_lookup:
                 pygame.draw.line(
-                    SCREEN,
+                    world_surface,
                     LINE_COLOR,
                     hub_lookup[start_name],
                     hub_lookup[end_name],
                     3,
                 )
 
+        # Draw Connections Between Hubs and labels
         for node in nodes:
             pos: tuple[int, int] = world_to_screen(node.x_coord, node.y_coord)
             node_color, label_suffix = get_node_style(node)
 
-            pygame.draw.circle(SCREEN, node_color, pos, 16)
-            pygame.draw.circle(SCREEN, (20, 20, 20), pos, 12)
-            pygame.draw.circle(SCREEN, node_color, pos, 6)
+            pygame.draw.circle(world_surface, node_color, pos, 16)
+            pygame.draw.circle(world_surface, (20, 20, 20), pos, 12)
+            pygame.draw.circle(world_surface, node_color, pos, 6)
 
             text_surface = FONT.render(
-                f"{node.name}{label_suffix} ({node.x_coord}, {node.y_coord})",
+                f"{node.name}{label_suffix}",
                 True,
                 TEXT_COLOR,
             )
             text_rect = text_surface.get_rect(center=(pos[0], pos[1] - 26))
             SCREEN.blit(text_surface, text_rect)
+            world_surface.blit(text_surface, text_rect)
 
+        SCREEN.fill((0, 0, 0))
+        visible_width = int(WIDTH / zoom_level)
+        visible_height = int(HEIGHT / zoom_level)
+        camera_rect = pygame.Rect(
+            camera_x,
+            camera_y,
+            visible_width,
+            visible_height
+            )
+
+        # Keep camera bounded within world boundaries
+        camera_rect.clamp_ip(world_surface.get_rect())
+
+        # Grab the visible camera patch and stretch/shrink it to fit window
+        sub_surface = world_surface.subsurface(camera_rect)
+        scaled_surface = pygame.transform.smoothscale(
+            sub_surface,
+            (WIDTH, HEIGHT)
+            )
+
+        SCREEN.blit(scaled_surface, (0, 0))
         pygame.display.flip()
         CLOCK.tick(60)
 
