@@ -25,7 +25,7 @@ def main() -> None:
         # print(f"Start hub has conf: {network.start_hub}")
         # print(f"End hub has conf: {network.end_hub}")
 
-        # for h in network.hub:
+        # for h in network.hubs:
         #     print(f"This hub has conf: {h}")
 
         # print(f"{network.connection}")
@@ -55,7 +55,7 @@ def start_display(network: Zone_Network) -> None:
     END_COLOR = (220, 20, 60)
     HUB_COLOR = (70, 130, 180)
 
-    nodes = [network.start_hub, network.end_hub, *network.hub]
+    nodes = [network.start_hub, network.end_hub, *network.hubs]
     min_x = min(node.x_coord for node in nodes)
     max_x = max(node.x_coord for node in nodes)
     min_y = min(node.y_coord for node in nodes)

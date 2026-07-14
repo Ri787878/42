@@ -18,12 +18,6 @@ class InvalidConfiguration(Exception):
         super().__init__(f"Input Error: {error}")
 
 
-class Drone(BaseModel):
-    x_coord: int = Field()
-    y_coord: int = Field()
-    in_transit: bool = Field(default=False)
-
-
 class Hub(BaseModel):
     """Represents a Hub"""
     # Inputted Values
@@ -92,8 +86,10 @@ class Zone_Network(BaseModel):
     nb_drones: int = Field(ge=1)
     start_hub: Hub
     end_hub: Hub
-    hub: list[Hub] = Field(default_factory=list)
+    hubs: list[Hub] = Field(default_factory=list)
     connection: list[tuple[str, str]] = Field(default_factory=list)
+    hub_map: dict[str, Hub] = Field(default_factory=dict, exclude=True)
+    adjacency: dict[str, list[Hub]] = Field(default_factory=dict, exclude=True)
 
     @model_validator(mode="after")
     def check_inputs(self) -> "Zone_Network":
@@ -103,7 +99,31 @@ class Zone_Network(BaseModel):
             raise ValueError(
                 "[ERROR] Start hub and End hub cannot"
                 " share the same coordinates.")
+
+        self.hub_map = self.build_hub_map()
+        self.adjacency = self.build_adjacency()
+
         return self
+
+    def build_hub_map(self) -> dict[str, Hub]:
+        hubs = [self.start_hub, self.end_hub, *self.hubs]
+        return {hub.name: hub for hub in hubs}
+
+    def build_adjacency(self) -> dict[str, list[Hub]]:
+        adjacency: dict[str, list[Hub]] = {
+            name: [] for name in self.build_hub_map()}
+
+        for left_name, right_name in self.connection:
+            if left_name in self.hub_map and right_name in self.hub_map:
+                left_hub = self.hub_map[left_name]
+                right_hub = self.hub_map[right_name]
+                adjacency[left_name].append(right_hub)
+                adjacency[right_name].append(left_hub)
+
+        return adjacency
+
+    def neighbors(self, hub_name: str) -> list[Hub]:
+        return self.adjacency.get(hub_name, [])
 
     @classmethod
     def from_file(cls, filename: str | Path) -> Self:
@@ -223,6 +243,13 @@ class Zone_Network(BaseModel):
             nb_drones=int(nb_drones_str),
             start_hub=start_hub_obj,
             end_hub=end_hub_obj,
-            hub=hub_objects,
+            hubs=hub_objects,
             connection=connections_list
         )
+
+
+class Drone(BaseModel):
+    current_hub: Hub
+    planned_hub: Hub
+    next_step_index: int
+    status: str
