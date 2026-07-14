@@ -18,6 +18,12 @@ class InvalidConfiguration(Exception):
         super().__init__(f"Input Error: {error}")
 
 
+class Drone(BaseModel):
+    x_coord: int = Field()
+    y_coord: int = Field()
+    in_transit: bool = Field(default=False)
+
+
 class Hub(BaseModel):
     """Represents a Hub"""
     # Inputted Values

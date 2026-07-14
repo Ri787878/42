@@ -41,15 +41,16 @@ def start_display(network: Zone_Network) -> None:
     pygame.init()
     pygame.font.init()
 
-    WIDTH, HEIGHT = 800, 600
+    WIDTH, HEIGHT = 1500, 800
     SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Zone Network Visualizer")
     CLOCK = pygame.time.Clock()
     FONT = pygame.font.SysFont("Arial", 14)
 
+    # TODO add option to be custum colors
+    # from a seperate variable files maybe?
     BG_COLOR = (30, 30, 40)
     LINE_COLOR = (180, 180, 180)
-    TEXT_COLOR = (255, 255, 255)
     START_COLOR = (50, 205, 50)
     END_COLOR = (220, 20, 60)
     HUB_COLOR = (70, 130, 180)
@@ -68,7 +69,7 @@ def start_display(network: Zone_Network) -> None:
         (WIDTH - 2 * margin) / span_x,
         (HEIGHT - 2 * margin) / span_y,
     )
-    cell_size = max(30, int(cell_size))
+    cell_size = max(150, int(cell_size))
 
     content_width = max(WIDTH, int(span_x * cell_size + (2 * margin)))
     content_height = max(HEIGHT, int(span_y * cell_size + (2 * margin)))
@@ -107,7 +108,7 @@ def start_display(network: Zone_Network) -> None:
                 elif event.button == 5:
                     min_zoom_x = WIDTH / content_width
                     min_zoom_y = HEIGHT / content_height
-                    absolute_min_zoom = max(0.2, max(min_zoom_x, min_zoom_y))
+                    absolute_min_zoom = max(0.1, max(min_zoom_x, min_zoom_y))
                     zoom_level = max(absolute_min_zoom, zoom_level - 0.1)
 
         # Keyboard panning controls
@@ -128,35 +129,53 @@ def start_display(network: Zone_Network) -> None:
             for node in nodes
         }
 
-        for start_name, end_name in network.connection:
-            if start_name in hub_lookup and end_name in hub_lookup:
+        for item1, item2 in network.connection:
+            start_key = item1.name if hasattr(item1, 'name') else str(item1)
+            end_key = item2.name if hasattr(item2, 'name') else str(item2)
+
+            start_key = start_key.split('[')[0].strip()
+            end_key = end_key.split('[')[0].strip()
+
+            # Safely look them up
+            if start_key in hub_lookup and end_key in hub_lookup:
                 pygame.draw.line(
                     world_surface,
                     LINE_COLOR,
-                    hub_lookup[start_name],
-                    hub_lookup[end_name],
+                    hub_lookup[start_key],
+                    hub_lookup[end_key],
                     3,
                 )
 
-        # Draw Connections Between Hubs and labels
+        # Draw Circles
         for node in nodes:
             pos: tuple[int, int] = world_to_screen(node.x_coord, node.y_coord)
-            node_color, label_suffix = get_node_style(node)
-
+            node_color, _ = get_node_style(node)
             pygame.draw.circle(world_surface, node_color, pos, 16)
             pygame.draw.circle(world_surface, (20, 20, 20), pos, 12)
             pygame.draw.circle(world_surface, node_color, pos, 6)
 
+        # Draw Labels
+        for idx, node in enumerate(nodes):
+            pos = world_to_screen(node.x_coord, node.y_coord)
+            node_color, _ = get_node_style(node)
+
             text_surface = FONT.render(
-                f"{node.name}{label_suffix}",
+                f"{node.name}",
                 True,
-                TEXT_COLOR,
+                node_color,
             )
-            text_rect = text_surface.get_rect(center=(pos[0], pos[1] - 26))
-            SCREEN.blit(text_surface, text_rect)
+            text_rect = text_surface.get_rect(center=(pos[0], pos[1] - 28))
+            bg_rect = text_rect.inflate(6, 4)
+            pygame.draw.rect(
+                world_surface,
+                (20, 20, 25),
+                bg_rect,
+                border_radius=4
+                )
             world_surface.blit(text_surface, text_rect)
 
         SCREEN.fill((0, 0, 0))
+
         visible_width = int(WIDTH / zoom_level)
         visible_height = int(HEIGHT / zoom_level)
         camera_rect = pygame.Rect(
@@ -179,7 +198,7 @@ def start_display(network: Zone_Network) -> None:
         SCREEN.blit(scaled_surface, (0, 0))
         pygame.display.flip()
         CLOCK.tick(60)
-
+    print(f"connections: {network.connection}")
     pygame.quit()
     sys.exit()
 
