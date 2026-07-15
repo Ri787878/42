@@ -6,8 +6,9 @@ import sys
 
 import pygame
 
-from zone_network import Zone_Network, Hub
-from drones import build_drone
+from drones import Drone
+from hub import Hub
+from zone_network import Zone_Network
 
 
 def load_drone_sprite() -> pygame.Surface:
@@ -24,7 +25,7 @@ def load_drone_sprite() -> pygame.Surface:
 
     sprite_bytes = base64.b64decode(encoded_png)
     sprite = pygame.image.load(BytesIO(sprite_bytes)).convert_alpha()
-    return pygame.transform.smoothscale(sprite, (68, 68))
+    return pygame.transform.smoothscale(sprite, (34, 34))
 
 
 def draw_step_counter(
@@ -33,9 +34,11 @@ def draw_step_counter(
     step_number: int,
     total_steps: int,
 ) -> None:
-    label = font.render(f"Step {step_number} / {total_steps}",
-                        True,
-                        (255, 255, 255))
+    label = font.render(
+        f"Step {step_number} / {total_steps}",
+        True,
+        (255, 255, 255),
+    )
     label_rect = label.get_rect(topright=(screen.get_width() - 20, 20))
 
     box_rect = label_rect.inflate(14, 10)
@@ -47,7 +50,7 @@ def draw_step_counter(
     screen.blit(label, label_rect)
 
 
-def start_display(network: Zone_Network, route: list[Hub]) -> None:
+def start_display(network: Zone_Network, drones: list[Drone]) -> None:
     pygame.init()
     pygame.font.init()
 
@@ -92,6 +95,12 @@ def start_display(network: Zone_Network, route: list[Hub]) -> None:
     camera_y = 0
     zoom_level = 1.0
 
+    def all_drones_arrived(drones: list[Drone]) -> bool:
+        return all(
+            drone.current_hub.name == drone.planned_path[-1].name
+            for drone in drones
+        )
+
     def world_to_screen(world_x: float, world_y: float) -> tuple[int, int]:
         screen_x = int(offset_x + world_x * cell_size)
         screen_y = int(content_height - (offset_y + world_y * cell_size))
@@ -105,13 +114,14 @@ def start_display(network: Zone_Network, route: list[Hub]) -> None:
         return HUB_COLOR, ""
 
     def draw_route(
-         surface: pygame.Surface,
-         path: list[Hub],
-         color: tuple[int, int, int]) -> None:
-        if len(path) < 2:
+        surface: pygame.Surface,
+        route: list[Hub],
+        color: tuple[int, int, int],
+    ) -> None:
+        if len(route) < 2:
             return
 
-        for start_hub, end_hub in zip(path, path[1:]):
+        for start_hub, end_hub in zip(route, route[1:]):
             pygame.draw.line(
                 surface,
                 color,
@@ -120,40 +130,48 @@ def start_display(network: Zone_Network, route: list[Hub]) -> None:
                 4,
             )
 
+    def route_position(
+        route: list[Hub],
+        segment_index: int,
+        progress: float,
+    ) -> tuple[float, float]:
+        if len(route) == 1:
+            hub = route[0]
+            return float(hub.x_coord), float(hub.y_coord)
+
+        if segment_index >= len(route) - 1:
+            hub = route[-1]
+            return float(hub.x_coord), float(hub.y_coord)
+
+        start_hub = route[segment_index]
+        end_hub = route[segment_index + 1]
+
+        dx = end_hub.x_coord - start_hub.x_coord
+        dy = end_hub.y_coord - start_hub.y_coord
+        x = start_hub.x_coord + dx * progress
+        y = start_hub.y_coord + dy * progress
+        return float(x), float(y)
+
     def draw_drone(
-         surface: pygame.Surface,
-         position: tuple[int, int],
-         sprite: pygame.Surface) -> None:
+        surface: pygame.Surface,
+        position: tuple[int, int],
+        sprite: pygame.Surface,
+    ) -> None:
         rect = sprite.get_rect(center=position)
         surface.blit(sprite, rect)
 
-    def route_position(
-         path: list[Hub],
-         segment_index: int,
-         progress: float) -> tuple[float, float]:
-        if len(path) == 1:
-            hub = path[0]
-            return float(hub.x_coord), float(hub.y_coord)
-
-        if segment_index >= len(path) - 1:
-            hub = path[-1]
-            return float(hub.x_coord), float(hub.y_coord)
-
-        start_hub = path[segment_index]
-        end_hub = path[segment_index + 1]
-
-        x = (start_hub.x_coord + (end_hub.x_coord - start_hub.x_coord)
-             * progress)
-        y = (start_hub.y_coord + (end_hub.y_coord - start_hub.y_coord)
-             * progress)
-        return float(x), float(y)
-
-    drone = build_drone(network, route)
     drone_sprite = load_drone_sprite()
 
-    STEP_DURATION_MS = 1000
-    current_segment = 0
-    segment_progress = 0.0
+    DRONE_STEP_MS = 1000
+    DRONE_START_DELAY_MS = 220
+
+    drone_segments = [0 for _ in drones]
+    drone_progress = [0.0 for _ in drones]
+    drone_timers = [
+        index * DRONE_START_DELAY_MS for index in range(len(drones))
+    ]
+
+    simulation_step = 1
 
     running = True
     while running:
@@ -162,7 +180,6 @@ def start_display(network: Zone_Network, route: list[Hub]) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 4:
                     zoom_level = min(4.0, zoom_level + 0.1)
@@ -182,12 +199,37 @@ def start_display(network: Zone_Network, route: list[Hub]) -> None:
         if keys[pygame.K_DOWN]:
             camera_y += 10
 
-        if len(route) > 1 and current_segment < len(route) - 1:
-            segment_progress += dt / STEP_DURATION_MS
-            if segment_progress >= 1.0:
-                segment_progress = 0.0
-                current_segment += 1
-                drone.advance()
+        for index, drone in enumerate(drones):
+            path = drone.planned_path
+            if len(path) < 2:
+                continue
+
+            drone_timers[index] += dt
+
+            while (
+                drone_timers[index] >= DRONE_STEP_MS
+                and drone_segments[index] < len(path) - 1
+            ):
+                drone_timers[index] -= DRONE_STEP_MS
+                drone_segments[index] += 1
+                drone.current_hub = path[drone_segments[index]]
+                drone.next_step_index = min(
+                    drone_segments[index] + 1,
+                    len(path) - 1,
+                )
+
+            if drone_segments[index] >= len(path) - 1:
+                drone_progress[index] = 1.0
+            else:
+                drone_progress[index] = drone_timers[index] / DRONE_STEP_MS
+
+        if not all_drones_arrived(drones):
+            active_steps = [
+                drone.next_step_index
+                for drone in drones
+                if drone.planned_path
+            ]
+            simulation_step = max(active_steps) if active_steps else 1
 
         world_surface.fill(BG_COLOR)
 
@@ -206,7 +248,8 @@ def start_display(network: Zone_Network, route: list[Hub]) -> None:
                     3,
                 )
 
-        draw_route(world_surface, route, ROUTE_COLOR)
+        for drone in drones:
+            draw_route(world_surface, drone.planned_path, ROUTE_COLOR)
 
         for node in nodes:
             pos = world_to_screen(node.x_coord, node.y_coord)
@@ -225,17 +268,25 @@ def start_display(network: Zone_Network, route: list[Hub]) -> None:
                 world_surface,
                 (20, 20, 25),
                 bg_rect,
-                border_radius=4)
+                border_radius=4,
+            )
             world_surface.blit(text_surface, text_rect)
 
-        drone_x, drone_y = route_position(
-            route,
-            current_segment,
-            segment_progress)
-        draw_drone(
-            world_surface,
-            world_to_screen(drone_x, drone_y),
-            drone_sprite)
+        for index, drone in enumerate(drones):
+            path = drone.planned_path
+            if not path:
+                continue
+
+            x, y = route_position(
+                path,
+                drone_segments[index],
+                drone_progress[index],
+            )
+            screen_pos = world_to_screen(x, y)
+
+            offset = index * 4
+            screen_pos = (screen_pos[0] + offset, screen_pos[1] + offset)
+            draw_drone(world_surface, screen_pos, drone_sprite)
 
         SCREEN.fill((0, 0, 0))
 
@@ -257,11 +308,16 @@ def start_display(network: Zone_Network, route: list[Hub]) -> None:
         )
 
         SCREEN.blit(scaled_surface, (0, 0))
-
-        total_steps = max(len(route) - 1, 1)
-        visible_step = min(current_segment + 1, total_steps)
-        draw_step_counter(SCREEN, FONT, visible_step, total_steps)
-
+        total_steps = max(
+            (len(drone.planned_path) - 1 for drone in drones if drone.planned_path),
+            default=1,
+        )
+        draw_step_counter(
+            SCREEN,
+            FONT,
+            min(simulation_step, total_steps),
+            total_steps,
+        )
         pygame.display.flip()
 
     pygame.quit()

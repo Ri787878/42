@@ -6,10 +6,8 @@ from zone_network import Hub, Zone_Network
 
 
 def _heuristic(current: Hub, goal: Hub) -> int:
-    """Estimate remaining cost with Manhattan distance.
-    The cost is the current coodenate - goal coordenate."""
-    return (abs(current.x_coord - goal.x_coord)
-            + abs(current.y_coord - goal.y_coord))
+    return (abs(current.x_coord - goal.x_coord) +
+            abs(current.y_coord - goal.y_coord))
 
 
 def _reconstruct_path(
@@ -27,15 +25,11 @@ def _reconstruct_path(
     return path
 
 
-def pathfinder(network: Zone_Network) -> list[Hub]:
-    """
-    Find the best path from start_hub to end_hub using A*.
-
-    Rules:
-    - blocked hubs are never traversed
-    - restricted hubs cost 1 extra turn
-    - priority hubs are preferred when scores are tied
-    """
+def pathfinder(
+    network: Zone_Network,
+    occupied_hubs: dict[str, int] | None = None,
+) -> list[Hub]:
+    occupied_hubs = occupied_hubs or {}
 
     start_hub = network.start_hub
     goal_hub = network.end_hub
@@ -68,8 +62,7 @@ def pathfinder(network: Zone_Network) -> list[Hub]:
             return _reconstruct_path(
                 came_from,
                 network.hub_map,
-                current_hub.name
-            )
+                current_hub.name)
 
         if current_cost > g_score.get(current_hub.name, current_cost):
             continue
@@ -78,7 +71,13 @@ def pathfinder(network: Zone_Network) -> list[Hub]:
             if neighbor.is_blocked:
                 continue
 
-            tentative_cost = current_cost + neighbor.movement_cost
+            congestion = occupied_hubs.get(neighbor.name, 0)
+            congestion_penalty = congestion * 5
+
+            tentative_cost = (
+                current_cost +
+                neighbor.movement_cost +
+                congestion_penalty)
 
             if tentative_cost >= g_score.get(neighbor.name, float("inf")):
                 continue
