@@ -1,4 +1,4 @@
-from drones import Drone, build_drone
+from drones import Drone
 from pathfinder.pathfinder import pathfinder
 from zone_network import Zone_Network
 
@@ -14,7 +14,7 @@ def dispatch_drones(network: Zone_Network) -> list[Drone]:
 
     for _ in range(network.nb_drones):
         route = pathfinder(network, occupied_hubs=occupied_hubs)
-        drone = build_drone(network, route)
+        drone = Drone.build_drone(network, route)
         drones.append(drone)
 
         for hub in route[1:-1]:

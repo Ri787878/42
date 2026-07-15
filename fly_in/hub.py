@@ -19,7 +19,7 @@ class Hub(BaseModel):
     # Metadata
     zone: str = Field(default="normal")
     color: str = Field(default="white")
-    max_drones: int = Field(default=1)
+    max_drones: int | None = Field(default=None)
 
     @model_validator(mode="after")
     def validate_hub(self) -> "Hub":

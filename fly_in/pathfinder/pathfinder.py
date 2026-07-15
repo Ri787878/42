@@ -72,7 +72,10 @@ def pathfinder(
                 continue
 
             congestion = occupied_hubs.get(neighbor.name, 0)
-            congestion_penalty = congestion * 5
+            if neighbor.max_drones is None or congestion < neighbor.max_drones:
+                congestion_penalty = 0
+            else:
+                congestion_penalty = (congestion - neighbor.max_drones + 1) * 5
 
             tentative_cost = (
                 current_cost +

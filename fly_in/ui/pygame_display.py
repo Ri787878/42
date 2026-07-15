@@ -163,7 +163,7 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
     drone_sprite = load_drone_sprite()
 
     DRONE_STEP_MS = 1000
-    DRONE_START_DELAY_MS = 220
+    DRONE_START_DELAY_MS = 200
 
     drone_segments = [0 for _ in drones]
     drone_progress = [0.0 for _ in drones]
@@ -309,7 +309,11 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
 
         SCREEN.blit(scaled_surface, (0, 0))
         total_steps = max(
-            (len(drone.planned_path) - 1 for drone in drones if drone.planned_path),
+            (
+                len(drone.planned_path) - 1
+                for drone in drones
+                if drone.planned_path
+            ),
             default=1,
         )
         draw_step_counter(

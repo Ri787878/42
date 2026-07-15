@@ -29,11 +29,15 @@ class Drone(BaseModel):
         else:
             self.status = DroneStatus.MOVING
 
-
-def build_drone(network: Zone_Network, route: list[Hub]) -> Drone:
-    return Drone(
-        current_hub=network.start_hub,
-        planned_path=route,
-        next_step_index=1,
-        status=DroneStatus.MOVING if len(route) > 1 else DroneStatus.ARRIVED,
-    )
+    @staticmethod
+    def build_drone(network: Zone_Network, route: list[Hub]) -> "Drone":
+        return Drone(
+            current_hub=network.start_hub,
+            planned_path=route,
+            next_step_index=1,
+            status=(
+                DroneStatus.MOVING
+                if len(route) > 1
+                else DroneStatus.ARRIVED
+            ),
+        )

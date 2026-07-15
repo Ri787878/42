@@ -1,9 +1,12 @@
 from pydantic import ValidationError
 import sys
+import copy
+import pygame
 
 from dispatcher import dispatch_drones
+from output_logs import simulate_drones
+# from drones import Drone
 from error_handling import InvalidConfiguration
-from pathfinder.pathfinder import pathfinder
 from ui.pygame_display import start_display
 from zone_network import Zone_Network
 
@@ -15,10 +18,13 @@ def main() -> None:
             sys.exit(1)
 
         network = Zone_Network.from_file(sys.argv[1])
-
         drones = dispatch_drones(network)
 
-        start_display(network, drones)
+        display_drones = copy.deepcopy(drones)
+
+        simulate_drones(network, drones)
+
+        start_display(network, display_drones)
 
     except (InvalidConfiguration, ValidationError) as e:
         print(f"Configuration Error: {e}")
