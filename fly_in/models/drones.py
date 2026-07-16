@@ -1,6 +1,8 @@
-from zone_network import Zone_Network, Hub
+from .hub import Hub
+from .zone_network import Zone_Network
 from variables import DroneStatus
 from pydantic import BaseModel, Field
+from typing import TypedDict
 
 
 class Drone(BaseModel):
@@ -41,3 +43,9 @@ class Drone(BaseModel):
                 else DroneStatus.ARRIVED
             ),
         )
+
+
+class ActiveDrone(TypedDict):
+    id: int
+    drone: Drone
+    path_index: int

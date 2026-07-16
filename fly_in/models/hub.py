@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, model_validator
-from zone_network import InvalidConfiguration
+from .error_handling import InvalidConfiguration
 from variables import Approved_tags
 
 

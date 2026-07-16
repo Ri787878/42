@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field, model_validator
-from error_handling import InvalidConfiguration
+from .error_handling import InvalidConfiguration
 from typing_extensions import Self
 from pathlib import Path
-from hub import Hub
+from models.hub import Hub
 
 
 class Zone_Network(BaseModel):
