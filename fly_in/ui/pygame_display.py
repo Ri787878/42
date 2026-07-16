@@ -50,7 +50,11 @@ def draw_step_counter(
     screen.blit(label, label_rect)
 
 
-def start_display(network: Zone_Network, drones: list[Drone]) -> None:
+def start_display(
+    network: Zone_Network,
+    drones: list[Drone],
+    history: list[str]
+) -> None:
     pygame.init()
     pygame.font.init()
 
@@ -95,11 +99,39 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
     camera_y = 0
     zoom_level = 1.0
 
-    def all_drones_arrived(drones: list[Drone]) -> bool:
-        return all(
-            drone.current_hub.name == drone.planned_path[-1].name
-            for drone in drones
-        )
+    # Build discrete step positions for each drone
+    # based on the actual history logs
+    total_steps = len(history)
+    hub_by_name = {node.name: node for node in nodes}
+
+    # Each drone (using 1-based IDs from "D1", "D2", etc.) gets a path
+    # timeline starting at the Start hub
+    drone_history_paths: dict[int, list[Hub]] = {
+        i + 1: [network.start_hub] for i in range(len(drones))
+    }
+
+    # Process the step logs to trace exactly where each drone
+    # is at every turn index
+    for turn_str in history:
+        moved_drones = set()
+        if turn_str.strip():
+            moves = turn_str.split()
+            for move in moves:
+                parts = move.split("-")
+                if len(parts) == 2:
+                    d_id = int(parts[0][1:])  # Strip "D" from ID (ex. D3 -> 3)
+                    dest_name = parts[1]
+                    dest_hub = hub_by_name.get(dest_name)
+                    if dest_hub:
+                        drone_history_paths[d_id].append(dest_hub)
+                        moved_drones.add(d_id)
+
+        # If a drone was delayed or stalled and
+        # didn't move this turn, stay in place
+        for d_id in drone_history_paths:
+            if d_id not in moved_drones:
+                last_pos = drone_history_paths[d_id][-1]
+                drone_history_paths[d_id].append(last_pos)
 
     def world_to_screen(world_x: float, world_y: float) -> tuple[int, int]:
         screen_x = int(offset_x + world_x * cell_size)
@@ -130,28 +162,6 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
                 4,
             )
 
-    def route_position(
-        route: list[Hub],
-        segment_index: int,
-        progress: float,
-    ) -> tuple[float, float]:
-        if len(route) == 1:
-            hub = route[0]
-            return float(hub.x_coord), float(hub.y_coord)
-
-        if segment_index >= len(route) - 1:
-            hub = route[-1]
-            return float(hub.x_coord), float(hub.y_coord)
-
-        start_hub = route[segment_index]
-        end_hub = route[segment_index + 1]
-
-        dx = end_hub.x_coord - start_hub.x_coord
-        dy = end_hub.y_coord - start_hub.y_coord
-        x = start_hub.x_coord + dx * progress
-        y = start_hub.y_coord + dy * progress
-        return float(x), float(y)
-
     def draw_drone(
         surface: pygame.Surface,
         position: tuple[int, int],
@@ -162,20 +172,14 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
 
     drone_sprite = load_drone_sprite()
 
-    DRONE_STEP_MS = 1000
-    DRONE_START_DELAY_MS = 200
-
-    drone_segments = [0 for _ in drones]
-    drone_progress = [0.0 for _ in drones]
-    drone_timers = [
-        index * DRONE_START_DELAY_MS for index in range(len(drones))
-    ]
-
-    simulation_step = 1
+    # Smooth step transition speed config
+    DRONE_STEP_MS = 1500  # Duration of 1 visual step
+    elapsed_time = 0.0
 
     running = True
     while running:
         dt = CLOCK.tick(60)
+        elapsed_time += dt
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -199,37 +203,13 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
         if keys[pygame.K_DOWN]:
             camera_y += 10
 
-        for index, drone in enumerate(drones):
-            path = drone.planned_path
-            if len(path) < 2:
-                continue
+        # Progress calculation relative to step index
+        step_float = elapsed_time / DRONE_STEP_MS
+        current_step_idx = int(step_float)
+        progress = step_float - current_step_idx
 
-            drone_timers[index] += dt
-
-            while (
-                drone_timers[index] >= DRONE_STEP_MS
-                and drone_segments[index] < len(path) - 1
-            ):
-                drone_timers[index] -= DRONE_STEP_MS
-                drone_segments[index] += 1
-                drone.current_hub = path[drone_segments[index]]
-                drone.next_step_index = min(
-                    drone_segments[index] + 1,
-                    len(path) - 1,
-                )
-
-            if drone_segments[index] >= len(path) - 1:
-                drone_progress[index] = 1.0
-            else:
-                drone_progress[index] = drone_timers[index] / DRONE_STEP_MS
-
-        if not all_drones_arrived(drones):
-            active_steps = [
-                drone.next_step_index
-                for drone in drones
-                if drone.planned_path
-            ]
-            simulation_step = max(active_steps) if active_steps else 1
+        # Display-friendly 1-indexed count capped to final step
+        display_step = min(current_step_idx + 1, total_steps)
 
         world_surface.fill(BG_COLOR)
 
@@ -238,6 +218,7 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
             for node in nodes
         }
 
+        # Draw grid connections
         for left_name, right_name in network.connection:
             if left_name in hub_lookup and right_name in hub_lookup:
                 pygame.draw.line(
@@ -248,9 +229,11 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
                     3,
                 )
 
+        # Draw pathways
         for drone in drones:
             draw_route(world_surface, drone.planned_path, ROUTE_COLOR)
 
+        # Draw Hub nodes
         for node in nodes:
             pos = world_to_screen(node.x_coord, node.y_coord)
             node_color, _ = get_node_style(node)
@@ -258,6 +241,7 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
             pygame.draw.circle(world_surface, (20, 20, 20), pos, 12)
             pygame.draw.circle(world_surface, node_color, pos, 6)
 
+        # Draw Node text labels
         for node in nodes:
             pos = world_to_screen(node.x_coord, node.y_coord)
             node_color, _ = get_node_style(node)
@@ -272,18 +256,24 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
             )
             world_surface.blit(text_surface, text_rect)
 
+        # Animate Drones frame-by-frame with smooth interpolation
         for index, drone in enumerate(drones):
-            path = drone.planned_path
-            if not path:
-                continue
+            drone_id = index + 1
+            hist_path = drone_history_paths.get(drone_id, [network.start_hub])
 
-            x, y = route_position(
-                path,
-                drone_segments[index],
-                drone_progress[index],
-            )
+            if current_step_idx >= len(hist_path) - 1:
+                # Final position arrived
+                final_hub = hist_path[-1]
+                x, y = float(final_hub.x_coord), float(final_hub.y_coord)
+            else:
+                curr_hub = hist_path[current_step_idx]
+                next_hub = hist_path[current_step_idx + 1]
+                dx = next_hub.x_coord - curr_hub.x_coord
+                dy = next_hub.y_coord - curr_hub.y_coord
+                x = curr_hub.x_coord + dx * progress
+                y = curr_hub.y_coord + dy * progress
+
             screen_pos = world_to_screen(x, y)
-
             offset = index * 4
             screen_pos = (screen_pos[0] + offset, screen_pos[1] + offset)
             draw_drone(world_surface, screen_pos, drone_sprite)
@@ -308,18 +298,11 @@ def start_display(network: Zone_Network, drones: list[Drone]) -> None:
         )
 
         SCREEN.blit(scaled_surface, (0, 0))
-        total_steps = max(
-            (
-                len(drone.planned_path) - 1
-                for drone in drones
-                if drone.planned_path
-            ),
-            default=1,
-        )
+
         draw_step_counter(
             SCREEN,
             FONT,
-            min(simulation_step, total_steps),
+            display_step,
             total_steps,
         )
         pygame.display.flip()

@@ -1,7 +1,6 @@
 from pydantic import ValidationError
 import sys
 import copy
-import pygame
 
 from dispatcher import dispatch_drones
 from output_logs import simulate_drones
@@ -22,9 +21,9 @@ def main() -> None:
 
         display_drones = copy.deepcopy(drones)
 
-        simulate_drones(network, drones)
+        history = simulate_drones(network, drones)
 
-        start_display(network, display_drones)
+        start_display(network, display_drones, history)
 
     except (InvalidConfiguration, ValidationError) as e:
         print(f"Configuration Error: {e}")

@@ -23,6 +23,8 @@ class Zone_Network(BaseModel):
                 "[ERROR] Start hub and End hub cannot"
                 " share the same coordinates.")
 
+        self.end_hub.max_drones = self.nb_drones
+
         self.hub_map = self.build_hub_map()
         self.adjacency = self.build_adjacency()
 
@@ -161,6 +163,7 @@ class Zone_Network(BaseModel):
         # Turn raw text data into structured Pydantic object instances
         start_hub_obj = parse_hub_string(start_hub_str)
         end_hub_obj = parse_hub_string(end_hub_str)
+        end_hub_obj.max_drones = int(nb_drones_str)
         hub_objects = [parse_hub_string(h) for h in hubs_str_list]
 
         return cls(
