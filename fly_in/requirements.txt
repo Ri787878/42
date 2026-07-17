@@ -2,15 +2,4 @@ flake8
 mypy
 pydantic
 pygame
-collections
-__future__
-typing
-enum
-pathlib
 typing_extensions
-json
-io
-sys
-base64
-copy
-heapq

@@ -1,3 +1,4 @@
-D1-waypoint1 D2-waypoint1
-D1-waypoint2 D2-waypoint2
-D1-goal D2-goal
+D1-junction D2-junction
+D1-path_a D2-path_a D3-junction D4-junction
+D1-goal D2-goal D3-path_a D4-path_a
+D3-goal D4-goal
