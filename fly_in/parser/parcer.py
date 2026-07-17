@@ -2,7 +2,10 @@ from models import InvalidConfiguration
 
 
 class Parcer():
-    def file_interpreter(self, filename: str) -> dict:
+    def file_interpreter(
+        self,
+        filename: str
+    ) -> dict[str, str | list[str] | list[tuple[str, str, int]]]:
         with open(filename, "r") as f:
             content = f.read()
 
@@ -11,6 +14,7 @@ class Parcer():
         start_hub: str = ""
         hubs: list[str] = []
         end_hub: str = ""
+        connections_list: list[tuple[str, str, int]] = []
 
         # Check if file starts with nb_drones and skips comments
         for line in lines:
@@ -46,27 +50,55 @@ class Parcer():
             elif line.startswith("end_hub:"):
                 end_hub = line.removeprefix("end_hub:")
 
-            if line.startswith("connection:"):
-                pass
+            elif line.startswith("connection:"):
+                raw = line.removeprefix("connection:").strip()
 
-        res: dict = {
+                bracket_i = raw.find("[")
+                if bracket_i != -1:
+                    core = raw[:bracket_i].strip()
+                    meta = raw[bracket_i:].strip("[] ").split()
+                else:
+                    core = raw
+                    meta = []
+
+                parts = core.split("-")
+                if len(parts) != 2:
+                    raise InvalidConfiguration(f"[ERROR] Invalid connection "
+                                               f"format: '{line}'")
+
+                left_name = parts[0].strip()
+                right_name = parts[1].strip()
+
+                cap = 1
+                for token in meta:
+                    if token.startswith("max_link_capacity="):
+                        cap = int(token.split("=", 1)[1].strip())
+
+                connections_list.append((left_name, right_name, cap))
+
+        res: dict[str, str | list[str] | list[tuple[str, str, int]]] = {
             "nb_drones": nb_drones,
             "start_hub": start_hub,
             "end_hub": end_hub,
-            "hubs": hubs}
+            "hubs": hubs,
+            "connections": connections_list
+            }
 
         # Validate directories has allowed parameters
         self.validate_conf(res)
 
         return res
 
-    def validate_conf(self, res: dict) -> bool:
+    def validate_conf(
+        self,
+        res: dict[str, str | list[str] | list[tuple[str, str, int]]]
+    ) -> bool:
         # Check number of drones is valid
         if str(res.get("nb_drones")).strip() == "":
             raise InvalidConfiguration(
                 "[ERROR] Missing configuration parameter: 'nb_drones'")
 
-        if not res["nb_drones"].isnumeric():
+        if not str(res["nb_drones"]).isnumeric():
             raise InvalidConfiguration(
                 "[ERROR] Missing configuration parameter: 'nb_drones'")
 

@@ -233,7 +233,7 @@ class Displayer():
             }
 
             # Draw grid connections
-            for left_name, right_name in network.connection:
+            for left_name, right_name, _cap in network.connection:
                 if left_name in hub_lookup and right_name in hub_lookup:
                     pygame.draw.line(
                         world_surface,

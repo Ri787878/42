@@ -10,7 +10,7 @@ class Zone_Network(BaseModel):
     start_hub: Hub
     end_hub: Hub
     hubs: list[Hub] = Field(default_factory=list)
-    connection: list[tuple[str, str]] = Field(default_factory=list)
+    connection: list[tuple[str, str, int]] = Field(default_factory=list)
     hub_map: dict[str, Hub] = Field(default_factory=dict, exclude=True)
     adjacency: dict[str, list[Hub]] = Field(default_factory=dict, exclude=True)
 
@@ -38,7 +38,7 @@ class Zone_Network(BaseModel):
         adjacency: dict[str, list[Hub]] = {
             name: [] for name in self.build_hub_map()}
 
-        for left_name, right_name in self.connection:
+        for left_name, right_name, _cap in self.connection:
             if left_name in self.hub_map and right_name in self.hub_map:
                 left_hub = self.hub_map[left_name]
                 right_hub = self.hub_map[right_name]
@@ -65,7 +65,7 @@ class Zone_Network(BaseModel):
         start_hub_str: str = ""
         end_hub_str: str = ""
         hubs_str_list: list[str] = []
-        connections_list: list[tuple[str, str]] = []
+        connections_list: list[tuple[str, str, int]] = []
 
         # Validate it starts with nb_drones
         for line in lines:
@@ -101,14 +101,31 @@ class Zone_Network(BaseModel):
                 hubs_str_list.append(cleaned_line.removeprefix("hub:").strip())
 
             elif cleaned_line.startswith("connection:"):
-                conn_raw = cleaned_line.removeprefix("connection:")
-                conn_data = conn_raw.strip().split("-")
+                raw = cleaned_line.removeprefix("connection:").strip()
 
+                bracket_i = raw.find("[")
+                if bracket_i != -1:
+                    core = raw[:bracket_i].strip()
+                    meta_tokens = [
+                        t.strip()
+                        for t in raw[bracket_i:].strip("[] ").split()
+                        if t.strip()
+                    ]
+                else:
+                    core = raw
+                    meta_tokens = []
+
+                conn_data = core.split("-")
                 if len(conn_data) == 2:
-                    left_name = conn_data[0].strip().split()[0]
-                    right_name = conn_data[1].strip().split()[0]
+                    left_name = conn_data[0].strip()
+                    right_name = conn_data[1].strip()
 
-                    connections_list.append((left_name, right_name))
+                    cap = 1  # default
+                    for tok in meta_tokens:
+                        if tok.startswith("max_link_capacity="):
+                            cap = int(tok.split("=", 1)[1].strip())
+
+                    connections_list.append((left_name, right_name, cap))
 
         # Base Validations
         if not nb_drones_str:
