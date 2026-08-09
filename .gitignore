@@ -140,4 +140,4 @@ libft/francinette
 
 #Virtual Enviroment
 venv/
-
+.venv/

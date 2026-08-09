@@ -1,0 +1,7 @@
+# Ignore Python Artifacts
+__pycache__
+.mypy_cache
+
+# Ignore Venv
+venv
+
