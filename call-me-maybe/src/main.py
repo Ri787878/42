@@ -9,7 +9,6 @@ def main() -> None:
         parcer = Parcer()
 
         arguments: list[str] = parcer.get_arguments(sys.argv)
-        print(f"arguments = {arguments}")
 
         cmd = Command(arguments=arguments)
         cmd.run()

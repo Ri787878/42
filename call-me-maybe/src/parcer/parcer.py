@@ -4,37 +4,6 @@ import json
 import sys
 
 
-class Command(BaseModel):
-    arguments: list[str] = Field()
-    function_definition_filepath: str = Field(
-        default="data/input/functions_definition.json")
-    input_filepath: str = Field(
-        default="data/input/function_calling_tests.json")
-    output_filepath: str = Field(
-        default="data/output/function_calling_results.json")
-
-    def change_default_filepaths(self):
-        """Change the default filepath to custum ones."""
-        for arg in self.arguments:
-            _, filepath = arg.split()
-            if arg.startswith("--functions_definition"):
-                self.function_definition_filepath = filepath
-            elif arg.startswith("--input"):
-                self.input_filepath = filepath
-            elif arg.startswith("--output"):
-                self.output_filepath = filepath
-        else:
-            pass
-
-    def run(self):
-        self.change_default_filepaths()
-        print(
-            f"\nfuncitons_definition filepath = {self.function_definition_filepath}"  # type: ignore
-            f"\ninput filepath = {self.input_filepath}"
-            f"\noutput filepath = {self.output_filepath}")
-        pass
-
-
 class Parcer(BaseModel):
     function_definition_filepath: str = Field(default="")
     input_filepath: str = Field(default="")
@@ -83,10 +52,6 @@ class Parcer(BaseModel):
         self.input_filepath = files[1]
         self.output_filepath = "/data/output/function_calls.json"
         return True
-
-    @classmethod
-    def is_valid_start_cmd(self) -> bool:
-        return False
 
     def does_file_exist(self, file: str) -> bool:
         try:

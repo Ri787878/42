@@ -10,6 +10,7 @@ debug:
 clean:
 	find . -type d -name ".mypy_cache" -exec rm -r {} +
 	find . -type d -name "__pycache__" -exec rm -r {} +
+	find . -type d -name "output" -exec rm -r {} +
 
 lint:
 	python3 -m flake8 . --exclude=venv
