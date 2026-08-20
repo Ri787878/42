@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field, model_validator
 from utils import print_to_stderr
 from pathlib import Path
-import os
 
 
 class Command(BaseModel):
@@ -20,6 +19,7 @@ class Command(BaseModel):
 
         if not self.do_files_exist():
             exit()
+
         self.create_output_file()
 
         return self
@@ -50,29 +50,46 @@ class Command(BaseModel):
             print_to_stderr("[SYSTEM] Missing Input File.")
             return False
         else:
-            print("[SYSTEM] All Files Exist.\n")
+            print(
+                "[SYSTEM] Function_Definitions File Exist.\n"
+                "[SYSTEM] Input File Exist.\n")
         return True
 
     def create_output_file(self) -> None:
-        """Create the Output Folder and File"""
-        _, reversed_directory_path = self.output_filepath[::-1].split("/", 1)
-        directory_path: Path = Path(reversed_directory_path[::-1])
-        try:
-            Path(directory_path).mkdir()
-            print(
-                f"[SYSTEM] Directory '{directory_path}' created successfully.")
-        except FileExistsError:
-            print_to_stderr(
-                f"[ERROR] Directory '{directory_path}' already exists.")
-        except PermissionError:
-            print_to_stderr(
-                f"[ERROR] Permission denied: "
-                f"Unable to create '{directory_path}'.")
-        except Exception as e:
-            print_to_stderr(
-                f"[ERROR] An error occurred: {e}")
+        """Create the Output Folder(s) and File"""
+        folders_to_create: list[str] = []
 
-        with open(self.output_filepath, "a"):
+        _, reversed_directory_path = self.output_filepath[::-1].split("/", 1)
+
+        while reversed_directory_path.find("/") > 0:
+            folder_name, reversed_directory_path = (
+                reversed_directory_path.split("/", 1))
+
+            folders_to_create.append(folder_name[::-1])
+
+        folders_to_create.append(reversed_directory_path[::-1])
+
+        current_path: str = ""
+        for folder in reversed(folders_to_create):
+            current_path += folder + "/"
+            try:
+                Path(current_path).mkdir()
+                print(
+                    f"[SYSTEM] Directory '{current_path}' "
+                    f"created successfully.")
+            except FileExistsError:
+                print_to_stderr(
+                    f"[WARNING] Directory '{current_path}' already exists.")
+            except PermissionError:
+                print_to_stderr(
+                    f"[ERROR] Permission denied: "
+                    f"Unable to create '{current_path}'.")
+            except Exception as e:
+                print_to_stderr(
+                    f"[ERROR] An error occurred: {e}")
+
+        with open(self.output_filepath, "a") as f:
+            f.truncate()
             print("[SYSTEM] Output File Created.")
 
     def change_default_filepaths(self):
@@ -89,8 +106,9 @@ class Command(BaseModel):
             pass
 
     def run(self):
-        print(
+        """print(
             f"\nfuncitons_definition filepath = "
             f"{self.function_definition_filepath}"
             f"\ninput filepath = {self.input_filepath}"
-            f"\noutput filepath = {self.output_filepath}")
+            f"\noutput filepath = {self.output_filepath}")"""
+        pass

@@ -11,6 +11,7 @@ def main() -> None:
         arguments: list[str] = parcer.get_arguments(sys.argv)
 
         cmd = Command(arguments=arguments)
+
         cmd.run()
 
     except ValidationError as exc:
