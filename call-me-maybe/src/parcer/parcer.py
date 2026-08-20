@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from utils import print_to_stderr
+from typing import Any
 import json
 import sys
 
@@ -88,3 +89,12 @@ class Parcer(BaseModel):
             i += 1
 
         return arguments
+
+    @staticmethod
+    def get_parameters_list(data: Any) -> list[tuple[str, str]]:
+        parameters_list: list[tuple[str, str]] = []
+
+        for param_name, param_def in data["parameters"].items():
+            param_type: str = param_def["type"]
+            parameters_list.append((param_name, param_type))
+        return parameters_list

@@ -1,10 +1,16 @@
 from pydantic import BaseModel, Field, model_validator
+# from llm_sdk.llm_sdk import Small_LLM_Model
+from call_me_maybe import Prompt, Function_definition
 from utils import print_to_stderr
+from parcer.parcer import Parcer
 from pathlib import Path
+import json
 
 
 class Command(BaseModel):
     arguments: list[str] = Field()
+    prompts_list: list[Prompt] = Field(default=[])
+    func_definition_list: list[Function_definition] = Field(default=[])
     function_definition_filepath: str = Field(
         default="data/input/functions_definition.json")
     input_filepath: str = Field(
@@ -21,6 +27,10 @@ class Command(BaseModel):
             exit()
 
         self.create_output_file()
+
+        self.ingest_prompts()
+
+        self.ingest_function_definitions()
 
         return self
 
@@ -105,10 +115,38 @@ class Command(BaseModel):
         else:
             pass
 
+    def ingest_prompts(self) -> None:
+        with open(self.input_filepath, "r") as file:
+            data = json.load(file)
+            i: int = 0
+            while i < len(data):
+                prompt = Prompt(prompt=data[i]['prompt'])
+                self.prompts_list.append(prompt)
+                i += 1
+
+    def ingest_function_definitions(self) -> None:
+        with open(self.function_definition_filepath, "r") as file:
+            data = json.load(file)
+
+            for func_def in data:
+                parameters_list: list[tuple[str, str]] = []
+                parameters_list = Parcer.get_parameters_list(func_def)
+
+                func_def = Function_definition(
+                    name=func_def['name'],
+                    description=func_def['description'],
+                    parameters=parameters_list,
+                    returns=func_def['returns']['type'])
+
+                self.func_definition_list.append(func_def)
+
     def run(self):
         """print(
             f"\nfuncitons_definition filepath = "
             f"{self.function_definition_filepath}"
             f"\ninput filepath = {self.input_filepath}"
             f"\noutput filepath = {self.output_filepath}")"""
+        print(f"\nfunc_definition_list = {self.func_definition_list}")
+        print(f"\nprompts_list = {self.prompts_list}")
+        # llm = Small_LLM_Model()
         pass
