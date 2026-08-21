@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from utils import print_to_stderr
 from typing import Any
 import json
+from pathlib import Path
 import sys
 
 
@@ -98,3 +99,14 @@ class Parcer(BaseModel):
             param_type: str = param_def["type"]
             parameters_list.append((param_name, param_type))
         return parameters_list
+
+    @staticmethod
+    def load_json_safely(path: str, default):
+        p = Path(path)
+        raw = p.read_text(encoding="utf-8").strip()
+        if raw == "":
+            return default
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"[ERROR] Invalid JSON in {path}: {e}") from e

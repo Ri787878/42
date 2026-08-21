@@ -1,10 +1,10 @@
+from llm_sdk import Small_LLM_Model
 from pydantic import BaseModel, Field, model_validator
-# from llm_sdk.llm_sdk import Small_LLM_Model
-from call_me_maybe import Prompt, Function_definition
+from .function_definition import Function_definition
+from .prompts import Prompt
+from ..parcer import Parcer
 from utils import print_to_stderr
-from parcer.parcer import Parcer
 from pathlib import Path
-import json
 
 
 class Command(BaseModel):
@@ -36,16 +36,15 @@ class Command(BaseModel):
 
     def do_files_exist(self) -> bool:
         """Validate if files exist"""
-        flag1: bool = False
-        flag2: bool = False
-        if not Path(self.function_definition_filepath).exists():
-            flag1 = True
+        flag1 = not Path(self.function_definition_filepath).exists()
+        flag2 = not Path(self.input_filepath).exists()
+
+        if flag1:
             print_to_stderr(
                 f"[ERROR] File '{self.function_definition_filepath}' "
                 f"does not exist.")
 
-        if not Path(self.input_filepath).exists():
-            flag2 = True
+        if flag2:
             print_to_stderr(
                 f"[ERROR] File '{self.input_filepath}' "
                 f"does not exist.")
@@ -56,13 +55,13 @@ class Command(BaseModel):
         elif flag1:
             print_to_stderr("[SYSTEM] Missing Function_Defenitions File.")
             return False
-        elif flag1 and flag2:
+        elif flag2:
             print_to_stderr("[SYSTEM] Missing Input File.")
             return False
-        else:
-            print(
-                "[SYSTEM] Function_Definitions File Exist.\n"
-                "[SYSTEM] Input File Exist.\n")
+
+        print(
+            "[SYSTEM] Function_Definitions File Exist.\n"
+            "[SYSTEM] Input File Exist.\n")
         return True
 
     def create_output_file(self) -> None:
@@ -112,41 +111,81 @@ class Command(BaseModel):
                 self.input_filepath = filepath
             elif arg.startswith("--output"):
                 self.output_filepath = filepath
-        else:
-            pass
+        if (
+            self.function_definition_filepath == self.input_filepath
+            or self.function_definition_filepath == self.output_filepath
+            or self.input_filepath == self.output_filepath
+        ):
+            print_to_stderr(
+                "[ERROR] Same file location used for multiple inputted files.")
+            exit()
 
     def ingest_prompts(self) -> None:
-        with open(self.input_filepath, "r") as file:
-            data = json.load(file)
-            i: int = 0
-            while i < len(data):
-                prompt = Prompt(prompt=data[i]['prompt'])
-                self.prompts_list.append(prompt)
-                i += 1
+        data = Parcer.load_json_safely(self.input_filepath, default=[])
+        if not isinstance(data, list):
+            raise ValueError(
+                f"[ERROR] Expected JSON array in {self.input_filepath}")
+
+        for item in data:
+            self.prompts_list.append(Prompt(prompt=item["prompt"]))
 
     def ingest_function_definitions(self) -> None:
-        with open(self.function_definition_filepath, "r") as file:
-            data = json.load(file)
+        data = Parcer.load_json_safely(
+            self.function_definition_filepath,
+            default=[])
 
-            for func_def in data:
-                parameters_list: list[tuple[str, str]] = []
-                parameters_list = Parcer.get_parameters_list(func_def)
+        if not isinstance(data, list):
+            raise ValueError(
+                f"[ERROR] Expected JSON array in "
+                f"{self.function_definition_filepath}")
 
-                func_def = Function_definition(
-                    name=func_def['name'],
-                    description=func_def['description'],
-                    parameters=parameters_list,
-                    returns=func_def['returns']['type'])
+        for func_def in data:
+            parameters_list: list[tuple[str, str]] = []
+            parameters_list = Parcer.get_parameters_list(func_def)
+            func_def = Function_definition(
+                name=func_def['name'],
+                description=func_def['description'],
+                parameters=parameters_list,
+                returns=func_def['returns']['type'])
 
-                self.func_definition_list.append(func_def)
+            self.func_definition_list.append(func_def)
 
-    def run(self):
-        """print(
-            f"\nfuncitons_definition filepath = "
-            f"{self.function_definition_filepath}"
-            f"\ninput filepath = {self.input_filepath}"
-            f"\noutput filepath = {self.output_filepath}")"""
-        print(f"\nfunc_definition_list = {self.func_definition_list}")
-        print(f"\nprompts_list = {self.prompts_list}")
-        # llm = Small_LLM_Model()
-        pass
+    def run(self, llm_model: Small_LLM_Model) -> None:
+        """Runs the project itself based on provided arguments."""
+        # print(f"\nfunc_definition_list = {self.func_definition_list}")
+        # print(f"\nprompts_list = {self.prompts_list}")
+        print("\n\n")
+
+        encoded_prompt_tensor = llm_model.encode(self.prompts_list[0].prompt)
+        encoded_prompt: list[int] = [int(x) for x in encoded_prompt_tensor.flatten().tolist()]
+
+        logits_produced = llm_model.get_logits_from_input_ids(encoded_prompt)
+
+        # print(f"encoded_prompt = {encoded_prompt}\n")
+        # print(f"logits_produced = {logits_produced}")
+
+        input_ids: list[int] = [int(x) for x in encoded_prompt_tensor.flatten().tolist()]
+        max_new_tokens = 50
+        eos_token_id = getattr(llm_model, "eos_token_id", None)
+
+        for _ in range(max_new_tokens):
+            logits = llm_model.get_logits_from_input_ids(input_ids)  # logits for current context
+
+            # if logits is [vocab], use directly; if [seq, vocab], take last row
+            if isinstance(logits[0], list):
+                next_token_logits = logits[-1]
+            else:
+                next_token_logits = logits
+
+            next_token_id = max(range(len(next_token_logits)), key=lambda i: next_token_logits[i])  # argmax
+            input_ids.append(next_token_id)
+
+            if eos_token_id is not None and next_token_id == eos_token_id:
+                break
+
+        # decode full sequence (or only newly generated tail)
+        generated_text = llm_model.decode(input_ids)
+        with open(self.output_filepath, "w") as f:
+            f.write(generated_text)
+        print(generated_text)
+

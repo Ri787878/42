@@ -1,3 +1,3 @@
-from src.main import main
+from src.call_me_maybe.main import main
 
 main()
