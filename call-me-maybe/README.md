@@ -10,3 +10,15 @@
 -
 -
 -
+
+What to search (in this order)
+“Constrained decoding for JSON generation”
+“Logit masking token-by-token decoding”
+“Finite state machine JSON parser generation”
+“Regex / CFG / DFA constrained text generation LLM”
+“Function calling schema enforcement LLM”
+“Argument extraction from natural language to structured JSON”
+“Deterministic fallback for tool calling”
+“Validation and repair loop for LLM structured outputs”
+“Tokenizer BPE token boundaries JSON generation pitfalls”
+“Evaluation metrics for tool selection and argument accuracy”

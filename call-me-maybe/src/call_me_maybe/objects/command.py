@@ -157,27 +157,35 @@ class Command(BaseModel):
         print("\n\n")
 
         encoded_prompt_tensor = llm_model.encode(self.prompts_list[0].prompt)
-        encoded_prompt: list[int] = [int(x) for x in encoded_prompt_tensor.flatten().tolist()]
+        # encoded_prompt: list[int] = [
+        #     int(x) for x in encoded_prompt_tensor.flatten().tolist()]
 
-        logits_produced = llm_model.get_logits_from_input_ids(encoded_prompt)
+        # logits_produced = llm_model.get_logits_from_input_ids(encoded_prompt)
 
         # print(f"encoded_prompt = {encoded_prompt}\n")
         # print(f"logits_produced = {logits_produced}")
 
-        input_ids: list[int] = [int(x) for x in encoded_prompt_tensor.flatten().tolist()]
+        input_ids: list[int] = [
+            int(x) for x in encoded_prompt_tensor.flatten().tolist()]
         max_new_tokens = 50
         eos_token_id = getattr(llm_model, "eos_token_id", None)
 
         for _ in range(max_new_tokens):
-            logits = llm_model.get_logits_from_input_ids(input_ids)  # logits for current context
+            # logits for current context
+            logits = llm_model.get_logits_from_input_ids(input_ids)
 
-            # if logits is [vocab], use directly; if [seq, vocab], take last row
+            # if logits is [vocab], use directly; if [seq, vocab],
+            # take last row
             if isinstance(logits[0], list):
                 next_token_logits = logits[-1]
             else:
                 next_token_logits = logits
 
-            next_token_id = max(range(len(next_token_logits)), key=lambda i: next_token_logits[i])  # argmax
+            next_token_id = max(
+                range(
+                    len(next_token_logits)),
+                key=lambda i: next_token_logits[i]
+                )  # argmax
             input_ids.append(next_token_id)
 
             if eos_token_id is not None and next_token_id == eos_token_id:
