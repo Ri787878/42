@@ -1,14 +1,16 @@
-from llm_sdk import Small_LLM_Model
+from utils import print_to_stderr, softmax, decoding_strategy
 from pydantic import BaseModel, Field, model_validator
 from .function_definition import Function_definition
+from llm_sdk import Small_LLM_Model
 from .prompts import Prompt
 from ..parcer import Parcer
-from utils import print_to_stderr
 from pathlib import Path
+import numpy as np
 
 
 class Command(BaseModel):
     arguments: list[str] = Field()
+    response: str = Field(default="")
     prompts_list: list[Prompt] = Field(default=[])
     func_definition_list: list[Function_definition] = Field(default=[])
     function_definition_filepath: str = Field(
@@ -157,43 +159,52 @@ class Command(BaseModel):
         print("\n\n")
 
         encoded_prompt_tensor = llm_model.encode(self.prompts_list[0].prompt)
-        # encoded_prompt: list[int] = [
-        #     int(x) for x in encoded_prompt_tensor.flatten().tolist()]
-
-        # logits_produced = llm_model.get_logits_from_input_ids(encoded_prompt)
-
-        # print(f"encoded_prompt = {encoded_prompt}\n")
-        # print(f"logits_produced = {logits_produced}")
-
-        input_ids: list[int] = [
+        encoded_prompt: list[int] = [
             int(x) for x in encoded_prompt_tensor.flatten().tolist()]
-        max_new_tokens = 50
-        eos_token_id = getattr(llm_model, "eos_token_id", None)
+        context_ids: list[int] = list(encoded_prompt)
+
+        max_new_tokens = 64
+        stop_strings = ["\nUser:", "\n\nUser:", "<|endoftext|>", "</s>"]
+
+        generated_ids: list[int] = []
 
         for _ in range(max_new_tokens):
-            # logits for current context
-            logits = llm_model.get_logits_from_input_ids(input_ids)
+            logits = llm_model.get_logits_from_input_ids(context_ids)
 
-            # if logits is [vocab], use directly; if [seq, vocab],
-            # take last row
-            if isinstance(logits[0], list):
-                next_token_logits = logits[-1]
+            # If model returns logits for all positions, use last position.
+            # If it already returns a 1D next-token vector, this still works.
+            logits_arr = np.array(logits)
+            if logits_arr.ndim > 1:
+                next_token_logits = logits_arr[-1]
             else:
-                next_token_logits = logits
+                next_token_logits = logits_arr
 
-            next_token_id = max(
-                range(
-                    len(next_token_logits)),
-                key=lambda i: next_token_logits[i]
-                )  # argmax
-            input_ids.append(next_token_id)
+            # softmax with numerical stability
+            shifted = next_token_logits - np.max(next_token_logits)
+            exp_vals = np.exp(shifted)
+            probabilities = exp_vals / np.sum(exp_vals)
 
-            if eos_token_id is not None and next_token_id == eos_token_id:
+            next_id = decoding_strategy(probabilities)
+
+            context_ids.append(next_id)
+            generated_ids.append(next_id)
+
+            # Stop rule via decoded text
+            current_text = llm_model.decode(generated_ids)
+            if any(s in current_text for s in stop_strings):
+                break
+            
+            # Optional anti-loop guard (same token repeated too much)
+            if len(generated_ids) >= 8 and len(set(generated_ids[-8:])) == 1:
                 break
 
-        # decode full sequence (or only newly generated tail)
-        generated_text = llm_model.decode(input_ids)
-        with open(self.output_filepath, "w") as f:
-            f.write(generated_text)
-        print(generated_text)
+        # 4) Decode generated text (only newly generated tokens)
+        self.response = llm_model.decode(generated_ids)
 
+        print(f"encoded_prompt = {encoded_prompt}\n")
+        print(f"generated_token_count = {len(generated_ids)}")
+        print(f"last_step_vocab_size = {len(probabilities)}")
+        print(f"response: {self.response}")
+
+        with open(self.output_filepath, "w") as f:
+            f.write(str(probabilities.tolist()))

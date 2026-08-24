@@ -2,7 +2,7 @@
 
 - https://www.geeksforgeeks.org/python/read-json-file-using-python/
 - https://www.w3schools.com/python/python_dictionaries_access.asp
--
+- https://telnyx.com/learn-ai/logits-ai
 -
 -
 -
@@ -22,3 +22,6 @@ What to search (in this order)
 “Validation and repair loop for LLM structured outputs”
 “Tokenizer BPE token boundaries JSON generation pitfalls”
 “Evaluation metrics for tool selection and argument accuracy”
+
+
+## FIX ERROR WHEN INPUTTING A OUTPUT FILE AND ONLY A FILE NAME IS GIVEN
