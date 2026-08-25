@@ -3,7 +3,7 @@
 - https://www.geeksforgeeks.org/python/read-json-file-using-python/
 - https://www.w3schools.com/python/python_dictionaries_access.asp
 - https://telnyx.com/learn-ai/logits-ai
--
+- https://medium.com/@c.savur/mastering-the-logits-a-guide-to-constrained-decoding-in-hugging-face-and-vllm-357a5c1b9a28
 -
 -
 -

@@ -1,4 +1,5 @@
-from utils import print_to_stderr, softmax, decoding_strategy
+from utils import print_to_stderr, softmax, decoding_strategy, get_token_id
+from ..contained_decoding import SimpleBanningProcessor
 from pydantic import BaseModel, Field, model_validator
 from .function_definition import Function_definition
 from llm_sdk import Small_LLM_Model
@@ -154,8 +155,6 @@ class Command(BaseModel):
 
     def run(self, llm_model: Small_LLM_Model) -> None:
         """Runs the project itself based on provided arguments."""
-        # print(f"\nfunc_definition_list = {self.func_definition_list}")
-        # print(f"\nprompts_list = {self.prompts_list}")
         print("\n\n")
 
         encoded_prompt_tensor = llm_model.encode(self.prompts_list[0].prompt)
@@ -166,7 +165,16 @@ class Command(BaseModel):
         max_new_tokens = 64
         stop_strings = ["\nUser:", "\n\nUser:", "<|endoftext|>", "</s>"]
 
+        # Configure banned tokens (adapt to your vocab/token mapping)
+        words_to_ban = ["<|endoftext|>"]  # add more if you want
+        processor = SimpleBanningProcessor(
+            token_to_id=get_token_id(llm_model),
+            words_to_ban=words_to_ban,
+            unknown_token_policy="ignore",
+        )
+
         generated_ids: list[int] = []
+        probabilities = None  # keep for final logging/write
 
         for _ in range(max_new_tokens):
             logits = llm_model.get_logits_from_input_ids(context_ids)
@@ -178,6 +186,11 @@ class Command(BaseModel):
                 next_token_logits = logits_arr[-1]
             else:
                 next_token_logits = logits_arr
+
+            # Apply banning processor (expects 2D list: [batch=1][vocab])
+            score_rows = [next_token_logits.tolist()]
+            score_rows = processor(input_ids=[context_ids], scores=score_rows)
+            next_token_logits = np.array(score_rows[0], dtype=float)
 
             # softmax with numerical stability
             shifted = next_token_logits - np.max(next_token_logits)
@@ -193,7 +206,7 @@ class Command(BaseModel):
             current_text = llm_model.decode(generated_ids)
             if any(s in current_text for s in stop_strings):
                 break
-            
+
             # Optional anti-loop guard (same token repeated too much)
             if len(generated_ids) >= 8 and len(set(generated_ids[-8:])) == 1:
                 break
@@ -203,8 +216,9 @@ class Command(BaseModel):
 
         print(f"encoded_prompt = {encoded_prompt}\n")
         print(f"generated_token_count = {len(generated_ids)}")
-        print(f"last_step_vocab_size = {len(probabilities)}")
+        print(
+            f"last_step_vocab_size = {len(probabilities) if probabilities is not None else 0}")
         print(f"response: {self.response}")
 
         with open(self.output_filepath, "w") as f:
-            f.write(str(probabilities.tolist()))
+            f.write(str(probabilities.tolist() if probabilities is not None else []))
