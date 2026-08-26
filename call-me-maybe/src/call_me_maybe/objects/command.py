@@ -1,5 +1,16 @@
-from utils import print_to_stderr, softmax, decoding_strategy, get_token_id
-from ..contained_decoding import SimpleBanningProcessor
+from utils import (
+    print_to_stderr,
+    softmax,
+    decoding_strategy,
+    get_token_id,
+    extract_last_position_if_needed
+    )
+from ..contained_decoding import (
+    SimpleBanningProcessor,
+    JsonState,
+    JsonTokenEnforcer,
+    mask_all_except,
+)
 from pydantic import BaseModel, Field, model_validator
 from .function_definition import Function_definition
 from llm_sdk import Small_LLM_Model
@@ -154,7 +165,7 @@ class Command(BaseModel):
             self.func_definition_list.append(func_def)
 
     def run(self, llm_model: Small_LLM_Model) -> None:
-        """Runs the project itself based on provided arguments."""
+        """Runs generation with token banning + JSON-constrained decoding."""
         print("\n\n")
 
         encoded_prompt_tensor = llm_model.encode(self.prompts_list[0].prompt)
@@ -165,60 +176,92 @@ class Command(BaseModel):
         max_new_tokens = 64
         stop_strings = ["\nUser:", "\n\nUser:", "<|endoftext|>", "</s>"]
 
-        # Configure banned tokens (adapt to your vocab/token mapping)
-        words_to_ban = ["<|endoftext|>"]  # add more if you want
+        # Configure banned tokens
+        words_to_ban = ["<|endoftext|>"]
         processor = SimpleBanningProcessor(
             token_to_id=get_token_id(llm_model),
             words_to_ban=words_to_ban,
             unknown_token_policy="ignore",
         )
 
+        # JSON enforcer setup (adapt these constructors to your implementation)
+        json_state = JsonState.initialize(top_level="any_json_value")
+        json_enforcer = JsonTokenEnforcer(
+            token_to_id=get_token_id(llm_model),
+            eos_token_id=get_token_id(llm_model).get("</s>")
+        )
+
         generated_ids: list[int] = []
-        probabilities = None  # keep for final logging/write
+        probabilities: np.ndarray | None = None
 
         for _ in range(max_new_tokens):
             logits = llm_model.get_logits_from_input_ids(context_ids)
+            next_token_logits = extract_last_position_if_needed(logits)
 
-            # If model returns logits for all positions, use last position.
-            # If it already returns a 1D next-token vector, this still works.
-            logits_arr = np.array(logits)
-            if logits_arr.ndim > 1:
-                next_token_logits = logits_arr[-1]
-            else:
-                next_token_logits = logits_arr
-
-            # Apply banning processor (expects 2D list: [batch=1][vocab])
+            # Apply banning processor (expects [batch=1][vocab])
             score_rows = [next_token_logits.tolist()]
             score_rows = processor(input_ids=[context_ids], scores=score_rows)
-            next_token_logits = np.array(score_rows[0], dtype=float)
+            next_token_logits = np.asarray(score_rows[0], dtype=float)
 
-            # softmax with numerical stability
-            shifted = next_token_logits - np.max(next_token_logits)
-            exp_vals = np.exp(shifted)
-            probabilities = exp_vals / np.sum(exp_vals)
+            # JSON filtering
+            allowed_ids = json_enforcer.allowed_token_ids(
+                state=json_state,
+                generated_ids=generated_ids
+            )
 
-            next_id = decoding_strategy(probabilities)
+            if not allowed_ids:
+                print_to_stderr("[ERROR] No valid JSON continuation.")
+                break
+
+            # Mask everything not allowed
+            next_token_logits = mask_all_except(
+                next_token_logits,
+                allowed_ids,
+                value=-float("inf")   # fixed -inf
+            )
+
+            # Optional safety: if everything got masked, stop
+            if np.all(np.isneginf(next_token_logits)):
+                print_to_stderr("[ERROR] All logits masked; stopping.")
+                break
+
+            # Softmax
+            probabilities = softmax(next_token_logits)
+            next_id = int(decoding_strategy(probabilities))
 
             context_ids.append(next_id)
             generated_ids.append(next_id)
 
-            # Stop rule via decoded text
+            # IMPORTANT: update JSON state using the sampled token
+            token_text = llm_model.decode([next_id])
+            if not json_state.consume(token_text):
+                print_to_stderr("[ERROR] JSON state rejected sampled token.")
+                break
+
+            # Prefer parser-complete stopping for JSON
+            if json_state.is_complete_json_value():
+                break
+
+            # Secondary stop rule via decoded text
             current_text = llm_model.decode(generated_ids)
             if any(s in current_text for s in stop_strings):
                 break
 
-            # Optional anti-loop guard (same token repeated too much)
+            # Optional anti-loop guard
             if len(generated_ids) >= 8 and len(set(generated_ids[-8:])) == 1:
                 break
 
-        # 4) Decode generated text (only newly generated tokens)
         self.response = llm_model.decode(generated_ids)
 
         print(f"encoded_prompt = {encoded_prompt}\n")
         print(f"generated_token_count = {len(generated_ids)}")
         print(
-            f"last_step_vocab_size = {len(probabilities) if probabilities is not None else 0}")
+            f"last_step_vocab_size = "
+            f"{len(probabilities) if probabilities is not None else 0}")
         print(f"response: {self.response}")
 
         with open(self.output_filepath, "w") as f:
-            f.write(str(probabilities.tolist() if probabilities is not None else []))
+            f.write(
+                str(probabilities.tolist() if (
+                    probabilities is not None) else [])
+            )
