@@ -173,7 +173,7 @@ class Command(BaseModel):
             int(x) for x in encoded_prompt_tensor.flatten().tolist()]
         context_ids: list[int] = list(encoded_prompt)
 
-        max_new_tokens = 64
+        max_new_tokens = 30
         stop_strings = ["\nUser:", "\n\nUser:", "<|endoftext|>", "</s>"]
 
         # Configure banned tokens
