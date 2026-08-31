@@ -2,29 +2,29 @@ from utils import (
     print_to_stderr,
     softmax,
     decoding_strategy,
-    get_token_id,
     extract_last_position_if_needed
     )
-from ..contained_decoding import (
-    SimpleBanningProcessor,
-    JsonState,
-    JsonTokenEnforcer,
-    mask_all_except,
-)
-from pydantic import BaseModel, Field, model_validator
-from .function_definition import Function_definition
-from llm_sdk import Small_LLM_Model
+from pydantic import BaseModel, Field, model_validator, ConfigDict
 from .prompts import Prompt
 from ..parcer import Parcer
+from .generator import Generator
+from ..values import Values
+from .function_definition import Function_definition
+from llm_sdk import Small_LLM_Model
 from pathlib import Path
 import numpy as np
 
 
 class Command(BaseModel):
-    arguments: list[str] = Field()
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    arguments: list[str] = Field(default_factory=list)
+    llm_model: Small_LLM_Model = Field()
+    project_values: Values = Field()
     response: str = Field(default="")
-    prompts_list: list[Prompt] = Field(default=[])
-    func_definition_list: list[Function_definition] = Field(default=[])
+    prompts_list: list[Prompt] = Field(default_factory=list)
+    func_definition_list: list[Function_definition] = Field(
+        default_factory=list)
     function_definition_filepath: str = Field(
         default="data/input/functions_definition.json")
     input_filepath: str = Field(
@@ -164,8 +164,43 @@ class Command(BaseModel):
 
             self.func_definition_list.append(func_def)
 
-    def run(self, llm_model: Small_LLM_Model) -> None:
+    def run(self) -> None:
         """Runs generation with token banning + JSON-constrained decoding."""
+        print("\n\n")
+
+        context_ids: list[int] = Generator.convert_to_token_list(self)
+
+        generated_ids: list[int] = []
+        probabilities: np.ndarray | None = None
+
+        for _ in range(self.project_values.max_tries):
+            logits = self.llm_model.get_logits_from_input_ids(context_ids)
+            next_token_logits = extract_last_position_if_needed(logits)
+
+            # Softmax
+            probabilities = softmax(next_token_logits)
+            next_id = int(decoding_strategy(probabilities))
+
+            context_ids.append(next_id)
+            generated_ids.append(next_id)
+
+        self.response = self.llm_model.decode(generated_ids)
+
+        print(f"generated_token_count = {len(generated_ids)}")
+        print(
+            f"last_step_vocab_size = "
+            f"{len(probabilities) if probabilities is not None else 0}")
+        print(f"response: {self.response}")
+
+        with open(self.output_filepath, "w") as f:
+            f.write(
+                str(probabilities.tolist() if (
+                    probabilities is not None) else [])
+            )
+
+
+"""
+def run(self, llm_model: Small_LLM_Model) -> None:
         print("\n\n")
 
         encoded_prompt_tensor = llm_model.encode(self.prompts_list[0].prompt)
@@ -184,13 +219,6 @@ class Command(BaseModel):
             unknown_token_policy="ignore",
         )
 
-        # JSON enforcer setup (adapt these constructors to your implementation)
-        json_state = JsonState.initialize(top_level="any_json_value")
-        json_enforcer = JsonTokenEnforcer(
-            token_to_id=get_token_id(llm_model),
-            eos_token_id=get_token_id(llm_model).get("</s>")
-        )
-
         generated_ids: list[int] = []
         probabilities: np.ndarray | None = None
 
@@ -204,10 +232,7 @@ class Command(BaseModel):
             next_token_logits = np.asarray(score_rows[0], dtype=float)
 
             # JSON filtering
-            allowed_ids = json_enforcer.allowed_token_ids(
-                state=json_state,
-                generated_ids=generated_ids
-            )
+            allowed_ids: list[Any] = []
 
             if not allowed_ids:
                 print_to_stderr("[ERROR] No valid JSON continuation.")
@@ -217,7 +242,7 @@ class Command(BaseModel):
             next_token_logits = mask_all_except(
                 next_token_logits,
                 allowed_ids,
-                value=-float("inf")   # fixed -inf
+                value=-float("-inf")
             )
 
             # Optional safety: if everything got masked, stop
@@ -231,16 +256,6 @@ class Command(BaseModel):
 
             context_ids.append(next_id)
             generated_ids.append(next_id)
-
-            # IMPORTANT: update JSON state using the sampled token
-            token_text = llm_model.decode([next_id])
-            if not json_state.consume(token_text):
-                print_to_stderr("[ERROR] JSON state rejected sampled token.")
-                break
-
-            # Prefer parser-complete stopping for JSON
-            if json_state.is_complete_json_value():
-                break
 
             # Secondary stop rule via decoded text
             current_text = llm_model.decode(generated_ids)
@@ -265,3 +280,4 @@ class Command(BaseModel):
                 str(probabilities.tolist() if (
                     probabilities is not None) else [])
             )
+"""

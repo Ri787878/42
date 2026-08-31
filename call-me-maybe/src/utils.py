@@ -9,10 +9,20 @@ def print_to_stderr(*a):
     print(*a, file=sys.stderr)
 
 
-def softmax(x):
-    # Subtracting the max value for numerical stability
-    exp_x = np.exp(x - np.max(x))
-    # Dividing by the sum of exponentials to normalize the values
+def softmax(x, temperature=1.0):
+    # Handle greedy decoding (temperature = 0) to avoid division by zero
+    if temperature <= 1e-5:
+        probs = np.zeros_like(x)
+        probs[np.argmax(x, axis=0)] = 1.0
+        return probs
+
+    # 1. Scale input by temperature
+    scaled_x = x / temperature
+
+    # 2. Subtract max value for numerical stability
+    exp_x = np.exp(scaled_x - np.max(scaled_x, axis=0, keepdims=True))
+
+    # 3. Normalize values
     return exp_x / exp_x.sum(axis=0)
 
 
