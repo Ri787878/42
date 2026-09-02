@@ -1,10 +1,14 @@
 from .banning_logits import SimpleBanningProcessor
-from .json_validator import JsonState, JsonTokenEnforcer, mask_all_except
+from .json_validator import (
+    BasicJsonFSM,
+    apply_json_mask,
+    load_vocab_from_model
+)
 
 
 __all__ = [
     "SimpleBanningProcessor",
-    "JsonState",
-    "JsonTokenEnforcer",
-    "mask_all_except"
+    "BasicJsonFSM",
+    "apply_json_mask",
+    "load_vocab_from_model"
     ]

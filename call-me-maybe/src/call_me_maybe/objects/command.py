@@ -3,12 +3,17 @@ from utils import (
     softmax,
     decoding_strategy,
     extract_last_position_if_needed
-    )
+)
 from pydantic import BaseModel, Field, model_validator, ConfigDict
 from .prompts import Prompt
 from ..parcer import Parcer
-from .generator import Generator
+from ..contained_decoding.function_calling import (
+    FunctionCallResult,
+    FunctionCall
+)
+# from .generator import Generator
 from ..values import Values
+# from ..contained_decoding import BasicJsonFSM, load_vocab_from_model
 from .function_definition import Function_definition
 from llm_sdk import Small_LLM_Model
 from pathlib import Path
@@ -165,40 +170,142 @@ class Command(BaseModel):
             self.func_definition_list.append(func_def)
 
     def run(self) -> None:
-        """Runs generation with token banning + JSON-constrained decoding."""
-        print("\n\n")
-
-        context_ids: list[int] = Generator.convert_to_token_list(self)
-
-        generated_ids: list[int] = []
-        probabilities: np.ndarray | None = None
-
-        for _ in range(self.project_values.max_tries):
-            logits = self.llm_model.get_logits_from_input_ids(context_ids)
-            next_token_logits = extract_last_position_if_needed(logits)
-
-            # Softmax
-            probabilities = softmax(next_token_logits)
-            next_id = int(decoding_strategy(probabilities))
-
-            context_ids.append(next_id)
-            generated_ids.append(next_id)
-
-        self.response = self.llm_model.decode(generated_ids)
-
-        print(f"generated_token_count = {len(generated_ids)}")
-        print(
-            f"last_step_vocab_size = "
-            f"{len(probabilities) if probabilities is not None else 0}")
-        print(f"response: {self.response}")
-
-        with open(self.output_filepath, "w") as f:
-            f.write(
-                str(probabilities.tolist() if (
-                    probabilities is not None) else [])
+        """Generate and validate one function call per user prompt."""
+        import json
+    
+        all_calls = []
+    
+        for prompt_item in self.prompts_list:
+            generation_prompt = FunctionCallResult.build_generation_prompt(
+                prompt_text=prompt_item.prompt,
+                definitions=self.func_definition_list,
             )
-
-
+    
+            print(f"\n{generation_prompt}\n")
+    
+            encoded_prompt_tensor = self.llm_model.encode(
+                generation_prompt
+            )
+    
+            context_ids: list[int] = [
+                int(token_id)
+                for token_id in encoded_prompt_tensor.flatten().tolist()
+            ]
+    
+            generated_ids: list[int] = []
+            decoded_text = ""
+            function_call = None
+    
+            for _ in range(self.project_values.max_tries):
+                logits = self.llm_model.get_logits_from_input_ids(
+                    context_ids
+                )
+    
+                next_token_logits = extract_last_position_if_needed(
+                    logits
+                ).copy()
+    
+                banned_token_ids = getattr(
+                    self.project_values,
+                    "banned_token_ids",
+                    [],
+                )
+    
+                if banned_token_ids:
+                    next_token_logits[banned_token_ids] = -np.inf
+    
+                temperature = max(
+                    float(
+                        getattr(
+                            self.project_values,
+                            "temperature",
+                            1.0,
+                        )
+                    ),
+                    1e-6,
+                )
+    
+                probabilities = softmax(
+                    next_token_logits,
+                    temperature=temperature,
+                )
+    
+                if (
+                    probabilities is None
+                    or not np.isfinite(probabilities).all()
+                    or probabilities.sum() <= 0
+                ):
+                    raise ValueError(
+                        "The model returned an invalid "
+                        "probability distribution."
+                    )
+    
+                next_token_id = int(
+                    decoding_strategy(probabilities)
+                )
+    
+                context_ids.append(next_token_id)
+                generated_ids.append(next_token_id)
+    
+                decoded_text = self.llm_model.decode(
+                    generated_ids
+                ).strip()
+    
+                try:
+                    parsed_response = json.loads(decoded_text)
+    
+                    function_call = FunctionCall.model_validate(
+                        parsed_response
+                    )
+    
+                    break
+                
+                except (json.JSONDecodeError, ValueError):
+                    continue
+                
+            if function_call is None:
+                print(f"RAW RESPONSE: {decoded_text!r}")
+                print(
+                    f"GENERATED TOKEN COUNT: {len(generated_ids)}"
+                )
+                print(
+                    f"MAX TRIES: {self.project_values.max_tries}"
+                )
+    
+                raise ValueError(
+                    "Could not generate a complete JSON function call "
+                    f"for prompt: {prompt_item.prompt}"
+                )
+    
+            function_call.prompt = prompt_item.prompt
+    
+            valid_function_names = {
+                definition.name
+                for definition in self.func_definition_list
+            }
+    
+            if function_call.name not in valid_function_names:
+                raise ValueError(
+                    f"Unknown function '{function_call.name}' returned "
+                    f"for prompt '{prompt_item.prompt}'."
+                )
+    
+            all_calls.append(function_call.model_dump())
+    
+        self.response = json.dumps(
+            all_calls,
+            indent=2,
+        )
+    
+        print(
+            f"generated_function_call_count = {len(all_calls)}"
+        )
+        print(f"response: {self.response}")
+    
+        with open(self.output_filepath, "w") as output_file:
+            output_file.write(self.response)
+    
+    
 """
 def run(self, llm_model: Small_LLM_Model) -> None:
         print("\n\n")
@@ -280,4 +387,115 @@ def run(self, llm_model: Small_LLM_Model) -> None:
                 str(probabilities.tolist() if (
                     probabilities is not None) else [])
             )
+
+
+
+
+
+
+
+        print("\n\n")
+
+        context_ids: list[int] = Generator.convert_to_token_list(self)
+
+        generated_ids: list[int] = []
+        probabilities: np.ndarray | None = None
+
+        # Expects dict[str, int]
+        tokenizer_vocab = load_vocab_from_model(self.llm_model)
+        fsm = BasicJsonFSM(tokenizer_vocab)
+        banned_token_ids: list[int] = getattr(
+            self.project_values,
+            "banned_token_ids", []
+        )
+
+        for _ in range(self.project_values.max_tries):
+            logits = self.llm_model.get_logits_from_input_ids(context_ids)
+            next_token_logits = extract_last_position_if_needed(logits).copy()
+
+            # 1) Ban tokens first
+            if banned_token_ids:
+                next_token_logits[banned_token_ids] = -np.inf
+
+            # 2) FSM-allowed tokens
+            allowed_token_ids = fsm.get_allowed_token_ids()
+
+            # remove banned from allowed set too (safety)
+            if banned_token_ids:
+                banned_set = set(banned_token_ids)
+                allowed_token_ids = [
+                    tid for tid in allowed_token_ids if tid not in banned_set]
+
+            # if nothing allowed, stop safely
+            if not allowed_token_ids:
+                break
+
+            # 3) Apply JSON mask
+            json_mask = np.full_like(next_token_logits, fill_value=-np.inf)
+            json_mask[allowed_token_ids] = next_token_logits[allowed_token_ids]
+            next_token_logits = json_mask
+
+            # if all tokens masked out, stop
+            if not np.isfinite(next_token_logits).any():
+                break
+
+            # 4) Softmax with safe temperature
+            temperature = max(
+                float(getattr(self.project_values, "temperature", 1.0)), 1e-6)
+            probabilities = softmax(next_token_logits, temperature=temperature)
+
+            # guard against NaN/invalid distribution
+            if (
+                probabilities is None
+                or not np.isfinite(probabilities).all()
+                or probabilities.sum() <= 0.0
+            ):
+                break
+
+            # 5) Sample
+            next_id = int(decoding_strategy(probabilities))
+
+            # hard safety check
+            allowed_set = set(allowed_token_ids)
+            if next_id not in allowed_set:
+                break
+
+            # 6) Advance FSM + append token
+            fsm.update_state(next_id)
+            context_ids.append(next_id)
+            generated_ids.append(next_id)
+
+            if fsm.current_state == fsm.STATE_DONE:
+                break
+
+        self.response = self.llm_model.decode(generated_ids)
+
+        import json
+
+        self.response = self.llm_model.decode(generated_ids).strip()
+
+        try:
+            json.loads(self.response)
+        except Exception:
+            # deterministic fallback that is always valid JSON
+            prompt_text = (
+                self.prompts_list[0].prompt if self.prompts_list else "")
+            safe_prompt = (
+                prompt_text.replace("\\", "\\\\")
+                .replace('"', '\\"')
+                .replace("\n", "\\n")
+            )
+            self.response = (
+                f'{{"question":"{safe_prompt}",'
+                f'"answer":"unknown"}}')
+
+        print(f"generated_token_count = {len(generated_ids)}")
+        print(
+            f"last_step_vocab_size = "
+            f"{len(probabilities) if probabilities is not None else 0}")
+        print(f"prompt tested: {self.prompts_list[0].prompt}")
+        print(f"response: {self.response}")
+
+        with open(self.output_filepath, "w") as f:
+            f.write(str(self.response))
 """
