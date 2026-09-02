@@ -172,48 +172,48 @@ class Command(BaseModel):
     def run(self) -> None:
         """Generate and validate one function call per user prompt."""
         import json
-    
+
         all_calls = []
-    
+
         for prompt_item in self.prompts_list:
             generation_prompt = FunctionCallResult.build_generation_prompt(
                 prompt_text=prompt_item.prompt,
                 definitions=self.func_definition_list,
             )
-    
-            print(f"\n{generation_prompt}\n")
-    
+
+            # print(f"\n{generation_prompt}\n")
+
             encoded_prompt_tensor = self.llm_model.encode(
                 generation_prompt
             )
-    
+
             context_ids: list[int] = [
                 int(token_id)
                 for token_id in encoded_prompt_tensor.flatten().tolist()
             ]
-    
+
             generated_ids: list[int] = []
             decoded_text = ""
             function_call = None
-    
+
             for _ in range(self.project_values.max_tries):
                 logits = self.llm_model.get_logits_from_input_ids(
                     context_ids
                 )
-    
+
                 next_token_logits = extract_last_position_if_needed(
                     logits
                 ).copy()
-    
+
                 banned_token_ids = getattr(
                     self.project_values,
                     "banned_token_ids",
                     [],
                 )
-    
+
                 if banned_token_ids:
                     next_token_logits[banned_token_ids] = -np.inf
-    
+
                 temperature = max(
                     float(
                         getattr(
@@ -224,12 +224,12 @@ class Command(BaseModel):
                     ),
                     1e-6,
                 )
-    
+
                 probabilities = softmax(
                     next_token_logits,
                     temperature=temperature,
                 )
-    
+
                 if (
                     probabilities is None
                     or not np.isfinite(probabilities).all()
@@ -239,30 +239,30 @@ class Command(BaseModel):
                         "The model returned an invalid "
                         "probability distribution."
                     )
-    
+
                 next_token_id = int(
                     decoding_strategy(probabilities)
                 )
-    
+
                 context_ids.append(next_token_id)
                 generated_ids.append(next_token_id)
-    
+
                 decoded_text = self.llm_model.decode(
                     generated_ids
                 ).strip()
-    
+
                 try:
                     parsed_response = json.loads(decoded_text)
-    
+
                     function_call = FunctionCall.model_validate(
                         parsed_response
                     )
-    
+
                     break
-                
+
                 except (json.JSONDecodeError, ValueError):
                     continue
-                
+
             if function_call is None:
                 print(f"RAW RESPONSE: {decoded_text!r}")
                 print(
@@ -271,41 +271,41 @@ class Command(BaseModel):
                 print(
                     f"MAX TRIES: {self.project_values.max_tries}"
                 )
-    
+
                 raise ValueError(
                     "Could not generate a complete JSON function call "
                     f"for prompt: {prompt_item.prompt}"
                 )
-    
+
             function_call.prompt = prompt_item.prompt
-    
+
             valid_function_names = {
                 definition.name
                 for definition in self.func_definition_list
             }
-    
+
             if function_call.name not in valid_function_names:
                 raise ValueError(
                     f"Unknown function '{function_call.name}' returned "
                     f"for prompt '{prompt_item.prompt}'."
                 )
-    
+
             all_calls.append(function_call.model_dump())
-    
+
         self.response = json.dumps(
             all_calls,
             indent=2,
         )
-    
+
         print(
             f"generated_function_call_count = {len(all_calls)}"
         )
         print(f"response: {self.response}")
-    
+
         with open(self.output_filepath, "w") as output_file:
             output_file.write(self.response)
-    
-    
+
+
 """
 def run(self, llm_model: Small_LLM_Model) -> None:
         print("\n\n")
