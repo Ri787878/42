@@ -9,7 +9,14 @@ from .prompts import Prompt
 from ..parcer import Parcer
 from ..contained_decoding.function_calling import (
     FunctionCallResult,
-    FunctionCall
+    parse_function_call,
+    validate_parameter_types,
+    normalize_parameter_types
+)
+from ..contained_decoding.json_validator import (
+    BasicJsonFSM,
+    apply_json_mask,
+    load_vocab_from_model,
 )
 # from .generator import Generator
 from ..values import Values
@@ -191,6 +198,8 @@ class Command(BaseModel):
                 int(token_id)
                 for token_id in encoded_prompt_tensor.flatten().tolist()
             ]
+            vocab = load_vocab_from_model(self.llm_model)
+            json_fsm = BasicJsonFSM(vocab)
 
             generated_ids: list[int] = []
             decoded_text = ""
@@ -213,6 +222,11 @@ class Command(BaseModel):
 
                 if banned_token_ids:
                     next_token_logits[banned_token_ids] = -np.inf
+
+                next_token_logits = apply_json_mask(
+                    next_token_logits,
+                    json_fsm,
+                )
 
                 temperature = max(
                     float(
@@ -244,6 +258,8 @@ class Command(BaseModel):
                     decoding_strategy(probabilities)
                 )
 
+                json_fsm.update_state(next_token_id)
+
                 context_ids.append(next_token_id)
                 generated_ids.append(next_token_id)
 
@@ -251,17 +267,13 @@ class Command(BaseModel):
                     generated_ids
                 ).strip()
 
-                try:
-                    parsed_response = json.loads(decoded_text)
+                function_call = parse_function_call(decoded_text)
 
-                    function_call = FunctionCall.model_validate(
-                        parsed_response
-                    )
-
+                if json_fsm.is_done() and function_call is not None:
                     break
 
-                except (json.JSONDecodeError, ValueError):
-                    continue
+                # TODO Add VISUALIZATION HERE!!
+                print(f"DECODED: {decoded_text!r}")
 
             if function_call is None:
                 print(f"RAW RESPONSE: {decoded_text!r}")
@@ -284,6 +296,16 @@ class Command(BaseModel):
                 for definition in self.func_definition_list
             }
 
+            normalize_parameter_types(
+                function_call,
+                self.func_definition_list,
+            )
+
+            validate_parameter_types(
+                function_call,
+                self.func_definition_list,
+            )
+
             if function_call.name not in valid_function_names:
                 raise ValueError(
                     f"Unknown function '{function_call.name}' returned "
@@ -304,198 +326,3 @@ class Command(BaseModel):
 
         with open(self.output_filepath, "w") as output_file:
             output_file.write(self.response)
-
-
-"""
-def run(self, llm_model: Small_LLM_Model) -> None:
-        print("\n\n")
-
-        encoded_prompt_tensor = llm_model.encode(self.prompts_list[0].prompt)
-        encoded_prompt: list[int] = [
-            int(x) for x in encoded_prompt_tensor.flatten().tolist()]
-        context_ids: list[int] = list(encoded_prompt)
-
-        max_new_tokens = 30
-        stop_strings = ["\nUser:", "\n\nUser:", "<|endoftext|>", "</s>"]
-
-        # Configure banned tokens
-        words_to_ban = ["<|endoftext|>"]
-        processor = SimpleBanningProcessor(
-            token_to_id=get_token_id(llm_model),
-            words_to_ban=words_to_ban,
-            unknown_token_policy="ignore",
-        )
-
-        generated_ids: list[int] = []
-        probabilities: np.ndarray | None = None
-
-        for _ in range(max_new_tokens):
-            logits = llm_model.get_logits_from_input_ids(context_ids)
-            next_token_logits = extract_last_position_if_needed(logits)
-
-            # Apply banning processor (expects [batch=1][vocab])
-            score_rows = [next_token_logits.tolist()]
-            score_rows = processor(input_ids=[context_ids], scores=score_rows)
-            next_token_logits = np.asarray(score_rows[0], dtype=float)
-
-            # JSON filtering
-            allowed_ids: list[Any] = []
-
-            if not allowed_ids:
-                print_to_stderr("[ERROR] No valid JSON continuation.")
-                break
-
-            # Mask everything not allowed
-            next_token_logits = mask_all_except(
-                next_token_logits,
-                allowed_ids,
-                value=-float("-inf")
-            )
-
-            # Optional safety: if everything got masked, stop
-            if np.all(np.isneginf(next_token_logits)):
-                print_to_stderr("[ERROR] All logits masked; stopping.")
-                break
-
-            # Softmax
-            probabilities = softmax(next_token_logits)
-            next_id = int(decoding_strategy(probabilities))
-
-            context_ids.append(next_id)
-            generated_ids.append(next_id)
-
-            # Secondary stop rule via decoded text
-            current_text = llm_model.decode(generated_ids)
-            if any(s in current_text for s in stop_strings):
-                break
-
-            # Optional anti-loop guard
-            if len(generated_ids) >= 8 and len(set(generated_ids[-8:])) == 1:
-                break
-
-        self.response = llm_model.decode(generated_ids)
-
-        print(f"encoded_prompt = {encoded_prompt}\n")
-        print(f"generated_token_count = {len(generated_ids)}")
-        print(
-            f"last_step_vocab_size = "
-            f"{len(probabilities) if probabilities is not None else 0}")
-        print(f"response: {self.response}")
-
-        with open(self.output_filepath, "w") as f:
-            f.write(
-                str(probabilities.tolist() if (
-                    probabilities is not None) else [])
-            )
-
-
-
-
-
-
-
-        print("\n\n")
-
-        context_ids: list[int] = Generator.convert_to_token_list(self)
-
-        generated_ids: list[int] = []
-        probabilities: np.ndarray | None = None
-
-        # Expects dict[str, int]
-        tokenizer_vocab = load_vocab_from_model(self.llm_model)
-        fsm = BasicJsonFSM(tokenizer_vocab)
-        banned_token_ids: list[int] = getattr(
-            self.project_values,
-            "banned_token_ids", []
-        )
-
-        for _ in range(self.project_values.max_tries):
-            logits = self.llm_model.get_logits_from_input_ids(context_ids)
-            next_token_logits = extract_last_position_if_needed(logits).copy()
-
-            # 1) Ban tokens first
-            if banned_token_ids:
-                next_token_logits[banned_token_ids] = -np.inf
-
-            # 2) FSM-allowed tokens
-            allowed_token_ids = fsm.get_allowed_token_ids()
-
-            # remove banned from allowed set too (safety)
-            if banned_token_ids:
-                banned_set = set(banned_token_ids)
-                allowed_token_ids = [
-                    tid for tid in allowed_token_ids if tid not in banned_set]
-
-            # if nothing allowed, stop safely
-            if not allowed_token_ids:
-                break
-
-            # 3) Apply JSON mask
-            json_mask = np.full_like(next_token_logits, fill_value=-np.inf)
-            json_mask[allowed_token_ids] = next_token_logits[allowed_token_ids]
-            next_token_logits = json_mask
-
-            # if all tokens masked out, stop
-            if not np.isfinite(next_token_logits).any():
-                break
-
-            # 4) Softmax with safe temperature
-            temperature = max(
-                float(getattr(self.project_values, "temperature", 1.0)), 1e-6)
-            probabilities = softmax(next_token_logits, temperature=temperature)
-
-            # guard against NaN/invalid distribution
-            if (
-                probabilities is None
-                or not np.isfinite(probabilities).all()
-                or probabilities.sum() <= 0.0
-            ):
-                break
-
-            # 5) Sample
-            next_id = int(decoding_strategy(probabilities))
-
-            # hard safety check
-            allowed_set = set(allowed_token_ids)
-            if next_id not in allowed_set:
-                break
-
-            # 6) Advance FSM + append token
-            fsm.update_state(next_id)
-            context_ids.append(next_id)
-            generated_ids.append(next_id)
-
-            if fsm.current_state == fsm.STATE_DONE:
-                break
-
-        self.response = self.llm_model.decode(generated_ids)
-
-        import json
-
-        self.response = self.llm_model.decode(generated_ids).strip()
-
-        try:
-            json.loads(self.response)
-        except Exception:
-            # deterministic fallback that is always valid JSON
-            prompt_text = (
-                self.prompts_list[0].prompt if self.prompts_list else "")
-            safe_prompt = (
-                prompt_text.replace("\\", "\\\\")
-                .replace('"', '\\"')
-                .replace("\n", "\\n")
-            )
-            self.response = (
-                f'{{"question":"{safe_prompt}",'
-                f'"answer":"unknown"}}')
-
-        print(f"generated_token_count = {len(generated_ids)}")
-        print(
-            f"last_step_vocab_size = "
-            f"{len(probabilities) if probabilities is not None else 0}")
-        print(f"prompt tested: {self.prompts_list[0].prompt}")
-        print(f"response: {self.response}")
-
-        with open(self.output_filepath, "w") as f:
-            f.write(str(self.response))
-"""
