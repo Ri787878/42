@@ -22,6 +22,11 @@ class Zone_Network(BaseModel):
             raise ValueError(
                 "[ERROR] Start hub and End hub cannot"
                 " share the same coordinates.")
+        if (self.start_hub.name == self.end_hub.name):
+            raise ValueError(
+                f"[ERROR] [Line {self.start_hub.line_index}] Start hub "
+                f"and End Hub can't have the same name."
+            )
 
         self.end_hub.max_drones = self.nb_drones
 
@@ -66,6 +71,7 @@ class Zone_Network(BaseModel):
         end_hub_str: str = ""
         hubs_str_list: list[str] = []
         connections_list: list[tuple[str, str, int]] = []
+        current_hub_name: str = ""
         i: int = 0
         nb_drones_line: int = 0
         end_hub_line: int = 0
@@ -107,9 +113,25 @@ class Zone_Network(BaseModel):
                         f"configurations."
                     )
                 end_hub_str = cleaned_line.removeprefix("end_hub:").strip()
+                if (
+                    end_hub_str.split(' ')[0] == start_hub_str
+                    or end_hub_str in hubs_str_list
+                ):
+                    raise InvalidConfiguration(
+                            f"[ERROR] [line {i}] Multiple Hubs have the "
+                            f"same name: '{end_hub_str}'")
 
             elif cleaned_line.startswith("hub:"):
-                hubs_str_list.append(cleaned_line.removeprefix("hub:").strip())
+                current_hub_name = cleaned_line.removeprefix("hub:").strip()
+                if (
+                    current_hub_name == start_hub_str
+                    or current_hub_name in hubs_str_list
+                ):
+                    raise InvalidConfiguration(
+                            f"[ERROR] [line {i}] Multiple Hubs have the "
+                            f"same name: '{end_hub_str}'")
+                else:
+                    hubs_str_list.append(current_hub_name)
 
             elif cleaned_line.startswith("connection:"):
                 raw = cleaned_line.removeprefix("connection:").strip()
@@ -137,6 +159,9 @@ class Zone_Network(BaseModel):
                             cap = int(tok.split("=", 1)[1].strip())
 
                     connections_list.append((left_name, right_name, cap))
+        print(f"start_hub_str: {start_hub_str}")
+        print(f"end_hub_str: {end_hub_str}")
+        print(f"hubs_list: {hubs_str_list}")
 
         # Base Validations
         if not nb_drones_str:
@@ -158,7 +183,7 @@ class Zone_Network(BaseModel):
 
         # Helper function to convert "name,x,y,[meta1,meta2]"
         # strings into real Hub objects
-        def parse_hub_string(hub_str: str) -> Hub:
+        def parse_hub_string(hub_str: str, line_index: int) -> Hub:
             cleaned = hub_str.strip()
 
             bracket_index = cleaned.find("[")

@@ -1,6 +1,0 @@
-D1-waypoint1
-D1-waypoint2 D2-waypoint1
-D1-goal D2-waypoint2 D3-waypoint1
-D2-goal D3-waypoint2 D4-waypoint1
-D3-goal D4-waypoint2
-D4-goal

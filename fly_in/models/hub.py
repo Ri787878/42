@@ -10,6 +10,7 @@ class Hub(BaseModel):
     x_coord: int = Field()
     y_coord: int = Field()
     metadata: list[str] | None = None
+    line_index: int = Field(ge=1)
 
     # Base Hidden values
     movement_cost: int = Field(default=1)
