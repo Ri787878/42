@@ -33,20 +33,12 @@ class Parcer():
             if line.startswith("#"):
                 continue
 
-            if line.startswith("start_hub:") and start_hub:
-                raise InvalidConfiguration(
-                    "[ERROR] There are 2 'start_hub'"
-                    "configurations.")
             elif line.startswith("start_hub:"):
                 start_hub = line.removeprefix("start_hub:")
 
             if line.startswith("hub:"):
                 hubs.append(line.removeprefix("hub:"))
 
-            if line.startswith("end_hub:") and end_hub:
-                raise InvalidConfiguration(
-                    "[ERROR] There are 2 'end_hub'"
-                    "configurations.")
             elif line.startswith("end_hub:"):
                 end_hub = line.removeprefix("end_hub:")
 

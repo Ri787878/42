@@ -13,6 +13,7 @@ class Zone_Network(BaseModel):
     connection: list[tuple[str, str, int]] = Field(default_factory=list)
     hub_map: dict[str, Hub] = Field(default_factory=dict, exclude=True)
     adjacency: dict[str, list[Hub]] = Field(default_factory=dict, exclude=True)
+    connection_lines: list[int] = Field(default_factory=list, exclude=True)
 
     @model_validator(mode="after")
     def check_inputs(self) -> "Zone_Network":
@@ -27,10 +28,55 @@ class Zone_Network(BaseModel):
                 f"[ERROR] [Line {self.start_hub.line_index}] Start hub "
                 f"and End Hub can't have the same name."
             )
+        hub_names = [hub.name for hub in self.hubs]
+        for hub in self.hubs:
+            if self.start_hub.name == hub.name:
+             raise ValueError(
+                f"[ERROR] [Line {self.start_hub.line_index}] Start hub "
+                f"and Hub {hub.name} can't have the same name."
+            )
+            if self.end_hub.name == hub.name:
+             raise ValueError(
+                f"[ERROR] [Line {self.end_hub.line_index}] End hub "
+                f"and Hub {hub.name} can't have the same name."
+            )
+
+            print(f"hubs_names: {hub_names}")
+            if hub_names.count(hub.name) > 1:
+                raise ValueError(
+                    f"[ERROR] [Line {hub.line_index}] End hub "
+                    f"and Hub {hub.name} can't have the same name."
+                )
 
         self.end_hub.max_drones = self.nb_drones
 
         self.hub_map = self.build_hub_map()
+        known_hub_names = set(self.hub_map)
+        seen_connections: set[frozenset[str]] = set()
+        for connection_index, (left_name, right_name, _cap) in enumerate(
+                self.connection):
+            line_number = (
+                self.connection_lines[connection_index]
+                if connection_index < len(self.connection_lines)
+                else 0
+            )
+            unknown_names = {
+                name for name in (left_name, right_name)
+                if name not in known_hub_names
+            }
+            if unknown_names:
+                raise ValueError(
+                    f"[ERROR] [Line {line_number}] Connection references "
+                    "unknown hub(s): "
+                    f"{', '.join(sorted(unknown_names))}."
+                )
+            connection_key = frozenset((left_name, right_name))
+            if connection_key in seen_connections:
+                raise ValueError(
+                    f"[ERROR] [Line {line_number}] Duplicate connection: "
+                    f"{left_name}-{right_name}."
+                )
+            seen_connections.add(connection_key)
         self.adjacency = self.build_adjacency()
 
         return self
@@ -44,11 +90,10 @@ class Zone_Network(BaseModel):
             name: [] for name in self.build_hub_map()}
 
         for left_name, right_name, _cap in self.connection:
-            if left_name in self.hub_map and right_name in self.hub_map:
-                left_hub = self.hub_map[left_name]
-                right_hub = self.hub_map[right_name]
-                adjacency[left_name].append(right_hub)
-                adjacency[right_name].append(left_hub)
+            left_hub = self.hub_map[left_name]
+            right_hub = self.hub_map[right_name]
+            adjacency[left_name].append(right_hub)
+            adjacency[right_name].append(left_hub)
 
         return adjacency
 
@@ -70,7 +115,9 @@ class Zone_Network(BaseModel):
         start_hub_str: str = ""
         end_hub_str: str = ""
         hubs_str_list: list[str] = []
+        hubs_index_list: list[int] = []
         connections_list: list[tuple[str, str, int]] = []
+        connection_lines: list[int] = []
         current_hub_name: str = ""
         i: int = 0
         nb_drones_line: int = 0
@@ -105,6 +152,7 @@ class Zone_Network(BaseModel):
                         f"configurations."
                     )
                 start_hub_str = cleaned_line.removeprefix("start_hub:").strip()
+                start_line: int = i
 
             elif cleaned_line.startswith("end_hub:"):
                 if end_hub_str:
@@ -113,25 +161,13 @@ class Zone_Network(BaseModel):
                         f"configurations."
                     )
                 end_hub_str = cleaned_line.removeprefix("end_hub:").strip()
-                if (
-                    end_hub_str.split(' ')[0] == start_hub_str
-                    or end_hub_str in hubs_str_list
-                ):
-                    raise InvalidConfiguration(
-                            f"[ERROR] [line {i}] Multiple Hubs have the "
-                            f"same name: '{end_hub_str}'")
+                end_line: int = i
 
             elif cleaned_line.startswith("hub:"):
                 current_hub_name = cleaned_line.removeprefix("hub:").strip()
-                if (
-                    current_hub_name == start_hub_str
-                    or current_hub_name in hubs_str_list
-                ):
-                    raise InvalidConfiguration(
-                            f"[ERROR] [line {i}] Multiple Hubs have the "
-                            f"same name: '{end_hub_str}'")
-                else:
-                    hubs_str_list.append(current_hub_name)
+                
+                hubs_str_list.append(current_hub_name)
+                hubs_index_list.append(i)
 
             elif cleaned_line.startswith("connection:"):
                 raw = cleaned_line.removeprefix("connection:").strip()
@@ -149,19 +185,23 @@ class Zone_Network(BaseModel):
                     meta_tokens = []
 
                 conn_data = core.split("-")
-                if len(conn_data) == 2:
-                    left_name = conn_data[0].strip()
-                    right_name = conn_data[1].strip()
+                if (len(conn_data) != 2 or
+                        not conn_data[0].strip() or
+                        not conn_data[1].strip()):
+                    raise InvalidConfiguration(
+                        f"[ERROR] [Line {i}] Invalid connection: '{raw}'."
+                    )
 
-                    cap = 1  # default
-                    for tok in meta_tokens:
-                        if tok.startswith("max_link_capacity="):
-                            cap = int(tok.split("=", 1)[1].strip())
+                left_name = conn_data[0].strip()
+                right_name = conn_data[1].strip()
 
-                    connections_list.append((left_name, right_name, cap))
-        print(f"start_hub_str: {start_hub_str}")
-        print(f"end_hub_str: {end_hub_str}")
-        print(f"hubs_list: {hubs_str_list}")
+                cap = 1  # default
+                for tok in meta_tokens:
+                    if tok.startswith("max_link_capacity="):
+                        cap = int(tok.split("=", 1)[1].strip())
+
+                connections_list.append((left_name, right_name, cap))
+                connection_lines.append(i)
 
         # Base Validations
         if not nb_drones_str:
@@ -208,7 +248,8 @@ class Zone_Network(BaseModel):
                     name=name,
                     x_coord=x,
                     y_coord=y,
-                    metadata=metadata
+                    metadata=metadata,
+                    line_index=line_index
                 )
             except (IndexError, ValueError) as e:
                 raise InvalidConfiguration(
@@ -217,15 +258,20 @@ class Zone_Network(BaseModel):
                 )
 
         # Turn raw text data into structured Pydantic object instances
-        start_hub_obj = parse_hub_string(start_hub_str)
-        end_hub_obj = parse_hub_string(end_hub_str)
+        start_hub_obj = parse_hub_string(start_hub_str, start_line)
+        end_hub_obj = parse_hub_string(end_hub_str, end_line)
         end_hub_obj.max_drones = int(nb_drones_str)
-        hub_objects = [parse_hub_string(h) for h in hubs_str_list]
+        hub_objects = [
+            parse_hub_string(
+                h,
+                hubs_index_list[hubs_str_list.index(h)]
+            ) for h in hubs_str_list]
 
         return cls(
             nb_drones=int(nb_drones_str),
             start_hub=start_hub_obj,
             end_hub=end_hub_obj,
             hubs=hub_objects,
-            connection=connections_list
+            connection=connections_list,
+            connection_lines=connection_lines
         )
