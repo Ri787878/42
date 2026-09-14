@@ -43,6 +43,7 @@ def main() -> None:
             network,
             drones,
             pathfinder,
+            show_capacity=show_capacity
         )
 
         displayer.start_display(network, display_drones, history)

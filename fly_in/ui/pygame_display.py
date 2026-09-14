@@ -330,6 +330,9 @@ class Displayer():
                 total_steps,
             )
             pygame.display.flip()
+            if total_steps > 0 and current_step_idx >= total_steps:
+                running = False
+
 
         pygame.quit()
         sys.exit()

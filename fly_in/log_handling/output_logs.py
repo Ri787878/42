@@ -63,6 +63,7 @@ class Logger():
         network: Zone_Network,
         drones: list[Drone],
         pathfinder: Pathfinder,
+        show_capacity: bool = False,
     ) -> list[str]:
         history: list[str] = []
     
@@ -245,13 +246,35 @@ class Logger():
             ]
     
             if turn_tokens:
-                output_line = " ".join(
+                movement_line = " ".join(
                     turn_tokens[drone_id]
                     for drone_id in sorted(turn_tokens)
                 )
+            
+                output_line = movement_line
+            
+                if show_capacity:
+                    capacity_info = []
+            
+                    for left, right, capacity in network.connection:
+                        link_key = tuple(sorted((left, right)))
+                        used = link_usage.get(link_key, 0)
+            
+                        if used:
+                            capacity_info.append(
+                                f"{left}-{right} = {used}/{capacity}"
+                            )
+            
+                    if capacity_info:
+                        output_line = (
+                            f"{movement_line} | capacity: "
+                            f"{' '.join(capacity_info)}"
+                        )
+            
                 print(output_line)
-                history.append(output_line)
-    
+            
+                # Keep history compatible with pygame_display.py.
+                history.append(movement_line)
             if active and not intents:
                 raise RuntimeError(
                     "Simulation stalled: no drone can progress."

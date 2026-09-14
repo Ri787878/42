@@ -41,7 +41,6 @@ class Zone_Network(BaseModel):
                 f"and Hub {hub.name} can't have the same name."
             )
 
-            print(f"hubs_names: {hub_names}")
             if hub_names.count(hub.name) > 1:
                 raise ValueError(
                     f"[ERROR] [Line {hub.line_index}] End hub "
