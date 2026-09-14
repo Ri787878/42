@@ -10,19 +10,6 @@ from models import Zone_Network, InvalidConfiguration
 
 def main() -> None:
     try:
-        show_capacity = False
-        
-        if len(sys.argv) > 2:
-            print("[ERROR] invalid number of arguments.")
-            sys.exit(1)
-        
-        if len(sys.argv) == 2:
-            if sys.argv[1] == "--capacity-info":
-                show_capacity = True
-            else:
-                print(f"[ERROR] Unknown argument: {sys.argv[1]}")
-                sys.exit(1)
-
         test_map: str = Map_Selector.select_map()
 
         if test_map == "":
@@ -43,7 +30,6 @@ def main() -> None:
             network,
             drones,
             pathfinder,
-            show_capacity=show_capacity
         )
 
         displayer.start_display(network, display_drones, history)

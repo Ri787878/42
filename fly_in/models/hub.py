@@ -24,7 +24,7 @@ class Hub(BaseModel):
 
     @model_validator(mode="after")
     def validate_hub(self) -> "Hub":
-        # Check Errors in Inputed values
+        """Check Errors in Inputed values"""
         if "-" in self.name or " " in self.name:
             raise InvalidConfiguration(
                 f"[ERROR] Hub {self.name} can't have ' ' or '-'.")
@@ -33,13 +33,13 @@ class Hub(BaseModel):
                 f"[ERROR] Hub {self.name} can't have multi word colors"
                 f" '{self.color}'.")
 
-        # Apply configurations depending on existing Metadata
         self.apply_metadata()
         self.apply_zone_qualifiers()
 
         return self
 
     def apply_metadata(self) -> None:
+        """Apply metadata to the Hubs.(Ex. Available Zone tags, color, etc)"""
         if not self.metadata:
             return
         else:
@@ -57,6 +57,7 @@ class Hub(BaseModel):
                     self.max_drones = int(metadata[11:])
 
     def apply_zone_qualifiers(self) -> None:
+        """Apply zone qualifiers."""
         if self.zone == "normal":
             pass
         elif self.zone == "blocked":

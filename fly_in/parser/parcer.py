@@ -2,10 +2,20 @@ from models import InvalidConfiguration
 
 
 class Parcer():
+    """Represents the parcer"""
     def file_interpreter(
         self,
         filename: str
     ) -> dict[str, str | list[str] | list[tuple[str, str, int]]]:
+        """
+        Reads a file and returns a list of the combined information,
+        already parsed.
+        Extracts from a file:
+            number of drones;
+            Start and End Hubs
+            Possible other Hubs in between
+            Connections between all diferent Hubs
+        """
         with open(filename, "r") as f:
             content = f.read()
 
@@ -85,7 +95,7 @@ class Parcer():
         self,
         res: dict[str, str | list[str] | list[tuple[str, str, int]]]
     ) -> bool:
-        # Check number of drones is valid
+        """Check if all the mandatory parameters are filled."""
         if str(res.get("nb_drones")).strip() == "":
             raise InvalidConfiguration(
                 "[ERROR] Missing configuration parameter: 'nb_drones'")

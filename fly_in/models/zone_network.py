@@ -6,6 +6,7 @@ from models.hub import Hub
 
 
 class Zone_Network(BaseModel):
+    """Represents the whole Network"""
     nb_drones: int = Field(ge=1)
     start_hub: Hub
     end_hub: Hub
@@ -17,7 +18,13 @@ class Zone_Network(BaseModel):
 
     @model_validator(mode="after")
     def check_inputs(self) -> "Zone_Network":
-        # Check if start and end hubs are in the exact same spot
+        """
+        Check inputed information: 
+            start and end hub in the same position; 
+            hubs with the same name;
+            valid connections between hubs;
+
+        """
         if (self.start_hub.x_coord == self.end_hub.x_coord and
                 self.start_hub.y_coord == self.end_hub.y_coord):
             raise ValueError(
@@ -31,15 +38,15 @@ class Zone_Network(BaseModel):
         hub_names = [hub.name for hub in self.hubs]
         for hub in self.hubs:
             if self.start_hub.name == hub.name:
-             raise ValueError(
-                f"[ERROR] [Line {self.start_hub.line_index}] Start hub "
-                f"and Hub {hub.name} can't have the same name."
-            )
+                raise ValueError(
+                    f"[ERROR] [Line {self.start_hub.line_index}] Start hub "
+                    f"and Hub {hub.name} can't have the same name."
+                )
             if self.end_hub.name == hub.name:
-             raise ValueError(
-                f"[ERROR] [Line {self.end_hub.line_index}] End hub "
-                f"and Hub {hub.name} can't have the same name."
-            )
+                raise ValueError(
+                    f"[ERROR] [Line {self.end_hub.line_index}] End hub "
+                    f"and Hub {hub.name} can't have the same name."
+                )
 
             if hub_names.count(hub.name) > 1:
                 raise ValueError(
@@ -81,10 +88,15 @@ class Zone_Network(BaseModel):
         return self
 
     def build_hub_map(self) -> dict[str, Hub]:
+        """Provide list all the hub's names."""
         hubs = [self.start_hub, self.end_hub, *self.hubs]
         return {hub.name: hub for hub in hubs}
 
     def build_adjacency(self) -> dict[str, list[Hub]]:
+        """
+        Create a connection between diferent connected Hubs 
+        based on provided connections.
+        """
         adjacency: dict[str, list[Hub]] = {
             name: [] for name in self.build_hub_map()}
 
@@ -97,6 +109,7 @@ class Zone_Network(BaseModel):
         return adjacency
 
     def neighbors(self, hub_name: str) -> list[Hub]:
+        """Return list of directly connected Hubs connected to provided Hub"""
         return self.adjacency.get(hub_name, [])
 
     @classmethod
@@ -164,7 +177,7 @@ class Zone_Network(BaseModel):
 
             elif cleaned_line.startswith("hub:"):
                 current_hub_name = cleaned_line.removeprefix("hub:").strip()
-                
+
                 hubs_str_list.append(current_hub_name)
                 hubs_index_list.append(i)
 

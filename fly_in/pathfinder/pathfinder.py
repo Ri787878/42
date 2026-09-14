@@ -6,7 +6,9 @@ from models import Hub, Zone_Network
 
 
 class Pathfinder():
+    """Represents the Pathfinder"""
     def _heuristic(self, current: Hub, goal: Hub) -> int:
+        """Calculate the heuristic for the search algorithm 'A*'"""
         return (abs(current.x_coord - goal.x_coord) +
                 abs(current.y_coord - goal.y_coord))
 
@@ -67,7 +69,7 @@ class Pathfinder():
                     came_from,
                     network.hub_map,
                     current_hub.name)
-                
+
                 return path[1] if len(path) > 1 else None
 
             if current_cost > g_score.get(current_hub.name, current_cost):
@@ -76,7 +78,7 @@ class Pathfinder():
             for neighbor in network.neighbors(current_hub.name):
                 if neighbor.is_blocked:
                     continue
-            
+
                 link_key: tuple[str, str] = (
                     current_hub.name,
                     neighbor.name,
@@ -84,25 +86,25 @@ class Pathfinder():
                     neighbor.name,
                     current_hub.name,
                 )
-            
+
                 link_capacity = 0
-            
+
                 for left, right, capacity in network.connection:
                     if tuple(sorted((left, right))) == link_key:
                         link_capacity = capacity
                         break
-            
+
                 if link_capacity <= 0:
                     continue
-            
+
                 # Only the first movement is being scheduled this turn.
                 # Do not block links later in the hypothetical A* route.
                 if current_hub.name == start_hub.name:
                     if used_links.get(link_key, 0) >= link_capacity:
                         continue
-            
+
                 congestion = occupied_hubs.get(neighbor.name, 0)
-            
+
                 if (
                     neighbor.max_drones is None
                     or congestion < neighbor.max_drones
@@ -112,31 +114,31 @@ class Pathfinder():
                     congestion_penalty = (
                         (congestion - neighbor.max_drones + 1) * 5
                     )
-            
+
                 tentative_cost = (
                     current_cost
                     + neighbor.movement_cost
                     + congestion_penalty
                 )
-            
+
                 if tentative_cost >= g_score.get(
                     neighbor.name,
                     float("inf"),
                 ):
                     continue
-            
+
                 came_from[neighbor.name] = current_hub.name
                 g_score[neighbor.name] = tentative_cost
-            
+
                 priority_score = (
                     0 if neighbor.prefered_zone else 1
                 )
-            
+
                 total_score = (
                     tentative_cost
                     + self._heuristic(neighbor, goal_hub)
                 )
-            
+
                 heappush(
                     open_set,
                     (

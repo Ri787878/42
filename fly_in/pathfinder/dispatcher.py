@@ -3,6 +3,7 @@ from models.zone_network import Zone_Network
 
 
 class Dispatcher():
+    """Represents the Dispatcher."""
     def dispatch_drones(self, network: Zone_Network) -> list[Drone]:
         """
         Build one route per drone.
