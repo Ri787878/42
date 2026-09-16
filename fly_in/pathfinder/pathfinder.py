@@ -18,6 +18,9 @@ class Pathfinder():
         hub_map: dict[str, Hub],
         current_name: str,
     ) -> list[Hub]:
+        """
+        Recunstructs path taken, from destination to starting point.
+        """
         path = [hub_map[current_name]]
 
         while current_name in came_from:
@@ -34,6 +37,25 @@ class Pathfinder():
         occupied_hubs: dict[str, int] | None = None,
         used_links: dict[tuple[str, str], int] | None = None,
     ) -> Hub | None:
+        """
+        Method uses A* algorithm to determine the next hub
+        a drone should move to.
+
+        Args:
+            network (Zone_Network): Network class object
+            current_hub (Hub): Hub the drone is located
+            occupied_hubs (dict[str, int] | None, optional): Drone occupied
+            Hubs. Defaults to None.
+            used_links (dict[tuple[str, str], int] | None, optional):
+            Drone occupied links. Defaults to None.
+
+        Raises:
+            ValueError: If start hub is blocked
+            ValueError: If End hub is blocked
+
+        Returns:
+            Hub | None: _description_
+        """
         occupied_hubs = occupied_hubs or {}
         used_links = used_links or {}
 

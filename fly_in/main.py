@@ -9,6 +9,7 @@ from models import Zone_Network, InvalidConfiguration
 
 
 def main() -> None:
+    """Main projec's function. Starts the whole project."""
     try:
         test_map: str = Map_Selector.select_map()
 

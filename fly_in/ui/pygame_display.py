@@ -13,6 +13,7 @@ from models import Drone, Hub, Zone_Network
 
 class Displayer():
     def load_drone_sprite(self) -> pygame.Surface:
+        """Method that loads drone sprites."""
         piskel_path = (
             Path(__file__).resolve().parent.parent
             / "sprites"
@@ -35,6 +36,7 @@ class Displayer():
         step_number: int,
         total_steps: int,
     ) -> None:
+        """Method that draws step counter for pygame."""
         label = font.render(
             f"Step {step_number} / {total_steps}",
             True,
@@ -56,6 +58,7 @@ class Displayer():
         drones: list[Drone],
         history: list[str]
     ) -> None:
+        """Method to start visualization of the map."""
         pygame.display.init()
         pygame.font.init()
 

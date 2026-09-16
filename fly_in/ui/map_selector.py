@@ -1,5 +1,6 @@
 class Map_Selector():
     def print_maps(self) -> None:
+        """Method lists list of preset available maps to use."""
         print("List of Available Maps:\n\tID:\tDificulty:\tName:")
         print("\t1\tEASY   \t\t01_linear_path")
         print("\t2\tEASY   \t\t02_simple_fork")
@@ -11,10 +12,12 @@ class Map_Selector():
         print("\t8\tHARD   \t\t02_capacity_hell")
         print("\t9\tHARD   \t\t03_ultimate_challenge")
         print("\t10\tCHALLENGER   \t01_the_impossible_dream")
-        print("\n\t11\tCUSTOM (To add a custum map write its name"
-              " and place it in the custum-test folder)")
+        print(
+            "\n\t11\tCUSTOM (To add a custum map write its name"
+            " and place it in the custum-test folder)")
 
     def input_filter_choice(self, map_id: str) -> bool:
+        """Method to validate inputted map choice."""
         if not map_id.isnumeric():
             print("\n[ERROR] - Try Again, thats not a valid map!\n\n")
             return False
@@ -24,6 +27,7 @@ class Map_Selector():
 
     @classmethod
     def map_id_to_path(self, map_id: int) -> str:
+        """Method to translate map id to filepath"""
         map_name: str = ""
 
         if map_id == 1:
@@ -54,6 +58,7 @@ class Map_Selector():
 
     @classmethod
     def select_map(self) -> str:
+        """Method to chose which map to use."""
         selector = Map_Selector()
 
         while True:
