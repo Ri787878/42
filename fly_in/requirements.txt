@@ -3,3 +3,4 @@ mypy
 pydantic
 pygame
 typing_extensions
+pillow

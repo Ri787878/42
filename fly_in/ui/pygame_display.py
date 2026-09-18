@@ -1,10 +1,15 @@
 
 from contextlib import redirect_stdout
 from pathlib import Path
+import hashlib
+from PIL import ImageColor
+import colorsys
+import time
 from io import BytesIO, StringIO
 import base64
 import json
 import sys
+from variables import Files_in_use
 with redirect_stdout(StringIO()):
     import pygame
 
@@ -16,8 +21,7 @@ class Displayer():
         """Method that loads drone sprites."""
         piskel_path = (
             Path(__file__).resolve().parent.parent
-            / "sprites"
-            / "drone.piskel"
+            / f"{Files_in_use.DRONE_ICON}"
         )
         raw = json.loads(piskel_path.read_text(encoding="utf-8"))
 
@@ -71,9 +75,6 @@ class Displayer():
         BG_COLOR = (30, 30, 40)
         LINE_COLOR = (180, 180, 180)
         ROUTE_COLOR = (255, 215, 0)
-        START_COLOR = (50, 205, 50)
-        END_COLOR = (220, 20, 60)
-        HUB_COLOR = (70, 130, 180)
 
         nodes = [network.start_hub, network.end_hub, *network.hubs]
         min_x = min(node.x_coord for node in nodes)
@@ -123,7 +124,7 @@ class Displayer():
                 for move in moves:
                     parts = move.split("-")
                     if len(parts) == 2:
-                        d_id = int(parts[0][1:])  # Strip "D" from ID (D3 -> 3)
+                        d_id = int(parts[0][1:])
                         dest_name = parts[1]
                         dest_hub = hub_by_name.get(dest_name)
                         if dest_hub:
@@ -141,18 +142,39 @@ class Displayer():
              world_x: float,
              world_y: float
              ) -> tuple[int, int]:
+            """
+            This function converts drone coordinates into screen coordinates.
+            """
             screen_x = int(offset_x + world_x * cell_size)
             screen_y = int(content_height - (offset_y + world_y * cell_size))
             return screen_x, screen_y
 
+        def string_to_rgb(color_name: str) -> tuple[int, int, int]:
+            """
+            Converts ANY single-word string into a deterministic RGB tuple.
+            """
+            clean_name = color_name.strip().lower()
+
+            # 1. Dynamic rainbow handling
+            if clean_name == "rainbow":
+                hue = (time.time() * 0.3) % 1.0
+                r, g, b = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
+                return (int(r * 255), int(g * 255), int(b * 255))
+
+            # 2. Use pygame.Color for any valid color name
+            color = pygame.Color(clean_name)
+            return (color.r, color.g, color.b)
+
         def get_node_style(
              node: Hub
              ) -> tuple[tuple[int, int, int], str]:
+            """Adds color and label to each node"""
+            rgb = string_to_rgb(node.color)
             if node.name == network.start_hub.name:
-                return START_COLOR, " (Start)"
+                return (rgb[0], rgb[1], rgb[2]), " (Start)"
             if node.name == network.end_hub.name:
-                return END_COLOR, " (Goal)"
-            return HUB_COLOR, ""
+                return (rgb[0], rgb[1], rgb[2]), " (Goal)"
+            return (rgb[0], rgb[1], rgb[2]), ""
 
         def draw_route(
             surface: pygame.Surface,
