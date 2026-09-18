@@ -19,8 +19,8 @@ class Zone_Network(BaseModel):
     @model_validator(mode="after")
     def check_inputs(self) -> "Zone_Network":
         """
-        Check inputed information: 
-            start and end hub in the same position; 
+        Check inputed information:
+            start and end hub in the same position;
             hubs with the same name;
             valid connections between hubs;
 
@@ -94,7 +94,7 @@ class Zone_Network(BaseModel):
 
     def build_adjacency(self) -> dict[str, list[Hub]]:
         """
-        Create a connection between diferent connected Hubs 
+        Create a connection between diferent connected Hubs
         based on provided connections.
         """
         adjacency: dict[str, list[Hub]] = {

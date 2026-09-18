@@ -1,20 +1,38 @@
+from variables import Files_in_use
+from pathlib import Path
+
+
 class Map_Selector():
     def print_maps(self) -> None:
         """Method lists list of preset available maps to use."""
-        print("List of Available Maps:\n\tID:\tDificulty:\tName:")
-        print("\t1\tEASY   \t\t01_linear_path")
-        print("\t2\tEASY   \t\t02_simple_fork")
-        print("\t3\tEASY   \t\t03_basic_capacity")
-        print("\t4\tMEDIUM   \t01_dead_end_trap")
-        print("\t5\tMEDIUM   \t02_circular_loop")
-        print("\t6\tMEDIUM   \t03_priority_puzzle")
-        print("\t7\tHARD   \t\t01_maze_nightmare")
-        print("\t8\tHARD   \t\t02_capacity_hell")
-        print("\t9\tHARD   \t\t03_ultimate_challenge")
-        print("\t10\tCHALLENGER   \t01_the_impossible_dream")
+        print("List of Available Maps:\n\tID:\tDifficulty:\tName:")
+
+        for map_id, map_path in enumerate(self.preset_maps(), start=1):
+            path = Path(map_path.value)
+            difficulty = path.parent.name.upper()
+            name = path.stem
+
+            print(f"\t{map_id}\t{difficulty:<10}\t{name}")
+
         print(
-            "\n\t11\tCUSTOM (To add a custum map write its name"
-            " and place it in the custum-test folder)")
+            "\n\t11\tCUSTOM      "
+            "\tWrite a custom map name"
+        )
+
+    @staticmethod
+    def preset_maps() -> list[Files_in_use]:
+        return [
+            Files_in_use.LINEAR_PATH,
+            Files_in_use.SIMPLE_FORK,
+            Files_in_use.BASIC_CAPACITY,
+            Files_in_use.DEAD_END_TRAP,
+            Files_in_use.CIRCULAR_LOOP,
+            Files_in_use.PRIORITY_PUZZLE,
+            Files_in_use.MAZE_NIGHTMARE,
+            Files_in_use.CAPACITY_HELL,
+            Files_in_use.ULTIMATE_CHALLENGE,
+            Files_in_use.THE_IMPOSSIBLE_DREAM,
+        ]
 
     def input_filter_choice(self, map_id: str) -> bool:
         """Method to validate inputted map choice."""
@@ -26,35 +44,19 @@ class Map_Selector():
         return False
 
     @classmethod
-    def map_id_to_path(self, map_id: int) -> str:
-        """Method to translate map id to filepath"""
-        map_name: str = ""
+    def map_id_to_path(cls, map_id: int) -> str:
+        maps = cls.preset_maps()
 
-        if map_id == 1:
-            return "test-files/easy/01_linear_path.txt"
-        if map_id == 2:
-            return "test-files/easy/02_simple_fork.txt"
-        if map_id == 3:
-            return "test-files/easy/03_basic_capacity.txt"
-        if map_id == 4:
-            return "test-files/medium/01_dead_end_trap.txt"
-        if map_id == 5:
-            return "test-files/medium/02_circular_loop.txt"
-        if map_id == 6:
-            return "test-files/medium/03_priority_puzzle.txt"
-        if map_id == 7:
-            return "test-files/hard/01_maze_nightmare.txt"
-        if map_id == 8:
-            return "test-files/hard/02_capacity_hell.txt"
-        if map_id == 9:
-            return "test-files/hard/03_ultimate_challenge.txt"
-        if map_id == 10:
-            return "test-files/challenger/01_the_impossible_dream.txt"
+        if 1 <= map_id <= len(maps):
+            return maps[map_id - 1].value
+
         if map_id == 11:
-            map_name = input("Write custum map name: ")
+            map_name = input("Write custom map name: ")
             if not map_name.endswith(".txt"):
                 map_name += ".txt"
-        return map_name
+            return map_name
+
+        return ""
 
     @classmethod
     def select_map(self) -> str:
