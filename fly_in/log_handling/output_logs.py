@@ -265,17 +265,13 @@ class Logger():
                 if not drone.has_reached(goal_hub)
             ]
 
-            if turn_tokens:
-                movement_line = " ".join(
-                    turn_tokens[drone_id]
-                    for drone_id in sorted(turn_tokens)
-                )
+            self._log_turn(
+                turn_tokens,
+                network,
+                link_usage,
+                history,
+            )
 
-                output_line = movement_line
-                print(output_line)
-
-                # Keep history compatible with pygame_display.py.
-                history.append(movement_line)
             if active and not intents:
                 raise RuntimeError(
                     "Simulation stalled: no drone can progress."
@@ -288,3 +284,39 @@ class Logger():
             )
 
         return history
+
+    def _log_turn(
+        self,
+        turn_tokens: dict[int, str],
+        network: Zone_Network,
+        link_usage: dict[tuple[str, str], int],
+        history: list[str],
+    ) -> None:
+        if not turn_tokens:
+            return
+
+        movement_line = " ".join(
+            turn_tokens[drone_id]
+            for drone_id in sorted(turn_tokens)
+        )
+
+        output_line = movement_line
+
+        capacity_info = []
+        for left, right, capacity in network.connection:
+            link_key = tuple(sorted((left, right)))
+            used = link_usage.get(link_key, 0)
+            if used:
+                capacity_info.append(
+                    f"{left}-{right} = {used}/{capacity}"
+                )
+        if capacity_info:
+            output_line = (
+                f"{movement_line} | capacity: "
+                f"{' '.join(capacity_info)}"
+            )
+
+        print(output_line)
+
+        # Keep history compatible with pygame_display.py.
+        history.append(movement_line)
