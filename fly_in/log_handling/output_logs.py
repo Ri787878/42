@@ -267,8 +267,6 @@ class Logger():
 
             self._log_turn(
                 turn_tokens,
-                network,
-                link_usage,
                 history,
             )
 
@@ -288,8 +286,6 @@ class Logger():
     def _log_turn(
         self,
         turn_tokens: dict[int, str],
-        network: Zone_Network,
-        link_usage: dict[tuple[str, str], int],
         history: list[str],
     ) -> None:
         if not turn_tokens:
@@ -301,22 +297,5 @@ class Logger():
         )
 
         output_line = movement_line
-
-        capacity_info = []
-        for left, right, capacity in network.connection:
-            link_key = tuple(sorted((left, right)))
-            used = link_usage.get(link_key, 0)
-            if used:
-                capacity_info.append(
-                    f"{left}-{right} = {used}/{capacity}"
-                )
-        if capacity_info:
-            output_line = (
-                f"{movement_line} | capacity: "
-                f"{' '.join(capacity_info)}"
-            )
-
         print(output_line)
-
-        # Keep history compatible with pygame_display.py.
         history.append(movement_line)
