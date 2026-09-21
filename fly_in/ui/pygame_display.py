@@ -1,8 +1,6 @@
 
 from contextlib import redirect_stdout
 from pathlib import Path
-import hashlib
-from PIL import ImageColor
 import colorsys
 import time
 from io import BytesIO, StringIO

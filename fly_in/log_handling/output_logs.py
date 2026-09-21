@@ -17,12 +17,12 @@ class Logger():
         next_hub: Hub,
     ) -> str:
         """
-        Return the next hub name, if its restricted 
+        Return the next hub name, if its restricted
         change it to be a connection between hubs.
         Parameters:
-            network: Network 
-            current_hub: Hub 
-            next_hub: Hub 
+            network: Network
+            current_hub: Hub
+            next_hub: Hub
         Return:
             Name of next Hub
         """
