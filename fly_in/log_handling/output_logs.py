@@ -265,6 +265,7 @@ class Logger():
                 if not drone.has_reached(goal_hub)
             ]
 
+            # Records each log of the program
             self._log_turn(
                 turn_tokens,
                 history,
