@@ -70,7 +70,7 @@ class Displayer():
         CLOCK = pygame.time.Clock()
         FONT = pygame.font.SysFont("Arial", 14)
 
-        BG_COLOR = (30, 30, 40)
+        BG_COLOR = (173, 216, 230)
         LINE_COLOR = (180, 180, 180)
         ROUTE_COLOR = (255, 215, 0)
 
