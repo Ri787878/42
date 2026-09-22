@@ -77,6 +77,7 @@ make install
 ```bash
 make run
 ```
+For easier utilization there is a variables.py file that containes predetermined filepath for the program to ingest (provided they exist and the file path is correct).
 
 
 The project expects a valid map/configuration file as input. Once launched, it will parse the file, build the simulation environment, and start the drone movement loop while displaying the state in the graphical interface.
