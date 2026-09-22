@@ -26,7 +26,35 @@ The visual representation of the project is quite simple in terms of features, h
 - Zoom using the mouse wheel to better see each zoom
 - Dinamic color interpretation depending on provided color in the map file
 - A simple step counter
-- Capabilitie to receive every valid single-word strings for a color, including "rainbow" that cycles through a HUE of colors 
+- Capabilitie to receive every valid single-word strings for a color, including "rainbow" that cycles through a HUE of colors
+
+### Example Input
+Example map file to provide the program:
+```bash
+# Easy Level 1: Simple linear path
+
+nb_drones: 4
+
+start_hub: start 0 0 [color=green]
+hub: waypoint1 1 0 [color=blue]
+hub: waypoint2 2 0 [color=blue]
+end_hub: goal 3 0 [color=red]
+
+connection: start-waypoint1
+connection: waypoint1-waypoint2
+connection: waypoint2-goal
+```
+
+### Expected Output
+Possible expected path taken by the program:
+```bash
+D1-waypoint1
+D1-waypoint2 D2-waypoint1
+D1-goal D2-waypoint2 D3-waypoint1
+D2-goal D3-waypoint2 D4-waypoint1
+D3-goal D4-waypoint2
+D4-goal
+```
 
 ### Features
 
@@ -56,11 +84,12 @@ The project expects a valid map/configuration file as input. Once launched, it w
 
 ## Resources
 
-- A* Search Algorithm — https://en.wikipedia.org/wiki/A*_search_algorithm
-- Pygame Documentation — https://www.pygame.org/docs/
-
+- https://en.wikipedia.org/wiki/A*_search_algorithm
 - https://www.geeksforgeeks.org/dsa/a-search-algorithm/
--       
+- https://www.pygame.org/docs/
+- https://www.datacamp.com/tutorial/a-star-algorithm
+- https://pydantic.dev/docs/validation/dev/get-started/
+
 
 ### AI usage
 AI was used as a support tool during the development of this project for:
