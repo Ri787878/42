@@ -64,10 +64,6 @@ class Parcer():
                     meta = []
 
                 parts = core.split("-")
-                if len(parts) != 2:
-                    raise InvalidConfiguration(f"[ERROR] Invalid connection "
-                                               f"format: '{line}'")
-
                 left_name = parts[0].strip()
                 right_name = parts[1].strip()
 
@@ -86,35 +82,4 @@ class Parcer():
             "connections": connections_list
             }
 
-        # Validate directories has allowed parameters
-        self.validate_conf(res)
-
         return res
-
-    def validate_conf(
-        self,
-        res: dict[str, str | list[str] | list[tuple[str, str, int]]]
-    ) -> bool:
-        """Check if all the mandatory parameters are filled."""
-        if str(res.get("nb_drones")).strip() == "":
-            raise InvalidConfiguration(
-                "[ERROR] Missing configuration parameter: 'nb_drones'")
-
-        if not str(res["nb_drones"]).isnumeric():
-            raise InvalidConfiguration(
-                "[ERROR] Missing configuration parameter: 'nb_drones'")
-
-        # Check start hub / end_hub / hubs has valid format
-        if res.get("start_hub") == "":
-            raise InvalidConfiguration(
-                "[ERROR] Missing configuration parameter: 'start_hub'")
-
-        if res.get("end_hub") == "":
-            raise InvalidConfiguration(
-                "[ERROR] Missing configuration parameter: 'end_hub'")
-
-        if res.get("hubs") == "":
-            raise InvalidConfiguration(
-                "[ERROR] Missing configuration parameter: 'hubs'")
-
-        return True

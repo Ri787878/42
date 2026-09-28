@@ -35,7 +35,8 @@ class Zone_Network(BaseModel):
                 f"[ERROR] [Line {self.start_hub.line_index}] Start hub "
                 f"and End Hub can't have the same name."
             )
-        hub_names = [hub.name for hub in self.hubs]
+
+        seen_hub_names: set[str] = set()
         for hub in self.hubs:
             if self.start_hub.name == hub.name:
                 raise ValueError(
@@ -48,11 +49,21 @@ class Zone_Network(BaseModel):
                     f"and Hub {hub.name} can't have the same name."
                 )
 
-            if hub_names.count(hub.name) > 1:
+            if hub.name in seen_hub_names:
                 raise ValueError(
-                    f"[ERROR] [Line {hub.line_index}] End hub "
-                    f"and Hub {hub.name} can't have the same name."
+                    f"[ERROR] [Line {hub.line_index}] Hub {hub.name} "
+                    f"can't have the same name as another hub."
                 )
+            seen_hub_names.add(hub.name)
+        seen_positions: set[tuple[int, int]] = set()
+        for hub in [self.start_hub, self.end_hub, *self.hubs]:
+            position = (hub.x_coord, hub.y_coord)
+            if position in seen_positions:
+                raise ValueError(
+                    f"[ERROR] [Line {hub.line_index}] Hub {hub.name} "
+                    f"can't share the same position as another hub."
+                )
+            seen_positions.add(position)
 
         self.end_hub.max_drones = self.nb_drones
 

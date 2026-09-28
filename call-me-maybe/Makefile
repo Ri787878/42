@@ -1,3 +1,4 @@
+# SGOINFRE := $(shell [ -d /sgoinfre/$(USER) ] && echo /sgoinfre/$(USER) || echo $(HOME))
 install:
 	pip install -r requirements.txt
 

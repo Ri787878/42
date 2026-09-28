@@ -55,6 +55,7 @@ D2-goal D3-waypoint2 D4-waypoint1
 D3-goal D4-waypoint2
 D4-goal
 ```
+There also is a created file called "output.txt" where the solution is stored.
 
 ### Features
 

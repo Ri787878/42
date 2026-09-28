@@ -237,8 +237,8 @@ class Logger():
                     intent_drone.pending_hub = intent_next_hub
                     intent_drone.status = DroneStatus.BLOCKED
 
-                    turn_tokens[drone.id] = (
-                        f"D{drone.id}-"
+                    turn_tokens[intent_drone.id] = (
+                        f"D{intent_drone.id}-"
                         f"{intent_current_hub.name}-"
                         f"{intent_next_hub.name}"
                     )

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, model_validator
 from .error_handling import InvalidConfiguration
 from variables import Approved_tags
+from pygame import Color
 
 
 class Hub(BaseModel):
@@ -52,7 +53,26 @@ class Hub(BaseModel):
                             f"[ERROR] Hub '{self.name}'"
                             f" has invalid zone '{metadata[5:]}'.")
                 elif "color" in metadata:
-                    self.color = metadata[6:]
+                    color_value = metadata[6:]
+                    if not color_value:
+                        self.color = "white"
+                        raise InvalidConfiguration(
+                            f"[ERROR] Hub {self.name} has an empty "
+                            f"color value."
+                        )
+                    if color_value.lower() == "rainbow":
+                        self.color = color_value
+                        continue
+                    try:
+                        Color(color_value)
+                        self.color = color_value
+                    except Exception:
+                        self.color = "white"
+                        raise InvalidConfiguration(
+                            f"[ERROR] [Line {self.line_index}] Hub "
+                            f"{self.name} has invalid color "
+                            f"'{color_value}'."
+                        )
                 elif "max_drones" in metadata:
                     self.max_drones = int(metadata[11:])
 
