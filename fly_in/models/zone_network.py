@@ -3,6 +3,7 @@ from .error_handling import InvalidConfiguration
 from typing_extensions import Self
 from pathlib import Path
 from models.hub import Hub
+import sys
 
 
 class Zone_Network(BaseModel):
@@ -128,8 +129,14 @@ class Zone_Network(BaseModel):
         """
         Parses a configuration file and initializes a Zone_Network instance.
         """
-        with open(filename, "r") as f:
-            content = f.read()
+        try:
+            with open(filename, "r") as f:
+                content = f.read()
+        except FileNotFoundError as e:
+            error_message: str = str(e)
+            error_message = error_message.removeprefix("[Errno 2] ")
+            print(f"[ERROR] {error_message}")
+            sys.exit(1)
 
         lines: list[str] = content.splitlines()
 
@@ -196,7 +203,18 @@ class Zone_Network(BaseModel):
                 raw = cleaned_line.removeprefix("connection:").strip()
 
                 bracket_i = raw.find("[")
-                if bracket_i != -1:
+                closing_bracket_i = raw.find("]")
+                if bracket_i != -1 or closing_bracket_i != -1:
+                    if (
+                        bracket_i == -1
+                        or closing_bracket_i == -1
+                        or closing_bracket_i < bracket_i
+                        or closing_bracket_i != len(raw) - 1
+                    ):
+                        raise InvalidConfiguration(
+                            f"[ERROR] [Line {i}] "
+                            f"Invalid metadata brackets: '{raw}'."
+                        )
                     core = raw[:bracket_i].strip()
                     meta_tokens = [
                         t.strip()
@@ -250,10 +268,27 @@ class Zone_Network(BaseModel):
             cleaned = hub_str.strip()
 
             bracket_index = cleaned.find("[")
-            if bracket_index != -1:
+            closing_bracket_index = cleaned.find("]")
+
+            if bracket_index != -1 or closing_bracket_index != -1:
+                if (
+                    bracket_index == -1
+                    or closing_bracket_index == -1
+                    or closing_bracket_index < bracket_index
+                    or closing_bracket_index != len(cleaned) - 1
+                ):
+                    raise InvalidConfiguration(
+                        f"[ERROR] [Line {line_index}] "
+                        f"Invalid metadata brackets: '{hub_str}'."
+                    )
+
                 core_part = cleaned[:bracket_index].strip()
                 meta_part = cleaned[bracket_index:].strip("[] ")
-                metadata = [t.strip() for t in meta_part.split() if t.strip()]
+                metadata = [
+                    token.strip()
+                    for token in meta_part.split(",")
+                    if token.strip()
+                ]
             else:
                 core_part = cleaned
                 metadata = None
