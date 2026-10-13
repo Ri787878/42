@@ -94,3 +94,16 @@ def extract_last_position_if_needed(logits) -> np.ndarray:
         return logits_arr[0, -1].astype(float, copy=False)
 
     raise ValueError(f"Unsupported logits shape: {logits_arr.shape}")
+
+
+def write_error(output_filepath: str, exc: Exception) -> None:
+    """Writes an error in the terminal and in a given file."""
+    error_message = str(exc) or exc.__class__.__name__
+
+    with open(output_filepath, "w", encoding="utf-8") as output_file:
+        json.dump(
+            {"error": error_message},
+            output_file,
+            indent=2,
+        )
+        output_file.write("\n")

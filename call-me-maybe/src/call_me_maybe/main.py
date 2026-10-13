@@ -1,7 +1,7 @@
 from llm_sdk import Small_LLM_Model
 from call_me_maybe import Parcer, Command, Values
 from pydantic import ValidationError
-from utils import print_to_stderr
+from utils import write_error
 import sys
 
 
@@ -21,11 +21,10 @@ def main() -> None:
 
         cmd.run()
 
-        # llm_model.
-
     except ValidationError as exc:
-        print_to_stderr(exc)
+        write_error(cmd.output_filepath, exc)
         sys.exit(1)
-    except ValueError as exc:
-        print_to_stderr(f"[ERROR] Generation failed: {exc}")
+
+    except (ValueError, StopIteration) as exc:
+        write_error(cmd.output_filepath, exc)
         sys.exit(1)
