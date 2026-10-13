@@ -333,3 +333,44 @@ class Zone_Network(BaseModel):
             connection=connections_list,
             connection_lines=connection_lines
         )
+
+    def get_link_occupancy(
+        self,
+        link: tuple[str, str],
+        link_usage: dict[tuple[str, str], int],
+    ) -> tuple[int, int]:
+        """
+        Function that returns the occupancy of provided link.
+
+        Output:
+        [used, limit]
+
+        Raises ValueError if link not found in connection.
+        """
+        used_capacity = link_usage.get(link, 0)
+
+        for left, right, capacity in self.connection:
+            if (left, right) == link:
+                return used_capacity, capacity
+
+        raise ValueError(f"Link {link!r} was not found in connection.")
+
+    def get_hub_occupancy(
+        self,
+        hub_name,
+        occupancy: dict[str, int]
+    ) -> tuple[int, int]:
+        """
+        Function that returns the occupancy of provided hub.
+
+        Output:
+        [used, limit]
+
+        Raises ValueError if hub not found in hub_map.
+        """
+        for h_name, hub in sorted(self.hub_map.items()):
+            if hub_name == h_name:
+                used_capacity = occupancy.get(hub_name, 0)
+                limit = hub.max_drones
+                return (used_capacity, limit)
+        raise ValueError(f"Hub {hub_name!r} was not found in hub_map.")

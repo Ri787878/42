@@ -21,7 +21,7 @@ class Hub(BaseModel):
     # Metadata
     zone: str = Field(default="normal")
     color: str = Field(default="white")
-    max_drones: int | None = Field(default=None)
+    max_drones: int = Field(default=1, ge=1)
 
     @model_validator(mode="after")
     def validate_hub(self) -> "Hub":
@@ -68,11 +68,11 @@ class Hub(BaseModel):
                         self.color = color_value
                     except Exception:
                         self.color = "white"
-                        raise InvalidConfiguration(
-                            f"[ERROR] [Line {self.line_index}] Hub "
-                            f"{self.name} has invalid color "
-                            f"'{color_value}'."
-                        )
+                        # raise InvalidConfiguration(
+                        #     f"[ERROR] [Line {self.line_index}] Hub "
+                        #     f"{self.name} has invalid color "
+                        #     f"'{color_value}'."
+                        # )
                 elif "max_drones" in metadata:
                     self.max_drones = int(metadata[11:])
 
