@@ -1,0 +1,31 @@
+[
+  {
+    "name": "fn_create_user_profile",
+    "description": "Create a user profile from a name, age, and active status.",
+    "parameters": {
+      "name": { "type": "string" },
+      "age": { "type": "number" },
+      "active": { "type": "boolean" }
+    },
+    "returns": { "type": "string" }
+  },
+  {
+    "name": "fn_convert_currency",
+    "description": "Convert an amount using a numeric exchange rate.",
+    "parameters": {
+      "amount": { "type": "number" },
+      "rate": { "type": "number" }
+    },
+    "returns": { "type": "number" }
+  },
+  {
+    "name": "fn_replace_literal",
+    "description": "Replace every literal target string in source text.",
+    "parameters": {
+      "source": { "type": "string" },
+      "target": { "type": "string" },
+      "replacement": { "type": "string" }
+    },
+    "returns": { "type": "string" }
+  }
+]

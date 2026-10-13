@@ -1,0 +1,86 @@
+[
+  {
+    "prompt": "Create a user profile for name 'Ada Lovelace', age 36, and active true",
+    "name": "fn_create_user_profile",
+    "parameters": {
+      "name": "Ada Lovelace",
+      "age": ","
+    }
+  },
+  {
+    "prompt": "Create a user profile for name '', age 0, and active false",
+    "name": "fn_create_user_profile",
+    "parameters": {
+      "name": ""
+    }
+  },
+  {
+    "prompt": "Convert 1000000000000000000000 USD to EUR using rate 0.91",
+    "name": "fn_convert_currency",
+    "parameters": {
+      "amount": 1000000000000000000000,
+      "rate": 0.91
+    }
+  },
+  {
+    "prompt": "Convert -10.5 USD to EUR using rate 1.25",
+    "name": "fn_convert_currency",
+    "parameters": {
+      "amount": -10.5,
+      "rate": 1.25
+    }
+  },
+  {
+    "prompt": "Replace 'cat' with 'dog' in the text 'cat catapult cat'",
+    "name": "fn_replace_literal",
+    "parameters": {
+      "source": "catapult",
+      "target": "dog",
+      "replacement": "cat"
+    }
+  },
+  {
+    "prompt": "Replace '[' with ']' in the text 'a[b[c'",
+    "name": "fn_replace_literal",
+    "parameters": {
+      "source": "a[b[c",
+      "target": "]",
+      "replacement": "}"
+    }
+  },
+  {
+    "prompt": "Which is more appropriate: greeting name 'Sam' or profile name 'Sam', age 20, active true?",
+    "name": "fn_create_user_profile",
+    "parameters": {
+      "name": "Sam",
+      "age": 20,
+      "active": "true"
+    }
+  },
+  {
+    "prompt": "Create a user profile for name 123, age 'old', and active maybe",
+    "name": "fn_create_user_profile",
+    "parameters": {
+      "name": "123",
+      "age": "old",
+      "active": "maybe"
+    }
+  },
+  {
+    "prompt": "Convert 5 USD to EUR",
+    "name": "fn_convert_currency",
+    "parameters": {
+      "amount": 5,
+      "rate": 1.1
+    }
+  },
+  {
+    "prompt": "Replace an empty pattern '' with 'X' in the text 'abc'",
+    "name": "fn_replace_literal",
+    "parameters": {
+      "source": "",
+      "target": "X",
+      "replacement": "X"
+    }
+  }
+]
