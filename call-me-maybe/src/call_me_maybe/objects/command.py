@@ -183,6 +183,7 @@ class Command(BaseModel):
 
         all_calls = []
         vocab = load_vocab_from_model(self.llm_model)
+        encoded_prompt_cache: dict[str, list[int]] = {}
 
         for prompt_item in self.prompts_list:
             generation_prompt = FunctionCallResult.build_generation_prompt(
@@ -190,22 +191,38 @@ class Command(BaseModel):
                 definitions=self.func_definition_list,
             )
 
-            # print(f"\n{generation_prompt}\n")
+            if generation_prompt not in encoded_prompt_cache:
+                encoded_prompt_tensor = self.llm_model.encode(
+                    generation_prompt
+                )
+                encoded_prompt_cache[generation_prompt] = [
+                    int(token_id)
+                    for token_id in encoded_prompt_tensor.flatten().tolist()
+                ]
 
-            encoded_prompt_tensor = self.llm_model.encode(
-                generation_prompt
-            )
-
-            context_ids: list[int] = [
-                int(token_id)
-                for token_id in encoded_prompt_tensor.flatten().tolist()
-            ]
+            context_ids = encoded_prompt_cache[generation_prompt].copy()
             json_fsm = BasicJsonFSM(vocab)
 
             generated_ids: list[int] = []
             decoded_text = ""
             function_call = None
 
+            banned_token_ids = getattr(
+                self.project_values,
+                "banned_token_ids",
+                [],
+            )
+
+            temperature = max(
+                float(
+                    getattr(
+                        self.project_values,
+                        "temperature",
+                        1.0,
+                    )
+                ),
+                1e-6,
+            )
             for _ in range(self.project_values.max_tries):
                 logits = self.llm_model.get_logits_from_input_ids(
                     context_ids
@@ -215,12 +232,6 @@ class Command(BaseModel):
                     logits
                 ).copy()
 
-                banned_token_ids = getattr(
-                    self.project_values,
-                    "banned_token_ids",
-                    [],
-                )
-
                 if banned_token_ids:
                     next_token_logits[banned_token_ids] = -np.inf
 
@@ -229,26 +240,11 @@ class Command(BaseModel):
                     json_fsm,
                 )
 
-                finite_token_ids = np.flatnonzero(
-                    np.isfinite(next_token_logits)
-                )
-
-                if len(finite_token_ids) == 0:
+                if not np.isfinite(next_token_logits).any():
                     raise ValueError(
                         "JSON mask removed every valid token. "
                         f"FSM state: {json_fsm.current_state}"
                     )
-
-                temperature = max(
-                    float(
-                        getattr(
-                            self.project_values,
-                            "temperature",
-                            1.0,
-                        )
-                    ),
-                    1e-6,
-                )
 
                 probabilities = softmax(
                     next_token_logits,
@@ -306,6 +302,12 @@ class Command(BaseModel):
                 for definition in self.func_definition_list
             }
 
+            if function_call.name not in valid_function_names:
+                raise ValueError(
+                    f"Unknown function '{function_call.name}' returned "
+                    f"for prompt '{prompt_item.prompt}'."
+                )
+
             normalize_parameter_types(
                 function_call,
                 self.func_definition_list,
@@ -316,11 +318,6 @@ class Command(BaseModel):
                 self.func_definition_list,
             )
 
-            if function_call.name not in valid_function_names:
-                raise ValueError(
-                    f"Unknown function '{function_call.name}' returned "
-                    f"for prompt '{prompt_item.prompt}'."
-                )
 
             all_calls.append(function_call.model_dump())
 

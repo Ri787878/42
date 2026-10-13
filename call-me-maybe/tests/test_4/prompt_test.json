@@ -1,0 +1,32 @@
+[
+  {
+    "prompt": "Greet the person named ''"
+  },
+  {
+    "prompt": "Reverse the empty string ''"
+  },
+  {
+    "prompt": "Add 999999999999999999999999 to 1"
+  },
+  {
+    "prompt": "Calculate the square root of 0"
+  },
+  {
+    "prompt": "Replace all digits in 'Room #42: floor 7' with '#'"
+  },
+  {
+    "prompt": "Replace all spaces in '  leading and trailing  ' with '-'"
+  },
+  {
+  "prompt": "Reverse the string 'quotes: single and double'"
+  },
+  {
+    "prompt": "Say hello to Alex"
+  },
+  {
+    "prompt": "What should I do with 12 and 30?"
+  },
+  {
+    "prompt": "Add 5 to five"
+  }
+]

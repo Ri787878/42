@@ -25,3 +25,7 @@ def main() -> None:
 
     except ValidationError as exc:
         print_to_stderr(exc)
+        sys.exit(1)
+    except ValueError as exc:
+        print_to_stderr(f"[ERROR] Generation failed: {exc}")
+        sys.exit(1)
