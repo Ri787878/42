@@ -318,7 +318,6 @@ class Command(BaseModel):
                 self.func_definition_list,
             )
 
-
             all_calls.append(function_call.model_dump())
 
         self.response = json.dumps(
