@@ -7,6 +7,8 @@ import time
 
 
 def main() -> None:
+    cmd = None
+
     try:
         project_values = Values()
         parcer = Parcer()
@@ -25,9 +27,19 @@ def main() -> None:
         cmd.run()
 
     except ValidationError as exc:
-        write_error(cmd.output_filepath, exc)
+        output_filepath = (
+            cmd.output_filepath
+            if cmd is not None
+            else "function_calling_results.json"
+        )
+        write_error(output_filepath, exc)
         sys.exit(1)
 
     except (ValueError, StopIteration) as exc:
-        write_error(cmd.output_filepath, exc)
+        output_filepath = (
+            cmd.output_filepath
+            if cmd is not None
+            else "function_calling_results.json"
+        )
+        write_error(output_filepath, exc)
         sys.exit(1)

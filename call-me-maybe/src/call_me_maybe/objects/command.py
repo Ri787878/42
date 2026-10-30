@@ -1,9 +1,4 @@
-from utils import (
-    print_to_stderr,
-    softmax,
-    decoding_strategy,
-    extract_last_position_if_needed
-)
+from utils import print_to_stderr
 from pydantic import BaseModel, Field, model_validator, ConfigDict
 from .prompts import Prompt
 from ..parcer import Parcer
@@ -94,60 +89,47 @@ class Command(BaseModel):
         return True
 
     def create_output_file(self) -> None:
-        """Create the Output Folder(s) and File"""
-        folders_to_create: list[str] = []
+        """Create the output folder(s) and file."""
+        output_path = Path(self.output_filepath)
 
-        _, reversed_directory_path = self.output_filepath[::-1].split("/", 1)
-
-        while reversed_directory_path.find("/") > 0:
-            folder_name, reversed_directory_path = (
-                reversed_directory_path.split("/", 1))
-
-            folders_to_create.append(folder_name[::-1])
-
-        folders_to_create.append(reversed_directory_path[::-1])
-
-        current_path: str = ""
-        for folder in reversed(folders_to_create):
-            current_path += folder + "/"
-            try:
-                Path(current_path).mkdir()
-                print(
-                    f"[SYSTEM] Directory '{current_path}' "
-                    f"created successfully.")
-            except FileExistsError:
-                print_to_stderr(
-                    f"[WARNING] Directory '{current_path}' already exists.")
-            except PermissionError:
-                print_to_stderr(
-                    f"[ERROR] Permission denied: "
-                    f"Unable to create '{current_path}'.")
-            except Exception as e:
-                print_to_stderr(
-                    f"[ERROR] An error occurred: {e}")
-
-        with open(self.output_filepath, "a") as f:
-            f.truncate()
+        try:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text("", encoding="utf-8")
             print("[SYSTEM] Output File Created.")
+        except PermissionError:
+            print_to_stderr(
+                f"[ERROR] Permission denied: Unable to create "
+                f"'{self.output_filepath}'."
+            )
+            raise
 
-    def change_default_filepaths(self):
-        """Change the default filepath to custum ones."""
+    def change_default_filepaths(self) -> None:
+        """Change the default filepaths to custom ones."""
         for arg in self.arguments:
-            _, filepath = arg.split()
-            if arg.startswith("--functions_definition"):
+            parts = arg.split(maxsplit=1)
+
+            if len(parts) != 2:
+                raise ValueError(f"Invalid command-line argument: {arg}")
+
+            flag, filepath = parts
+
+            if flag == "--functions_definition":
                 self.function_definition_filepath = filepath
-            elif arg.startswith("--input"):
+            elif flag == "--input":
                 self.input_filepath = filepath
-            elif arg.startswith("--output"):
+            elif flag == "--output":
                 self.output_filepath = filepath
+            else:
+                raise ValueError(f"Unknown command-line argument: {flag}")
+
         if (
             self.function_definition_filepath == self.input_filepath
             or self.function_definition_filepath == self.output_filepath
             or self.input_filepath == self.output_filepath
         ):
-            print_to_stderr(
-                "[ERROR] Same file location used for multiple inputted files.")
-            exit()
+            raise ValueError(
+                "Same file location used for multiple inputted files."
+            )
 
     def ingest_prompts(self) -> None:
         data = Parcer.load_json_safely(self.input_filepath, default=[])
@@ -185,6 +167,7 @@ class Command(BaseModel):
         feedback: str = "",
         max_tokens: int = 80,
     ):
+        """Generates a single function call."""
         start = time.perf_counter()
         generation_prompt = FunctionCallResult.build_generation_prompt(
             prompt,
