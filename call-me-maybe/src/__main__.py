@@ -1,4 +1,4 @@
-from src.call_me_maybe.main import main
+from call_me_maybe.main import main
 import time
 
 

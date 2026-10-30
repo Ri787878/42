@@ -8,16 +8,16 @@ from pydantic import BaseModel, Field, model_validator, ConfigDict
 from .prompts import Prompt
 from ..parcer import Parcer
 from ..contained_decoding.function_calling import (
-    FunctionCallResult,
-    parse_function_call,
-    validate_parameter_types,
-    normalize_parameter_types,
-    normalize_substitution_regex
-)
+        FunctionCallResult,
+        parse_function_call,
+        validate_parameter_types,
+        normalize_parameter_types,
+        normalize_substitution_regex
+    )
 from ..contained_decoding.json_validator import (
-    BasicJsonFSM,
-    apply_json_mask,
-    load_vocab_from_model,
+        BasicJsonFSM,
+        apply_json_mask,
+        load_vocab_from_model,
 )
 # from .generator import Generator
 from ..values import Values
@@ -26,11 +26,13 @@ from .function_definition import Function_definition
 from llm_sdk import Small_LLM_Model
 from pathlib import Path
 import numpy as np
+import json
+import time
 
 
 class Command(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-
+    vocab: dict[str, int] = Field(default_factory=dict)
     arguments: list[str] = Field(default_factory=list)
     llm_model: Small_LLM_Model = Field()
     project_values: Values = Field()
@@ -177,158 +179,145 @@ class Command(BaseModel):
 
             self.func_definition_list.append(func_def)
 
+    def _generate_function_call(
+        self,
+        prompt: str,
+        feedback: str = "",
+        max_tokens: int = 80,
+    ):
+        start = time.perf_counter()
+        generation_prompt = FunctionCallResult.build_generation_prompt(
+            prompt,
+            self.func_definition_list,
+        )
+
+        if feedback:
+            generation_prompt += (
+                "\nThe previous response was invalid.\n"
+                f"Validation error: {feedback}\n"
+                "Generate a corrected JSON object now:\n"
+            )
+
+        input_ids_tensor = self.llm_model.encode(generation_prompt)
+        input_ids = [
+            int(token_id)
+            for token_id in input_ids_tensor.flatten().tolist()
+        ]
+
+        json_fsm = BasicJsonFSM(self.vocab)
+
+        generated_token_ids: list[int] = []
+
+        for _ in range(max_tokens):
+            logits = self.llm_model.get_logits_from_input_ids(input_ids)
+            logits = np.asarray(logits, dtype=float)
+
+            masked_logits = apply_json_mask(logits, json_fsm)
+
+            if not np.isfinite(masked_logits).any():
+                raise ValueError(
+                    "The model produced no valid token for the JSON response."
+                )
+
+            next_token_id = int(np.argmax(masked_logits))
+
+            json_fsm.update_state(next_token_id)
+
+            input_ids.append(next_token_id)
+            generated_token_ids.append(next_token_id)
+
+            if json_fsm.is_done():
+                break
+
+        if not json_fsm.is_done():
+            raise ValueError(
+                "The model did not generate a complete JSON function call."
+            )
+
+        generated_text = self.llm_model.decode(generated_token_ids)
+        function_call = parse_function_call(generated_text)
+
+        if function_call is None:
+            raise ValueError(
+                f"Could not parse generated function call: {generated_text!r}"
+            )
+
+        # The model output does not contain the original prompt, but the
+        # normalization logic needs it to infer the substitution regex.
+        function_call.prompt = prompt
+
+        normalize_parameter_types(
+            function_call,
+            self.func_definition_list,
+        )
+
+        validate_parameter_types(
+            function_call,
+            self.func_definition_list,
+        )
+
+        normalize_substitution_regex(function_call)
+
+        # Validate the complete result through Pydantic.
+        result = FunctionCallResult.model_validate({
+            "calls": [function_call],
+        })
+        print(
+            f"Function generation took "
+            f"{time.perf_counter() - start:.2f}s"
+        )
+        # REMOVE LATER
+        print(f"Generated {len(generated_token_ids)} tokens")
+
+        return result.calls[0]
+
     def run(self) -> None:
         """Generate and validate one function call per user prompt."""
-        import json
 
-        all_calls = []
-        vocab = load_vocab_from_model(self.llm_model)
-        encoded_prompt_cache: dict[str, list[int]] = {}
+        max_attempts = 5
+        generated_calls: list[dict] = []
+        self.vocab = load_vocab_from_model(self.llm_model)
 
-        for prompt_item in self.prompts_list:
-            generation_prompt = FunctionCallResult.build_generation_prompt(
-                prompt_text=prompt_item.prompt,
-                definitions=self.func_definition_list,
-            )
-
-            if generation_prompt not in encoded_prompt_cache:
-                encoded_prompt_tensor = self.llm_model.encode(
-                    generation_prompt
-                )
-                encoded_prompt_cache[generation_prompt] = [
-                    int(token_id)
-                    for token_id in encoded_prompt_tensor.flatten().tolist()
-                ]
-
-            context_ids = encoded_prompt_cache[generation_prompt].copy()
-            json_fsm = BasicJsonFSM(vocab)
-
-            generated_ids: list[int] = []
-            decoded_text = ""
+        for prompt_data in self.prompts_list:
+            prompt = prompt_data.prompt
+            feedback = ""
             function_call = None
 
-            banned_token_ids = getattr(
-                self.project_values,
-                "banned_token_ids",
-                [],
-            )
-
-            temperature = max(
-                float(
-                    getattr(
-                        self.project_values,
-                        "temperature",
-                        1.0,
+            for attempt in range(max_attempts):
+                try:
+                    function_call = self._generate_function_call(
+                        prompt=prompt,
+                        feedback=feedback,
                     )
-                ),
-                1e-6,
-            )
-            for _ in range(self.project_values.max_tries):
-                logits = self.llm_model.get_logits_from_input_ids(
-                    context_ids
-                )
-
-                next_token_logits = extract_last_position_if_needed(
-                    logits
-                ).copy()
-
-                if banned_token_ids:
-                    next_token_logits[banned_token_ids] = -np.inf
-
-                next_token_logits = apply_json_mask(
-                    next_token_logits,
-                    json_fsm,
-                )
-
-                if not np.isfinite(next_token_logits).any():
-                    raise ValueError(
-                        "JSON mask removed every valid token. "
-                        f"FSM state: {json_fsm.current_state}"
-                    )
-
-                probabilities = softmax(
-                    next_token_logits,
-                    temperature=temperature,
-                )
-
-                if (
-                    probabilities is None
-                    or not np.isfinite(probabilities).all()
-                    or probabilities.sum() <= 0
-                ):
-                    raise ValueError(
-                        "The model returned an invalid "
-                        "probability distribution."
-                    )
-
-                next_token_id = int(
-                    decoding_strategy(probabilities)
-                )
-
-                json_fsm.update_state(next_token_id)
-
-                context_ids.append(next_token_id)
-                generated_ids.append(next_token_id)
-
-                if json_fsm.is_done():
-                    decoded_text = self.llm_model.decode(
-                        generated_ids
-                    ).strip()
-                    function_call = parse_function_call(decoded_text)
                     break
 
-                # TODO Add VISUALIZATION HERE!!
-                # print(f"DECODED: {decoded_text!r}")
+                except (ValueError, TypeError) as exc:
+                    feedback = str(exc)
+
+                    if attempt == max_attempts - 1:
+                        error = (
+                            f"Could not generate a valid function call for "
+                            f"prompt after {max_attempts} attempts: {prompt}"
+                        )
+                        raise ValueError(error) from exc
+            print(self.llm_model._device)
 
             if function_call is None:
-                print(f"RAW RESPONSE: {decoded_text!r}")
-                print(
-                    f"GENERATED TOKEN COUNT: {len(generated_ids)}"
-                )
-                print(
-                    f"MAX TRIES: {self.project_values.max_tries}"
-                )
-
                 raise ValueError(
-                    "Could not generate a complete JSON function call "
-                    f"for prompt: {prompt_item.prompt}"
+                    f"No function call generated for prompt: {prompt}"
                 )
 
-            function_call.prompt = prompt_item.prompt
-            normalize_substitution_regex(function_call)
-
-            valid_function_names = {
-                definition.name
-                for definition in self.func_definition_list
-            }
-
-            if function_call.name not in valid_function_names:
-                raise ValueError(
-                    f"Unknown function '{function_call.name}' returned "
-                    f"for prompt '{prompt_item.prompt}'."
-                )
-
-            normalize_parameter_types(
-                function_call,
-                self.func_definition_list,
-            )
-
-            validate_parameter_types(
-                function_call,
-                self.func_definition_list,
-            )
-
-            all_calls.append(function_call.model_dump())
+            generated_calls.append({
+                "prompt": prompt,
+                "name": function_call.name,
+                "parameters": function_call.parameters,
+            })
 
         self.response = json.dumps(
-            all_calls,
+            generated_calls,
             indent=2,
         )
 
-        print(
-            f"generated_function_call_count = {len(all_calls)}"
-        )
-        print(f"response: {self.response}")
-
-        with open(self.output_filepath, "w") as output_file:
+        with open(self.output_filepath, "w", encoding="utf-8") as output_file:
             output_file.write(self.response)
+            output_file.write("\n")

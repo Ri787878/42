@@ -7,7 +7,7 @@ run:
 	uv run call-me-maybe
 
 debug:
-	uv run mcp call-me-maybe
+	uv run python -m pdb src/call_me_maybe/__main__.py
 
 clean:
 	find . -type d -name ".mypy_cache" -exec rm -r {} +

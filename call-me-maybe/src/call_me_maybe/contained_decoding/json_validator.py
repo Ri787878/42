@@ -222,7 +222,7 @@ class BasicJsonFSM:
     def get_allowed_token_ids(self) -> list[int]:
         if self.is_done():
             return []
-    
+
         return [
             token_id
             for token_id in self.inv_vocab
@@ -252,8 +252,12 @@ def apply_json_mask(
     """
     Keep logits only for tokens that preserve valid JSON structure.
     """
-    masked_logits = np.full_like(logits, -np.inf)
+    masked_logits = logits.copy()
     allowed_token_ids = fsm.get_allowed_token_ids()
+
+    allowed = np.zeros(logits.shape[0], dtype=bool)
+    allowed[allowed_token_ids] = True
+    masked_logits[~allowed] = -np.inf
 
     if allowed_token_ids:
         masked_logits[allowed_token_ids] = logits[allowed_token_ids]

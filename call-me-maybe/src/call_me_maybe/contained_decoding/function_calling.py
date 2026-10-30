@@ -12,7 +12,7 @@ class FunctionParameter(BaseModel):
 
 
 class FunctionCall(BaseModel):
-    prompt: str
+    prompt: str = Field(default="")
     name: str
     parameters: dict[str, Any] = Field(default_factory=dict)
 
@@ -61,7 +61,6 @@ User request:
 
 Return exactly one JSON object with this structure:
 {{
-  "prompt": "exact original request",
   "name": "function name",
   "parameters": {{
     "parameter_name": "value with the declared type"
@@ -72,7 +71,6 @@ Rules:
 - Select exactly one available function.
 - Return exactly one complete JSON object and nothing else.
 - Use the exact function and parameter names.
-- Copy the original user request exactly into the "prompt" field.
 - Copy quoted values exactly,
   including spaces,
   capitalization,
