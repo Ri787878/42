@@ -1,14 +1,18 @@
 # include "codexion.h"
 
 
-void	codexion(char** arguments)
+int	codexion(int argc, char** arguments)
 {
-	return;
+	(void)arguments;
+
+	return (-1);
 }
 
 
 int main(int argc, char** argv)
 {
+	(void)argc;
+	(void)argv;
 	printf("Hello World!!");
 	codexion(argv);
 	return (0);

@@ -9,8 +9,8 @@ SRCS =	src/codexion.c \
 		src/parcer/parcer.c
 
 TEST_SRCS = tester/tester.c \
-            src/codexion.c \
-            src/parcer/parcer.c
+            src/parcer/parcer.c \
+			src/utils/utils_parcer.c
 
 OBJECTS = $(SRCS:.c=.o)
 TEST_OBJECTS = $(TEST_SRCS:.c=.o)
@@ -29,11 +29,15 @@ tester: $(TEST_OBJECTS)
 test: tester
 	./tester_exec
 
+run: $(NAME)
+	$(CC) -w -o codexion $(NAME)
+	./codexion
+
 clean:
 	$(RM) $(OBJECTS) $(TEST_OBJECTS)
 
 fclean: clean
-	$(RM) $(NAME) tester_exec
+	$(RM) $(NAME) tester_exec codexion
 
 re: fclean all
 
