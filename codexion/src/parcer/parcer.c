@@ -1,5 +1,24 @@
 # include "../codexion.h"
 
+static int	is_valid_number(const char *str)
+{
+	int	i;
+
+	if (str == NULL || str[0] == '\0')
+		return (0);
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (str[i] == '\0')
+		return (0);
+	while (str[i] != '\0')
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
 
 void fill_struct(struct codexionStruct *cdx){
 	cdx->nb_coders = ft_atoi(cdx->arguments[1]);
@@ -23,11 +42,9 @@ int parse_arguments(struct codexionStruct *cdx)
 	if (cdx->argc != 9)
 		return (-9);
 	while (c <= 7){
-		if (cdx->arguments[c] == NULL)
-			return (-2);
 		// Check if not a number
-		if (ft_isdigit(ft_atoi(cdx->arguments[c]))){
-			printf("round %d: [PARCING ERROR CODE -2] Argument type is not an int!", c);
+		if (!is_valid_number(cdx->arguments[c])){
+			printf("[PARCING ERROR CODE -2] Argument \"%s\" type is not an int!\n", cdx->arguments[c]);
 			return (-2);
 		}
 		// Check if valid number
@@ -35,9 +52,9 @@ int parse_arguments(struct codexionStruct *cdx)
 		c++;
 	}
 	if (cdx->arguments[c] == NULL
-		|| (ft_strcmp(cdx->arguments[c], "fifo")
-			&& ft_strcmp(cdx->arguments[c], "edf"))){
-		printf("[PARCING ERROR CODE -3] Scheduler argument is \"fifo\" or \"edf\"!");
+		|| (strcmp(cdx->arguments[c], "fifo")
+			&& strcmp(cdx->arguments[c], "edf"))){
+		printf("[PARCING ERROR CODE -3] Scheduler argument \"%s\" isn't \"fifo\" or \"edf\"!\n", cdx->arguments[c]);
 		return (-3);
 	}
 	fill_struct(cdx);

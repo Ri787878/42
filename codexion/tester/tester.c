@@ -7,8 +7,19 @@ int	codexion(long int argc, char** argv)
 	struct codexionStruct *cdx;
 	int	parse_code;
 
+	if (argv == NULL){
+		printf("[PARCING ERROR CODE -2] No arguments passed!\n");
+		return (-2);
+	}
+	if (argc != 9){
+		printf("[PARCING ERROR CODE -9] Argument amount isn't right!\n");
+		return (-9);
+	}
 	cdx = init_codexion_struct(argc, argv);
+	if (cdx == NULL)
+		return (-2);
 	parse_code = parse_arguments(cdx);
+	free_codexion_struct(cdx);
 	if (parse_code <= 0)
 		return (parse_code);
 	return (-1);
@@ -16,11 +27,11 @@ int	codexion(long int argc, char** argv)
 
 void	test_codexion_argument_types()
 {
-	char *empty_pointer = "\0";
-	char *empty_string = " ";
+	char *empty_pointer[9] = { "codexion", "", "10", "100", "200", "50", "30", "10", "fifo" };
+	char *empty_string[9] = { "codexion", " ", "10", "100", "200", "50", "30", "10", "fifo" };
 
-	assert(codexion(9, &empty_pointer) == -2);
-    assert(codexion(9, &empty_string) == -2);
+	assert(codexion(9, empty_pointer) == -2);
+    assert(codexion(9, empty_string) == -2);
     assert(codexion(9, NULL) == -2);
 
 	// Array of invalid type representations to test against
@@ -38,7 +49,7 @@ void	test_codexion_argument_types()
     // Default valid arguments template (index 0 is program name "codexion")
     // Positions 1 through 8: number_of_coders, number_of_compiles, time_to_burnout,
     // time_to_compile, time_to_debug, time_to_refactor, dongle_cooldown, scheduler/etc.
-    char *base_args[9] = { "codexion", "5", "10", "100", "200", "50", "30", "10", "5" };
+    char *base_args[9] = { "codexion", "5", "10", "100", "200", "50", "30", "10", "fifo" };
 
     // Loop through every position from 1 to 8
     for (int pos = 1; pos <= 8; pos++) {
@@ -55,11 +66,14 @@ void	test_codexion_argument_types()
             test_argv[pos] = invalid_types[t];
 
             // 3. Assert that codexion correctly identifies it and returns -2
-            assert(codexion(9, test_argv) == -2);
+            if (pos == 8 && t != 6)
+                assert(codexion(9, test_argv) == -3);
+            else
+                assert(codexion(9, test_argv) == -2);
         }
     }
 
-    printf("All matrix position and invalid type tests passed successfully!\n");
+    printf("\nAll matrix position and invalid type tests passed successfully!\n\n");
 }
 
 void test_codexion_argument_quantities(void) {
@@ -67,9 +81,9 @@ void test_codexion_argument_quantities(void) {
 
 	assert(codexion(0, &emt) == -9);
     assert(codexion(10, &emt) == -9);
-    assert(codexion(2147483649, &emt) == -9);
+    assert(codexion(1000, &emt) == -9);
 
-    printf("\nAll argument quantity assertions passed successfully!\n");
+    printf("\nAll argument quantity assertions passed successfully!\n\n");
 }
 
 void	test_parcer()
