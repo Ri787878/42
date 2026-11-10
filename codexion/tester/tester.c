@@ -19,7 +19,7 @@ int	codexion(long int argc, char** argv)
 		free_codexion_struct(cdx);
 		return (-24);
 	}
-	print_struct(cdx);
+	//print_struct(cdx);
 	free_codexion_struct(cdx);
 	return (1);
 }
@@ -106,6 +106,15 @@ void test_codexion_argument_ranges(void){
 	for (pos = 1; pos <= 7; pos++)
 		test_args[pos] = "0";
 	test_args[1] = "1";
+	assert(codexion(9, test_args) == 1);
+
+	test_args[8] = "round_robin";
+	assert(codexion(9, test_args) == -23);
+	test_args[8] = "FIFO";
+	assert(codexion(9, test_args) == -23);
+	test_args[8] = "";
+	assert(codexion(9, test_args) == -23);
+	test_args[8] = "edf";
 	assert(codexion(9, test_args) == 1);
 
 	printf("\nAll argument range assertions passed successfully!\n\n");
