@@ -8,11 +8,16 @@ int	codexion(long int argc, char** argv)
 
 	cdx = init_codexion_struct(argc, argv);
 	if (cdx == NULL)
-		return (-2);
+		return (-30);
 	parse_code = parse_arguments(cdx);
-	if (parse_code <= 0)
+	if (parse_code <= 0) {
+		free_codexion_struct(cdx);
 		return (parse_code);
-	printf("parse code = %d", parse_code);
+	}
+	if (validate_numbers(cdx) < 0) {
+		free_codexion_struct(cdx);
+		return (-24);
+	}
 	print_struct(cdx);
 	free_codexion_struct(cdx);
 	return (1);
@@ -21,5 +26,8 @@ int	codexion(long int argc, char** argv)
 
 int main(int argc, char** argv)
 {
+	char *emt = "";
+
+	printf("res=%d\n", codexion(0, &emt));
 	return (codexion(argc, argv));
 }

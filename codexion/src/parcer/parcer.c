@@ -37,26 +37,59 @@ int parse_arguments(struct codexionStruct *cdx)
 	int c;
 
 	c = 1;
-	if (cdx == NULL || cdx->arguments == NULL)
-		return (-2);
+	if (cdx == NULL)
+		return (-30);
 	if (cdx->argc != 9)
-		return (-9);
+		return (-29);
+	if (cdx->arguments == NULL)
+		return (-22);
 	while (c <= 7){
 		// Check if not a number
 		if (!is_valid_number(cdx->arguments[c])){
-			printf("[PARCING ERROR CODE -2] Argument \"%s\" type is not an int!\n", cdx->arguments[c]);
-			return (-2);
+			printf("[PARCING ERROR CODE -22] Argument \"%s\" type is not an int!\n",
+				cdx->arguments[c] ? cdx->arguments[c] : "(null)");
+			return (-22);
 		}
 		// Check if valid number
 
 		c++;
 	}
-	if (cdx->arguments[c] == NULL
-		|| (strcmp(cdx->arguments[c], "fifo")
-			&& strcmp(cdx->arguments[c], "edf"))){
-		printf("[PARCING ERROR CODE -3] Scheduler argument \"%s\" isn't \"fifo\" or \"edf\"!\n", cdx->arguments[c]);
-		return (-3);
+	if (cdx->arguments[c] == NULL){
+		printf("[PARCING ERROR CODE -22] Scheduler argument is missing!\n");
+		return (-22);
+	}
+	if (strcmp(cdx->arguments[c], "fifo")
+		&& strcmp(cdx->arguments[c], "edf")){
+		printf("[PARCING ERROR CODE -23] Scheduler argument \"%s\" isn't \"fifo\" or \"edf\"!\n",
+			cdx->arguments[c]);
+		return (-23);
 	}
 	fill_struct(cdx);
 	return (1);
+}
+
+int validate_numbers(struct codexionStruct *cdx){
+    if (cdx->nb_coders < 1){
+        printf("[PARCING ERROR CODE -40] Number of coders must be more than 0!\n");
+        return (-24);
+    } else if (cdx->nb_compiles < 0){
+        printf("[PARCING ERROR CODE -41] Number of compiles must be more than or equal to 0!\n");
+        return (-24);
+    } else if (cdx->tm_burnout < 0){
+        printf("[PARCING ERROR CODE -42] Number of time_to_burnout must be more than or equal to 0!\n");
+        return (-24);
+    } else if (cdx->tm_compile < 0){
+        printf("[PARCING ERROR CODE -43] Number of time_to_compile must be more than or equal to 0!\n");
+        return (-24);
+    } else if (cdx->tm_debug < 0){
+        printf("[PARCING ERROR CODE -44] Number of time_to_debug must be more than or equal to 0!\n");
+        return (-24);
+    } else if (cdx->tm_refactor < 0){
+        printf("[PARCING ERROR CODE -45] Number of time_to_refactor must be more than or equal to 0!\n");
+        return (-24);
+    } else if (cdx->dongle_cooldown < 0){
+        printf("[PARCING ERROR CODE -46] The dongle_cooldown must be more than or equal to 0!\n");
+        return (-24);
+    }
+    return (1);
 }

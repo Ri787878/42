@@ -25,24 +25,25 @@ struct	codexionStruct {
 };
 
 // Parcer Utils
-int	ft_isdigit(int c);
-int	ft_atoi(const char *str);
-int	ft_strcmp(const char *s1, const char *s2);
-int	ft_strlen(const char *str);
+int		ft_isdigit(int c);
+int		ft_atoi(const char *str);
+int		ft_strcmp(const char *s1, const char *s2);
+int		ft_strlen(const char *str);
 char	*ft_strdup(const char *src);
 
 // Debug Utils
 void	print_struct(struct codexionStruct *cdx);
 
 // Declare Utils
-struct codexionStruct *init_codexion_struct(int argc, char *argv[]);
-void free_codexion_struct(struct codexionStruct *cdx);
+struct	codexionStruct *init_codexion_struct(int argc, char *argv[]);
+void	free_codexion_struct(struct codexionStruct *cdx);
 
 // Parcer
-int parse_arguments(struct codexionStruct *cdx);
-void fill_struct(struct codexionStruct *cdx);
+int		parse_arguments(struct codexionStruct *cdx);
+void	fill_struct(struct codexionStruct *cdx);
+int		validate_numbers(struct codexionStruct *cdx);
 
 // Codexion main function
-int	codexion(long int argc, char** arguments);
+int		codexion(long int argc, char** arguments);
 
 #endif
