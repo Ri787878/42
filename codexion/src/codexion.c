@@ -1,6 +1,14 @@
 # include "codexion.h"
 
 
+void	runtime(struct codexionStruct *cdx){
+	(void)cdx;
+	while (true){
+		break;
+	}
+}
+
+
 int	codexion(long int argc, char** argv)
 {
 	struct codexionStruct *cdx;
@@ -19,6 +27,8 @@ int	codexion(long int argc, char** argv)
 		return (-24);
 	}
 	print_struct(cdx);
+	//runtime(cdx);
+	pthread_join(cdx->monitor_thread, NULL);
 	free_codexion_struct(cdx);
 	return (1);
 }

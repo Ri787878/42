@@ -1,7 +1,7 @@
 NAME = codexion.a
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -lpthread
 AR = ar rcs
 RM = rm -f
 
@@ -9,14 +9,35 @@ SRCS =	src/codexion.c \
 		src/parcer/parcer.c \
 		src/utils/utils_parcer.c \
 		src/utils/utils_debug.c \
-		src/utils/utils_declare.c
+		src/utils/utils_declare.c \
+		src/threads/monitor_thread.c \
+		src/threads/coder_thread.c \
+		src/lists/lstadd_back.c \
+		src/lists/lstadd_front.c \
+		src/lists/lstclear.c \
+		src/lists/lstdelone.c \
+		src/lists/lstiteri.c \
+		src/lists/lstlast.c \
+		src/lists/lstmap.c \
+		src/lists/lstnew.c \
+		src/lists/lstsize.c
 
 TEST_SRCS = tester/tester.c \
             src/parcer/parcer.c \
 			src/utils/utils_parcer.c \
 			src/utils/utils_debug.c \
-			src/utils/utils_declare.c
-
+			src/utils/utils_declare.c \
+			src/threads/monitor_thread.c \
+			src/threads/coder_thread.c \
+			src/lists/lstadd_back.c \
+			src/lists/lstadd_front.c \
+			src/lists/lstclear.c \
+			src/lists/lstdelone.c \
+			src/lists/lstiteri.c \
+			src/lists/lstlast.c \
+			src/lists/lstmap.c \
+			src/lists/lstnew.c \
+			src/lists/lstsize.c
 
 OBJECTS = $(SRCS:.c=.o)
 TEST_OBJECTS = $(TEST_SRCS:.c=.o)

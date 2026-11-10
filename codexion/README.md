@@ -14,4 +14,15 @@
 		- '-43' Number of time_to_compile must be more than 0;
 		- '-44' Number of time_to_debug must be more than 0;
 		- '-45' Number of time_to_refactor must be more than 0;
-		- '-46' Number of dongle_cooldownc must be more than 0;
+		- '-46' Number of dongle_cooldownd must be more than 0;
+
+
+# References:
+	- https://man7.org/linux/man-pages/man3/pthread_create.3.html
+	- https://www.geeksforgeeks.org/c/multithreading-in-c/
+	- 
+	-
+	-
+	-
+	-
+	-

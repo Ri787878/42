@@ -20,6 +20,7 @@ struct codexionStruct *init_codexion_struct(int argc, char *argv[]) {
 		return (NULL);
 	}
 
+	// fill arguments in struct with argv
 	i = 0;
     while (i < argc) {
 		if (argv[i] == NULL) {
@@ -37,6 +38,8 @@ struct codexionStruct *init_codexion_struct(int argc, char *argv[]) {
 		}
 		i++;
 	}
+	// create threads
+
 
     return cdx;
 }

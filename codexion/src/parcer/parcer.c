@@ -29,6 +29,7 @@ void fill_struct(struct codexionStruct *cdx){
 	cdx->nb_compiles = ft_atoi(cdx->arguments[6]);
 	cdx->dongle_cooldown = ft_atoi(cdx->arguments[7]);
 	cdx->scheduler = cdx->arguments[8];
+	pthread_create(&cdx->monitor_thread, NULL, mont_thr_fn, NULL);
 }
 
 
