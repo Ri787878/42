@@ -5,7 +5,8 @@ CFLAGS = -Wall -Wextra -Werror -lpthread
 AR = ar rcs
 RM = rm -f
 
-SRCS =	src/codexion.c \
+SRCS =	src/main.c \
+		src/codexion.c \
 		src/parcer/parcer.c \
 		src/utils/utils_parcer.c \
 		src/utils/utils_debug.c \
@@ -23,6 +24,7 @@ SRCS =	src/codexion.c \
 		src/lists/lstsize.c
 
 TEST_SRCS = tester/tester.c \
+			src/codexion.c \
             src/parcer/parcer.c \
 			src/utils/utils_parcer.c \
 			src/utils/utils_debug.c \
