@@ -11,7 +11,7 @@ from ..contained_decoding.function_calling import (
     )
 from ..contained_decoding.json_validator import (
         BasicJsonFSM,
-        apply_json_mask,
+        select_json_token,
         load_vocab_from_model,
 )
 # from .generator import Generator
@@ -166,6 +166,7 @@ class Command(BaseModel):
         prompt: str,
         feedback: str = "",
         max_tokens: int = 80,
+        json_fsm: BasicJsonFSM | None = None,
     ):
         """Generates a single function call."""
         start = time.perf_counter()
@@ -187,22 +188,26 @@ class Command(BaseModel):
             for token_id in input_ids_tensor.flatten().tolist()
         ]
 
-        json_fsm = BasicJsonFSM(self.vocab)
+        if json_fsm is None:
+            json_fsm = BasicJsonFSM(self.vocab)
+        else:
+            json_fsm.reset()
 
         generated_token_ids: list[int] = []
 
+        inference_seconds = 0.0
+        selection_seconds = 0.0
+        prompt_token_count = len(input_ids)
+
         for _ in range(max_tokens):
+            step_start = time.perf_counter()
             logits = self.llm_model.get_logits_from_input_ids(input_ids)
+            inference_seconds += time.perf_counter() - step_start
+
+            step_start = time.perf_counter()
             logits = np.asarray(logits, dtype=float)
-
-            masked_logits = apply_json_mask(logits, json_fsm)
-
-            if not np.isfinite(masked_logits).any():
-                raise ValueError(
-                    "The model produced no valid token for the JSON response."
-                )
-
-            next_token_id = int(np.argmax(masked_logits))
+            next_token_id = select_json_token(logits, json_fsm)
+            selection_seconds += time.perf_counter() - step_start
 
             json_fsm.update_state(next_token_id)
 
@@ -211,6 +216,13 @@ class Command(BaseModel):
 
             if json_fsm.is_done():
                 break
+
+        print(
+            f"Prompt: {prompt_token_count} tokens; "
+            f"generated: {len(generated_token_ids)} tokens; "
+            f"model: {inference_seconds:.2f}s; "
+            f"token selection: {selection_seconds:.2f}s"
+        )
 
         if not json_fsm.is_done():
             raise ValueError(
@@ -249,17 +261,18 @@ class Command(BaseModel):
             f"Function generation took "
             f"{time.perf_counter() - start:.2f}s"
         )
-        # REMOVE LATER
-        print(f"Generated {len(generated_token_ids)} tokens")
 
         return result.calls[0]
 
     def run(self) -> None:
         """Generate and validate one function call per user prompt."""
 
-        max_attempts = 5
+        max_attempts = 4
         generated_calls: list[dict] = []
         self.vocab = load_vocab_from_model(self.llm_model)
+        # Reuse normalized tokens and state masks across prompts and retries.
+        json_fsm = BasicJsonFSM(self.vocab)
+        run_start = time.perf_counter()
 
         for prompt_data in self.prompts_list:
             prompt = prompt_data.prompt
@@ -267,15 +280,21 @@ class Command(BaseModel):
             function_call = None
 
             for attempt in range(max_attempts):
+                attempt_start = time.perf_counter()
                 try:
                     function_call = self._generate_function_call(
                         prompt=prompt,
                         feedback=feedback,
+                        json_fsm=json_fsm,
                     )
                     break
 
                 except (ValueError, TypeError) as exc:
                     feedback = str(exc)
+                    print_to_stderr(
+                        f"Attempt {attempt + 1}/{max_attempts} failed after "
+                        f"{time.perf_counter() - attempt_start:.2f}s: {feedback}"
+                    )
 
                     if attempt == max_attempts - 1:
                         error = (
@@ -283,7 +302,6 @@ class Command(BaseModel):
                             f"prompt after {max_attempts} attempts: {prompt}"
                         )
                         raise ValueError(error) from exc
-            print(self.llm_model._device)
 
             if function_call is None:
                 raise ValueError(
@@ -304,3 +322,5 @@ class Command(BaseModel):
         with open(self.output_filepath, "w", encoding="utf-8") as output_file:
             output_file.write(self.response)
             output_file.write("\n")
+
+        print(f"Total generation took {time.perf_counter() - run_start:.2f}s")

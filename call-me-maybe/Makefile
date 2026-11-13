@@ -28,7 +28,7 @@ clean:
 	rm -f $(INSTALL_STAMP)
 
 fclean: clean
-	rm -rf .venv
+	rm -rf .venv 2>/dev/null || true
 
 lint: install
 	uv run flake8 $(PYTHON_FILES)

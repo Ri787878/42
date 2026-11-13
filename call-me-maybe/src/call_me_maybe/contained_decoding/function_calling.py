@@ -38,54 +38,26 @@ def build_single_call_prompt(
         available_functions.append({
             "name": definition.name,
             "description": definition.description,
-            "parameters": [
-                {
-                    "name": parameter_name,
-                    "type": parameter_type,
-                    "required": True,
-                }
-                for parameter_name, parameter_type in definition.parameters
-            ],
-            "returns": definition.returns,
+            "parameters": dict(definition.parameters),
         })
 
-    functions_json = json.dumps(available_functions, indent=2)
+    functions_json = json.dumps(available_functions, separators=(",", ":"))
 
-    return f"""You select the best available function for the user request.
-
-Available functions:
+    return f"""Select one function for the request. Return compact JSON only:
+{{"name":"exact function name","parameters":{{"exact parameter name":"value"}}}}
+Functions (parameter names mapped to types):
 {functions_json}
-
-User request:
-{prompt_text}
-
-Return exactly one JSON object with this structure:
-{{
-  "name": "function name",
-  "parameters": {{
-    "parameter_name": "value with the declared type"
-  }}
-}}
-
 Rules:
-- Select exactly one available function.
-- Return exactly one complete JSON object and nothing else.
-- Use the exact function and parameter names.
-- Copy quoted values exactly,
-  including spaces,
-  capitalization,
-  and punctuation.
-- Use the declared JSON types:
-  numbers as JSON numbers,
-  strings as JSON strings,
-  booleans as true or false.
-- For regex substitution, match only the requested characters.
-- Use [0-9]+ for all digits.
-- For specific characters such as 2 and 5, use [25].
-- Escape double quotes inside JSON strings as \\".
-- Stop immediately after the final closing brace.
-Begin the JSON response now:
+- Include all declared parameters with their declared types; no extra keys.
+- Copy quoted values exactly, preserving spaces, case and punctuation.
+- Escape quotes and backslashes inside JSON strings.
+- Regex: all digits = [0-9]+; specific characters 2 and 5 = [25].
+- Stop after the final closing brace. No explanation or formatting.
+Request:
+{prompt_text}
+JSON:
 """
+
 
 
 def _repair_invalid_json_escapes(text: str) -> str:

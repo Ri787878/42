@@ -44,6 +44,12 @@ class BasicJsonFSM:
             for token, token_id in tokenizer_vocab.items()
         }
 
+        self.normalized_vocab = {
+            token_id: self._normalize_token(token)
+            for token_id, token in self.inv_vocab.items()
+        }
+        self._allowed_cache: dict[tuple, tuple[int, ...]] = {}
+
         self.current_state = self.STATE_EXPECT_OPEN_BRACE
         self.object_depth = 0
         self.string_kind: str | None = None
@@ -206,14 +212,14 @@ class BasicJsonFSM:
         return False
 
     def _token_is_allowed(self, token_id: int) -> bool:
-        token = self.inv_vocab.get(token_id)
+        token = self.normalized_vocab.get(token_id)
 
         if token is None:
             return False
 
         candidate = copy(self)
 
-        for character in self._normalize_token(token):
+        for character in token:
             if not candidate._consume_character(character):
                 return False
 
@@ -223,21 +229,31 @@ class BasicJsonFSM:
         if self.is_done():
             return []
 
-        return [
-            token_id
-            for token_id in self.inv_vocab
-            if self._token_is_allowed(token_id)
-        ]
+        key = (
+            self.current_state,
+            self.object_depth,
+            self.string_kind,
+            self.string_has_content,
+            self.unicode_digits_remaining,
+        )
+        if key not in self._allowed_cache:
+            self._allowed_cache[key] = tuple(
+                token_id
+                for token_id in self.inv_vocab
+                if self._token_is_allowed(token_id)
+            )
+        # Preserve the public list interface without exposing the cached data.
+        return list(self._allowed_cache[key])
 
     def update_state(self, selected_token_id: int) -> None:
-        token = self.inv_vocab.get(selected_token_id)
+        token = self.normalized_vocab.get(selected_token_id)
 
         if token is None:
             raise ValueError(
                 f"Unknown token ID returned by model: {selected_token_id}"
             )
 
-        for character in self._normalize_token(token):
+        for character in token:
             if not self._consume_character(character):
                 raise ValueError(
                     f"Token {selected_token_id} would create invalid JSON: "
@@ -252,17 +268,40 @@ def apply_json_mask(
     """
     Keep logits only for tokens that preserve valid JSON structure.
     """
-    masked_logits = logits.copy()
+    masked_logits = np.full_like(logits, -np.inf)
     allowed_token_ids = fsm.get_allowed_token_ids()
-
-    allowed = np.zeros(logits.shape[0], dtype=bool)
-    allowed[allowed_token_ids] = True
-    masked_logits[~allowed] = -np.inf
 
     if allowed_token_ids:
         masked_logits[allowed_token_ids] = logits[allowed_token_ids]
 
     return masked_logits
+
+
+
+def select_json_token(logits: np.ndarray, fsm: BasicJsonFSM) -> int:
+    """Choose the highest-scoring valid token without scanning the vocabulary.
+
+    Try up to 16 candidates in score order, preserving NumPy's lowest-ID tie
+    breaking. Fall back to the cached full mask for restrictive parser states.
+    Candidate checks use a copy of the FSM and never advance the real parser.
+    """
+    scores = logits
+    for attempt in range(16):
+        token_id = int(np.argmax(scores))
+        if not np.isfinite(scores[token_id]):
+            break
+        if fsm._token_is_allowed(token_id):
+            return token_id
+        if attempt == 0:
+            scores = logits.copy()
+        scores[token_id] = -np.inf
+
+    masked_logits = apply_json_mask(logits, fsm)
+    if not np.isfinite(masked_logits).any():
+        raise ValueError(
+            "The model produced no valid token for the JSON response."
+        )
+    return int(np.argmax(masked_logits))
 
 
 def load_vocab_from_model(llm_model) -> dict[str, int]:
