@@ -2,28 +2,6 @@
 #include <assert.h>
 
 
-//int	codexion(long int argc, char** argv)
-//{
-//	struct codexionStruct *cdx;
-//	int	parse_code;
-
-//	cdx = init_codexion_struct(argc, argv);
-//	if (cdx == NULL)
-//		return (-30);
-//	parse_code = parse_arguments(cdx);
-//	if (parse_code <= 0) {
-//		free_codexion_struct(cdx);
-//		return (parse_code);
-//	}
-//	if (validate_numbers(cdx) < 0) {
-//		free_codexion_struct(cdx);
-//		return (-24);
-//	}
-//	//print_struct(cdx);
-//	free_codexion_struct(cdx);
-//	return (1);
-//}
-
 void	test_codexion_argument_types()
 {
 	char *empty_pointer[9] = { "codexion", "", "10", "100", "200", "50", "30", "10", "fifo" };
@@ -71,8 +49,6 @@ void	test_codexion_argument_types()
                 assert(codexion(9, test_argv) == -22);
         }
     }
-
-    printf("\nAll matrix position and invalid type tests passed successfully!\n\n");
 }
 
 void test_codexion_argument_quantities(void) {
@@ -81,8 +57,6 @@ void test_codexion_argument_quantities(void) {
 	assert(codexion(0, &emt) == -30);
     assert(codexion(10, &emt) == -29);
     assert(codexion(1000, &emt) == -29);
-
-    printf("\nAll argument quantity assertions passed successfully!\n\n");
 }
 
 void test_codexion_argument_ranges(void){
@@ -116,8 +90,6 @@ void test_codexion_argument_ranges(void){
 	assert(codexion(9, test_args) == -23);
 	test_args[8] = "edf";
 	assert(codexion(9, test_args) == 1);
-
-	printf("\nAll argument range assertions passed successfully!\n\n");
 }
 
 void	test_parcer()
@@ -125,6 +97,11 @@ void	test_parcer()
 	test_codexion_argument_quantities();
 	test_codexion_argument_types();
 	test_codexion_argument_ranges();
+	
+    printf("\n[ARGUMENT QUANTITY TEST] All argument quantity assertions passed successfully!");
+    printf("\n[ARGUMENT TYPES TEST] All matrix position and invalid type tests passed successfully!");
+	printf("\n[ARGUMENT RANGE TEST] All argument range assertions passed successfully!");
+	printf("\n\n[FINAL RESULT] All parcer tests passed!!\n");
 }
 
 

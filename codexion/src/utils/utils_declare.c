@@ -1,13 +1,14 @@
 # include "../codexion.h"
 
 
-struct codexionStruct *init_codexion_struct(int argc, char *argv[]) {
-    struct codexionStruct *cdx;
+struct codexion_struct	*init_codexion_struct(int argc, char *argv[])
+{
+    struct codexion_struct *cdx;
 	int i;
 
 	if (argc < 1)
 		return (NULL);
-	cdx = malloc(sizeof(struct codexionStruct));
+	cdx = malloc(sizeof(struct codexion_struct));
 	if (!cdx)
 		return (NULL);
 	cdx->argc = argc;
@@ -44,16 +45,36 @@ struct codexionStruct *init_codexion_struct(int argc, char *argv[]) {
     return cdx;
 }
 
-void free_codexion_struct(struct codexionStruct *cdx) {
-    if (cdx == NULL)
-		return;
-	int i;
+void free_codexion_struct(struct codexion_struct *cdx)
+{
+    int i;
 
-	i = 0;
-    while (i < cdx->argc && cdx->arguments != NULL) {
-        free(cdx->arguments[i]);
+    if (cdx == NULL)
+        return;
+
+    i = 0;
+    while (i < cdx->argc && cdx->arguments != NULL){
+		free(cdx->arguments[i]);
 		i++;
-    }
+	}
+	i = 0;
+	while (cdx->nb_coders[i] != NULL){
+		free(cdx->dongles);
+		free(cdx->coders);
+		i++;
+	}
     free(cdx->arguments);
-	free(cdx);
+    free(cdx);
+}
+
+int	allocate_arrays(struct codexion_struct *cdx){
+	cdx->dongles = malloc(cdx->nb_coders * sizeof(*cdx->dongles));
+	if (cdx->dongles == NULL)
+		return (-31);
+	cdx->coders = malloc(cdx->nb_coders * sizeof(*cdx->coders));
+	if (cdx->coders == NULL){
+		free(cdx->dongles);
+		cdx->dongles = NULL;
+		return (-32);
+	}
 }

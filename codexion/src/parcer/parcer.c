@@ -20,7 +20,8 @@ static int	is_valid_number(const char *str)
 	return (1);
 }
 
-void fill_struct(struct codexionStruct *cdx){
+void	fill_struct(struct codexion_struct *cdx)
+{
 	cdx->nb_coders = ft_atoi(cdx->arguments[1]);
 	cdx->tm_burnout = ft_atoi(cdx->arguments[2]);
 	cdx->tm_compile = ft_atoi(cdx->arguments[3]);
@@ -29,13 +30,19 @@ void fill_struct(struct codexionStruct *cdx){
 	cdx->nb_compiles = ft_atoi(cdx->arguments[6]);
 	cdx->dongle_cooldown = ft_atoi(cdx->arguments[7]);
 	cdx->scheduler = cdx->arguments[8];
+	gettimeofday(&cdx->start_time, NULL);
+	gettimeofday(&cdx->current_time, NULL);
 	pthread_create(&cdx->monitor_thread, NULL, mont_thr_fn, NULL);
+	cdx->coders = NULL;
+	cdx->dongles = NULL;
+
 }
 
 
-int parse_arguments(struct codexionStruct *cdx)
+int	parse_arguments(struct codexion_struct *cdx)
 {
-	int c;
+	int			c;
+	const char	*argument;
 
 	c = 1;
 	if (cdx == NULL)
@@ -47,12 +54,11 @@ int parse_arguments(struct codexionStruct *cdx)
 	while (c <= 7){
 		// Check if not a number
 		if (!is_valid_number(cdx->arguments[c])){
-			printf("[PARCING ERROR CODE -22] Argument \"%s\" type is not an int!\n",
-				cdx->arguments[c] ? cdx->arguments[c] : "(null)");
+			argument = cdx->arguments[c];
+			if (argument == NULL)
+			printf("[PARCING ERROR CODE -22] Argument \"(null)\" type is not an int!\n");
 			return (-22);
 		}
-		// Check if valid number
-
 		c++;
 	}
 	if (cdx->arguments[c] == NULL){
@@ -69,7 +75,8 @@ int parse_arguments(struct codexionStruct *cdx)
 	return (1);
 }
 
-int validate_numbers(struct codexionStruct *cdx){
+int	validate_numbers(struct codexion_struct *cdx)
+{
     if (cdx->nb_coders < 1){
         printf("[PARCING ERROR CODE -40] Number of coders must be more than 0!\n");
         return (-24);

@@ -11,6 +11,7 @@ SRCS =	src/main.c \
 		src/utils/utils_parcer.c \
 		src/utils/utils_debug.c \
 		src/utils/utils_declare.c \
+		src/utils/utils_time.c \
 		src/threads/monitor_thread.c \
 		src/threads/coder_thread.c \
 		src/lists/lstadd_back.c \
@@ -29,6 +30,7 @@ TEST_SRCS = tester/tester.c \
 			src/utils/utils_parcer.c \
 			src/utils/utils_debug.c \
 			src/utils/utils_declare.c \
+			src/utils/utils_time.c \
 			src/threads/monitor_thread.c \
 			src/threads/coder_thread.c \
 			src/lists/lstadd_back.c \

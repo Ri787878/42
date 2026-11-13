@@ -5,35 +5,62 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <stdint.h>
-#include <string.h>
-#include <pthread.h>
+# include <string.h>
+# include <pthread.h>
+# include <time.h>
+# include <sys/time.h>
+# include <stdbool.h>
 
 
-// Project struct
-struct	codexionStruct {
-	// System variables
-	int argc;
-	char **arguments;
-	// Inputted variables
-	int nb_coders;
-	int nb_compiles;
-	long int tm_burnout;
-	long int tm_compile;
-	long int tm_debug;
-	long int tm_refactor;
-	long int dongle_cooldown;
-	char *scheduler;
-	// Threads
-	pthread_t	monitor_thread;
-};
+// Dongle Struct
+typedef struct dongle_struct
+{
+	long int		*id;
+	pthread_t		thread;
+	pthread_mutex_t	mutex;
 
-// Node for linked lists
+}	t_dongle;
+
+// Coder Struct
+typedef struct coder_struct
+{
+	int			id;
+	pthread_t	thread;
+	t_dongle	*left_dongle;
+	t_dongle	*right_dongle;
+	char		state;
+
+}	t_coder;
+
 typedef struct s_list
 {
-	void			*content;
-	struct s_list	*next;
-	struct s_list	*previous;
-}	t_list;
+	void *content;
+	struct s_list *next;
+	struct s_list *previous;
+} t_list;
+
+// Project struct
+struct	codexion_struct {
+	// System variables
+	int			argc;
+	char 		**arguments;
+	// Inputted variables
+	int 		nb_coders;
+	int 		nb_compiles;
+	long int 	tm_burnout;
+	long int 	tm_compile;
+	long int 	tm_debug;
+	long int 	tm_refactor;
+	long int 	dongle_cooldown;
+	char 		*scheduler;
+	struct 		timeval	start_time;
+	struct 		timeval	current_time;
+	// Threads
+	pthread_t	monitor_thread;
+	// Arrays
+	t_dongle	*dongles;
+	t_coder		*coders;
+};
 
 // Parcer Utils
 int		ft_isdigit(int c);
@@ -43,20 +70,24 @@ int		ft_strlen(const char *str);
 char	*ft_strdup(const char *src);
 
 // Debug Utils
-void	print_struct(struct codexionStruct *cdx);
+void	print_struct(struct codexion_struct *cdx);
+
+// Time Utils
+long int	get_time_elapsed_ms(struct codexion_struct *cdx);
 
 // Declare Utils
-struct	codexionStruct *init_codexion_struct(int argc, char *argv[]);
-void	free_codexion_struct(struct codexionStruct *cdx);
+struct	codexion_struct *init_codexion_struct(int argc, char *argv[]);
+void	free_codexion_struct(struct codexion_struct *cdx);
+void	allocate_arrays(struct codexion_struct *cdx);
 
 // Parcer
-int		parse_arguments(struct codexionStruct *cdx);
-void	fill_struct(struct codexionStruct *cdx);
-int		validate_numbers(struct codexionStruct *cdx);
+int		parse_arguments(struct codexion_struct *cdx);
+void	fill_struct(struct codexion_struct *cdx);
+int		validate_numbers(struct codexion_struct *cdx);
 
 // Codexion main function
 int		codexion(long int argc, char** arguments);
-void	runtime(struct codexionStruct *cdx);
+void	runtime(struct codexion_struct *cdx);
 
 // Monitoring Threads
 void	*mont_thr_fn(void *arg);

@@ -7,7 +7,8 @@ void	lstadd_back(t_list **lst, t_list *new)
 
 	if (!lst || !new)
 		return ;
-	if (!*lst){
+	if (!*lst)
+	{
 		new->previous = NULL;
 		new->next = NULL;
 		*lst = new;

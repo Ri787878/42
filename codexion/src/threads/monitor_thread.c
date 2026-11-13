@@ -2,7 +2,15 @@
 
 void	*mont_thr_fn(void *arg){
 	(void) arg;
-	printf("Hello from monitoring!\n");
+	//int	i;
+
+	//i = 0;
+	//while (i < 4){
+	//	sleep(1);
+	//	printf("Thread is running...\n");
+	//	i++;
+	//}
+	printf("\nyey\n");
 	pthread_exit(NULL);
 	return (NULL);
 }
