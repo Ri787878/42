@@ -68,6 +68,7 @@ There also is a created file called "output.txt" where the solution is stored.
 - Creation of output on a file "output.txt"
 
 ## Instructions
+The program works with the maps provided being in a folder called "maps", or having a "maps.tar.gz" compressed file on the root of the project.
 
 ### Installation
 ```bash
