@@ -1,25 +1,43 @@
-# SGOINFRE := $(shell [ -d /sgoinfre/$(USER) ] && echo /sgoinfre/$(USER) || echo $(HOME))
-install:
-	uv venv
-	uv pip install -r requirements.txt
+PYTHON_FILES = src
+INSTALL_STAMP = .install_compiled
 
-run:
-	uv run call-me-maybe
+# Store caches and temporary files on sgoinfre (if the pc doesnt hav enough space aka 42 pcs)
+CACHE_ROOT ?= $(HOME)/sgoinfre
 
-debug:
-	uv run python -m pdb src/call_me_maybe/__main__.py
+export UV_CACHE_DIR := $(CACHE_ROOT)/uv-cache
+export TMPDIR := $(CACHE_ROOT)/tmp
+export HF_HOME := $(CACHE_ROOT)/huggingface
+
+install: $(INSTALL_STAMP)
+$(INSTALL_STAMP): pyproject.toml uv.lock
+	mkdir -p "$(UV_CACHE_DIR)" "$(TMPDIR)" "$(HF_HOME)"
+	uv sync
+	touch $(INSTALL_STAMP)
+
+run: install
+	uv run python -m src
+
+debug: install
+	uv run python -m pdb -m src
 
 clean:
-	find . -type d -name ".mypy_cache" -exec rm -r {} +
-	find . -type d -name "__pycache__" -exec rm -r {} +
-	find . -type d -name "output" -exec rm -r {} +
+	find . -type d -name "__pycache__" -prune -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
+	rm -rf .mypy_cache .pytest_cache
+	rm -rf data/output
+	rm -f $(INSTALL_STAMP)
 
-lint:
-	uv run python -m flake8 . --exclude=.venv
-	uv run python -m mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
+fclean: clean
+	rm -rf .venv
 
-lint-strict:
-	uv run python -m flake8 . --exclude=.venv
-	uv run python -m mypy . --strict
+lint: install
+	uv run flake8 $(PYTHON_FILES)
+	uv run mypy $(PYTHON_FILES) \
+		--warn-return-any --warn-unused-ignores --ignore-missing-imports \
+		--disallow-untyped-defs --check-untyped-defs
 
-.PHONY: install run debug clean lint lint-strict
+lint-strict: install
+	uv run flake8 $(PYTHON_FILES)
+	uv run mypy --strict $(PYTHON_FILES)
+
+.PHONY: install run debug clean fclean lint lint-strict
