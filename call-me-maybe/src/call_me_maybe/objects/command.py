@@ -3,16 +3,16 @@ from pydantic import BaseModel, Field, model_validator, ConfigDict
 from .prompts import Prompt
 from ..parcer import Parcer
 from ..contained_decoding.function_calling import (
-        FunctionCallResult,
-        parse_function_call,
-        validate_parameter_types,
-        normalize_parameter_types,
-        normalize_substitution_regex
-    )
+    FunctionCallResult,
+    parse_function_call,
+    validate_parameter_types,
+    normalize_parameter_types,
+    normalize_substitution_regex
+)
 from ..contained_decoding.json_validator import (
-        BasicJsonFSM,
-        select_json_token,
-        load_vocab_from_model,
+    BasicJsonFSM,
+    select_json_token,
+    load_vocab_from_model,
 )
 # from .generator import Generator
 from ..values import Values
@@ -270,7 +270,6 @@ class Command(BaseModel):
         max_attempts = 4
         generated_calls: list[dict] = []
         self.vocab = load_vocab_from_model(self.llm_model)
-        # Reuse normalized tokens and state masks across prompts and retries.
         json_fsm = BasicJsonFSM(self.vocab)
         run_start = time.perf_counter()
 

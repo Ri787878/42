@@ -37,27 +37,18 @@ def build_single_call_prompt(
     for definition in definitions:
         available_functions.append({
             "name": definition.name,
-            "description": definition.description,
             "parameters": dict(definition.parameters),
         })
 
     functions_json = json.dumps(available_functions, separators=(",", ":"))
 
-    return f"""Select one function for the request. Return compact JSON only:
-{{"name":"exact function name","parameters":{{"exact parameter name":"value"}}}}
-Functions (parameter names mapped to types):
-{functions_json}
-Rules:
-- Include all declared parameters with their declared types; no extra keys.
-- Copy quoted values exactly, preserving spaces, case and punctuation.
-- Escape quotes and backslashes inside JSON strings.
-- Regex: all digits = [0-9]+; specific characters 2 and 5 = [25].
-- Stop after the final closing brace. No explanation or formatting.
-Request:
-{prompt_text}
-JSON:
-"""
-
+    return f"""Return compact JSON only:
+{{"name":"function","parameters":{{"parameter":"value"}}}}
+Functions: {functions_json}
+Use exact names; include all parameters and no extras. Preserve quoted values.
+Escape JSON strings. Digits: [0-9]+. Characters 2 and 5: [25].
+Request:{prompt_text}
+JSON:"""
 
 
 def _repair_invalid_json_escapes(text: str) -> str:
