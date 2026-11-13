@@ -113,7 +113,10 @@ class Command(BaseModel):
 
             flag, filepath = parts
 
-            if flag == "--functions_definition":
+            if flag in (
+                "--functions_definition",
+                "--functions_definitions",
+            ):
                 self.function_definition_filepath = filepath
             elif flag == "--input":
                 self.input_filepath = filepath
