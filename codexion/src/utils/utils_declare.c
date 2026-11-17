@@ -13,6 +13,8 @@ struct codexion_struct	*init_codexion_struct(int argc, char *argv[])
 		return (NULL);
 	cdx->argc = argc;
 	cdx->arguments = NULL;
+	cdx->dongles = NULL;
+	cdx->coders = NULL;
 	if (argc != 9 || argv == NULL)
 		return (cdx);
 	cdx->arguments = malloc(argc * sizeof(char *));
@@ -41,7 +43,6 @@ struct codexion_struct	*init_codexion_struct(int argc, char *argv[])
 	}
 	// create threads
 
-
     return cdx;
 }
 
@@ -57,17 +58,16 @@ void free_codexion_struct(struct codexion_struct *cdx)
 		free(cdx->arguments[i]);
 		i++;
 	}
-	i = 0;
-	while (cdx->nb_coders[i] != NULL){
-		free(cdx->dongles);
-		free(cdx->coders);
-		i++;
-	}
     free(cdx->arguments);
+    free(cdx->dongles);
+    free(cdx->coders);
     free(cdx);
 }
 
 int	allocate_arrays(struct codexion_struct *cdx){
+	int i;
+
+	i = 0;
 	cdx->dongles = malloc(cdx->nb_coders * sizeof(*cdx->dongles));
 	if (cdx->dongles == NULL)
 		return (-31);
@@ -77,4 +77,9 @@ int	allocate_arrays(struct codexion_struct *cdx){
 		cdx->dongles = NULL;
 		return (-32);
 	}
+	while (i < cdx->nb_coders){
+		cdx->dongles[i].id = i;
+		i++;
+	}
+	return (1);
 }

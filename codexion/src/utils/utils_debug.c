@@ -3,6 +3,9 @@
 
 void	print_struct(struct codexion_struct *cdx)
 {
+	int	i;
+
+	i = 0;
 	printf("\n[%ld] cdx.nb_coders = %d\n", get_time_elapsed_ms(cdx), cdx->nb_coders);
 	printf("cdx.tm_burnout = %ld\n", cdx->tm_burnout);
 	printf("cdx.tm_compile = %ld\n", cdx->tm_compile);
@@ -11,5 +14,10 @@ void	print_struct(struct codexion_struct *cdx)
 	printf("cdx.nb_compiles = %d\n", cdx->nb_compiles);
 	printf("cdx.dongle_cooldown = %ld\n", cdx->dongle_cooldown);
 	printf("cdx.scheduler = %s\n", cdx->scheduler);
+	printf("cdx.dongles = %ld\n", sizeof(cdx->dongles));
+	while (i < cdx->nb_coders){
+		printf("first dongle id = %ld\n", cdx->dongles[i++].id);
+	}
 	printf("\nElapsed time %ld\n\n", get_time_elapsed_ms(cdx));
+
 }

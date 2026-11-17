@@ -15,7 +15,7 @@
 // Dongle Struct
 typedef struct dongle_struct
 {
-	long int		*id;
+	long int		id;
 	pthread_t		thread;
 	pthread_mutex_t	mutex;
 
@@ -78,7 +78,7 @@ long int	get_time_elapsed_ms(struct codexion_struct *cdx);
 // Declare Utils
 struct	codexion_struct *init_codexion_struct(int argc, char *argv[]);
 void	free_codexion_struct(struct codexion_struct *cdx);
-void	allocate_arrays(struct codexion_struct *cdx);
+int	allocate_arrays(struct codexion_struct *cdx);
 
 // Parcer
 int		parse_arguments(struct codexion_struct *cdx);

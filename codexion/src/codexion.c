@@ -26,7 +26,10 @@ int	codexion(long int argc, char** argv)
 		free_codexion_struct(cdx);
 		return (-24);
 	}
-	allocate_arrays(cdx);
+	if (allocate_arrays(cdx) < 0) {
+		free_codexion_struct(cdx);
+		return (-31);
+	}
 	print_struct(cdx);
 
 	//runtime(cdx);
