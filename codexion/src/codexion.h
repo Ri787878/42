@@ -28,7 +28,7 @@ typedef struct coder_struct
 	pthread_t	thread;
 	t_dongle	*left_dongle;
 	t_dongle	*right_dongle;
-	char		state;
+	int			state;
 
 }	t_coder;
 

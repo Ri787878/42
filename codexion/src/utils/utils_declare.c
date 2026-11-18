@@ -78,7 +78,12 @@ int	allocate_arrays(struct codexion_struct *cdx){
 		return (-32);
 	}
 	while (i < cdx->nb_coders){
-		cdx->dongles[i].id = i;
+		cdx->dongles[i].id = i + 1;
+
+		cdx->coders[i].id = i + 1;
+		cdx->coders[i].left_dongle = &cdx->dongles[i];
+		cdx->coders[i].right_dongle = &cdx->dongles[(i) % cdx->nb_coders];
+		cdx->coders[i].state = 1;
 		i++;
 	}
 	return (1);

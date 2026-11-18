@@ -16,7 +16,11 @@ void	print_struct(struct codexion_struct *cdx)
 	printf("cdx.scheduler = %s\n", cdx->scheduler);
 	printf("cdx.dongles = %ld\n", sizeof(cdx->dongles));
 	while (i < cdx->nb_coders){
-		printf("first dongle id = %ld\n", cdx->dongles[i++].id);
+		printf("\ncoder id = %ld\n", cdx->dongles[i].id);
+		printf("coder %ld left_dongle.id = %ld\n", cdx->dongles[i].id, cdx->coders[i].left_dongle->id);
+		printf("coder %ld right_dongle.id = %ld\n", cdx->dongles[i].id, cdx->coders[i].right_dongle->id);
+		printf("coder %ld state = %d\n\n", cdx->dongles[i].id, cdx->coders[i].state);
+		i++;
 	}
 	printf("\nElapsed time %ld\n\n", get_time_elapsed_ms(cdx));
 
