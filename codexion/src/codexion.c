@@ -13,6 +13,7 @@ int	codexion(long int argc, char** argv)
 {
 	struct		codexion_struct *cdx;
 	int			parse_code;
+	int			i;
 
 	cdx = init_codexion_struct(argc, argv);
 	if (cdx == NULL)
@@ -30,10 +31,13 @@ int	codexion(long int argc, char** argv)
 		free_codexion_struct(cdx);
 		return (-31);
 	}
-	print_struct(cdx);
+	// print_struct(cdx);
 
 	//runtime(cdx);
 	//sleep(5);
+	i = 0;
+	while (i < cdx->nb_coders)
+		pthread_join(cdx->coders[i++].thread, NULL);
 	pthread_join(cdx->monitor_thread, NULL);
 	print_struct(cdx);
 	free_codexion_struct(cdx);

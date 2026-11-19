@@ -82,8 +82,16 @@ int	allocate_arrays(struct codexion_struct *cdx){
 
 		cdx->coders[i].id = i + 1;
 		cdx->coders[i].left_dongle = &cdx->dongles[i];
-		cdx->coders[i].right_dongle = &cdx->dongles[(i) % cdx->nb_coders];
+		cdx->coders[i].right_dongle = &cdx->dongles[(i + 1) % cdx->nb_coders];
 		cdx->coders[i].state = 1;
+		cdx->coders[i].cooldown = 0;
+		cdx->coders[i].tm_lst_compile = get_start_tm_ms(cdx);
+		if (pthread_create(&cdx->coders[i].thread, NULL, coder_thr_fn, NULL) != 0){
+			while (i > 0)
+				pthread_join(cdx->coders[--i].thread, NULL);
+			return (-33);
+		}
+
 		i++;
 	}
 	return (1);

@@ -30,9 +30,9 @@ void	fill_struct(struct codexion_struct *cdx)
 	cdx->nb_compiles = ft_atoi(cdx->arguments[6]);
 	cdx->dongle_cooldown = ft_atoi(cdx->arguments[7]);
 	cdx->scheduler = cdx->arguments[8];
-	gettimeofday(&cdx->start_time, NULL);
-	gettimeofday(&cdx->current_time, NULL);
-	pthread_create(&cdx->monitor_thread, NULL, mont_thr_fn, NULL);
+	clock_gettime(CLOCK_MONOTONIC, &cdx->start_time);
+	clock_gettime(CLOCK_MONOTONIC, &cdx->current_time);
+	pthread_create(&cdx->monitor_thread, NULL, mont_thr_fn, cdx);
 	cdx->coders = NULL;
 	cdx->dongles = NULL;
 

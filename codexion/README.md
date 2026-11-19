@@ -23,7 +23,7 @@
 	- https://www.geeksforgeeks.org/c/multithreading-in-c/
 	- https://www.geeksforgeeks.org/c/thread-functions-in-c-c/
 	- https://linuxhint.com/gettimeofday_c_language/
-	-
+	- https://stackoverflow.com/questions/19324306/running-two-threads-at-the-same-time
 	-
 	-
 	-

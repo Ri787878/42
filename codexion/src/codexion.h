@@ -10,6 +10,7 @@
 # include <time.h>
 # include <sys/time.h>
 # include <stdbool.h>
+# include <inttypes.h>
 
 
 // Dongle Struct
@@ -18,17 +19,21 @@ typedef struct dongle_struct
 	long int		id;
 	pthread_t		thread;
 	pthread_mutex_t	mutex;
+	long int		cooldown;
 
 }	t_dongle;
 
 // Coder Struct
 typedef struct coder_struct
 {
-	int			id;
-	pthread_t	thread;
-	t_dongle	*left_dongle;
-	t_dongle	*right_dongle;
-	int			state;
+	int				id;
+	pthread_t		thread;
+	pthread_mutex_t	mutex;
+	t_dongle		*left_dongle;
+	t_dongle		*right_dongle;
+	int				state;
+	long int		cooldown;
+	long int		tm_lst_compile;
 
 }	t_coder;
 
@@ -53,8 +58,8 @@ struct	codexion_struct {
 	long int 	tm_refactor;
 	long int 	dongle_cooldown;
 	char 		*scheduler;
-	struct 		timeval	start_time;
-	struct 		timeval	current_time;
+	struct 		timespec	start_time;
+	struct 		timespec	current_time;
 	// Threads
 	pthread_t	monitor_thread;
 	// Arrays
@@ -73,7 +78,9 @@ char	*ft_strdup(const char *src);
 void	print_struct(struct codexion_struct *cdx);
 
 // Time Utils
-long int	get_time_elapsed_ms(struct codexion_struct *cdx);
+int64_t	get_time_elapsed_ms(struct codexion_struct *cdx);
+int64_t	get_start_tm_ms(struct codexion_struct *cdx);
+void sleep_ms(int milliseconds);
 
 // Declare Utils
 struct	codexion_struct *init_codexion_struct(int argc, char *argv[]);

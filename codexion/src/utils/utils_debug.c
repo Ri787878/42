@@ -6,7 +6,7 @@ void	print_struct(struct codexion_struct *cdx)
 	int	i;
 
 	i = 0;
-	printf("\n[%ld] cdx.nb_coders = %d\n", get_time_elapsed_ms(cdx), cdx->nb_coders);
+	printf("\n[%" PRIi64 "] cdx.nb_coders = %d\n", get_time_elapsed_ms(cdx), cdx->nb_coders);
 	printf("cdx.tm_burnout = %ld\n", cdx->tm_burnout);
 	printf("cdx.tm_compile = %ld\n", cdx->tm_compile);
 	printf("cdx.tm_debug = %ld\n", cdx->tm_debug);
@@ -19,9 +19,11 @@ void	print_struct(struct codexion_struct *cdx)
 		printf("\ncoder id = %ld\n", cdx->dongles[i].id);
 		printf("coder %ld left_dongle.id = %ld\n", cdx->dongles[i].id, cdx->coders[i].left_dongle->id);
 		printf("coder %ld right_dongle.id = %ld\n", cdx->dongles[i].id, cdx->coders[i].right_dongle->id);
-		printf("coder %ld state = %d\n\n", cdx->dongles[i].id, cdx->coders[i].state);
+		printf("coder %ld state = %d\n", cdx->dongles[i].id, cdx->coders[i].state);
+		printf("coder %ld cooldown = %ld\n", cdx->dongles[i].id, cdx->coders[i].cooldown);
+		printf("coder %ld cooldown = %ld\n", cdx->dongles[i].id, cdx->coders[i].tm_lst_compile);
 		i++;
 	}
-	printf("\nElapsed time %ld\n\n", get_time_elapsed_ms(cdx));
+	printf("\n\nElapsed time %" PRIi64 "\n", get_time_elapsed_ms(cdx));
 
 }
