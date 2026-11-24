@@ -1,9 +1,6 @@
 ### Error Codes:
 
-	- '-20' to '-29' are Parcing errors:
-		- '-29' Wrong number of arguments passed;
-		- '-22' Argument type is not an int;
-		- '-23' Scheduler argument is "fifo" or "edf";
+	- Argument parsing errors reported to stderr return '-1'.
 	- '-30' to '-39' are Memory errors:
 		- '-30' Expected variable to not be 'NULL', but 'NULL';
 		- '-31' Error allocating dongles array;

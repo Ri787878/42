@@ -22,21 +22,12 @@ int	parse_arguments(char **argv, t_config *config)
 	{
 		result = parse_number(argv[i + 1], &numbers[i]);
 		if (result == -22)
-		{
-			print_to_stderr("[ERROR] Numeric arguments must be integers.");
-			return (-22);
-		}
+			return (print_to_stderr("[ERROR] Numeric arguments must be integers."));
 		if (result == -24)
-		{
-			print_to_stderr("[ERROR] Numeric argument is out of range.");
-			return (-24);
-		}
+			return (print_to_stderr("[ERROR] Numeric argument is out of range."));
 		if (numbers[i] < 0 || (i == 0
 				&& (numbers[i] == 0 || numbers[i] > INT_MAX)))
-		{
-			print_to_stderr("[ERROR] Numeric argument is out of range.");
-			return (-24);
-		}
+			return (print_to_stderr("[ERROR] Numeric argument is out of range."));
 		i++;
 	}
 	if (argv[8] == NULL)
@@ -46,10 +37,7 @@ int	parse_arguments(char **argv, t_config *config)
 	else if (strcmp(argv[8], "edf") == 0)
 		scheduler = EDF;
 	else
-	{
-		print_to_stderr("[ERROR] Scheduler must be fifo or edf.");
-		return (-23);
-	}
+		return (print_to_stderr("[ERROR] Scheduler must be fifo or edf."));
 	config->nb_coders = (int)numbers[0];
 	config->tm_burnout = numbers[1];
 	config->tm_compile = numbers[2];

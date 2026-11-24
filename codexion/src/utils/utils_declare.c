@@ -96,5 +96,5 @@ int	allocate_arrays(struct codexion_struct *cdx){
 int	print_to_stderr(const char *msg)
 {
 	fprintf(stderr, "Error: %s\n", msg);
-	return (1);
+	return (-1);
 }

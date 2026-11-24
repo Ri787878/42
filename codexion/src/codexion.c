@@ -11,10 +11,7 @@ int	codexion(long int argc, char** argv)
 	int			parse_code;
 
 	if (argc != 9)
-	{
-		print_to_stderr("[ERROR] expected 8 arguments.");
-		return (-29);
-	}
+		return (print_to_stderr("[ERROR] expected 8 arguments."));
 	parse_code = parse_arguments(argv, &config);
 	if (parse_code < 0)
 		return (parse_code);
