@@ -11,7 +11,28 @@
 # include <sys/time.h>
 # include <stdbool.h>
 # include <inttypes.h>
+# include <stdatomic.h>
 
+
+// Enum for both types of scheduler
+typedef enum e_scheduler
+{
+	FIFO,
+	EDF
+}	t_scheduler;
+
+//Configs Struct
+typedef struct s_config
+{
+	int 		nb_coders;
+	int 		nb_compiles;
+	long	 	tm_burnout;
+	long	 	tm_compile;
+	long	 	tm_debug;
+	long	 	tm_refactor;
+	long	 	dongle_cooldown;
+	t_scheduler	*scheduler;
+}	t_config;
 
 // Dongle Struct
 typedef struct dongle_struct
@@ -49,19 +70,13 @@ struct	codexion_struct {
 	// System variables
 	int			argc;
 	char 		**arguments;
-	// Inputted variables
-	int 		nb_coders;
-	int 		nb_compiles;
-	long int 	tm_burnout;
-	long int 	tm_compile;
-	long int 	tm_debug;
-	long int 	tm_refactor;
-	long int 	dongle_cooldown;
-	char 		*scheduler;
+	t_config	config;
 	struct 		timespec	start_time;
 	struct 		timespec	current_time;
 	// Threads
 	pthread_t	monitor_thread;
+	atomic_bool	stop_requested;
+	int			coder_mutexes_initialized;
 	// Arrays
 	t_dongle	*dongles;
 	t_coder		*coders;
@@ -79,8 +94,7 @@ void	print_struct(struct codexion_struct *cdx);
 
 // Time Utils
 int64_t	get_time_elapsed_ms(struct codexion_struct *cdx);
-int64_t	get_start_tm_ms(struct codexion_struct *cdx);
-void sleep_ms(int milliseconds);
+int64_t	convert_to_ms(struct timespec time);
 
 // Declare Utils
 struct	codexion_struct *init_codexion_struct(int argc, char *argv[]);
@@ -89,7 +103,6 @@ int	allocate_arrays(struct codexion_struct *cdx);
 
 // Parcer
 int		parse_arguments(struct codexion_struct *cdx);
-void	fill_struct(struct codexion_struct *cdx);
 int		validate_numbers(struct codexion_struct *cdx);
 
 // Codexion main function
@@ -108,7 +121,7 @@ void	lstadd_front(t_list **lst, t_list *new);
 void	lstclear(t_list **lst, void (*del)(void*));
 void	lstdelone(t_list **lst, t_list *node, void (*del)(void *));
 
-void	lstiter(t_list *lst, void (*f)(void *));
+int	lstiter(t_list *lst, int (*f)(void *));
 t_list	*lstlast(t_list *lst);
 t_list	*lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 t_list	*lstnew(void *content);

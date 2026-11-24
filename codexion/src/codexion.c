@@ -2,10 +2,17 @@
 
 
 void	runtime(struct codexion_struct *cdx){
-	(void)cdx;
-	while (true){
-		break;
+	int	i;
+
+	i = 0;
+	while (i < cdx->nb_compiles
+		&& !atomic_load(&cdx->stop_requested)){
+		print_struct(cdx);
+		sleep(2);
+		printf("\n\nprint after 2 seconds\n\n");
+		i++;
 	}
+	atomic_store(&cdx->stop_requested, true);
 }
 
 
@@ -31,10 +38,18 @@ int	codexion(long int argc, char** argv)
 		free_codexion_struct(cdx);
 		return (-31);
 	}
-	// print_struct(cdx);
+	if (pthread_create(&cdx->monitor_thread, NULL, mont_thr_fn, cdx) != 0)
+	{
+		fprintf(stderr, "failed to create monitor thread\n");
+		atomic_store(&cdx->stop_requested, true);
+		i = 0;
+		while (i < cdx->nb_coders)
+			pthread_join(cdx->coders[i++].thread, NULL);
+		free_codexion_struct(cdx);
+		return (-32);
+	}
 
-	//runtime(cdx);
-	//sleep(5);
+	runtime(cdx);
 	i = 0;
 	while (i < cdx->nb_coders)
 		pthread_join(cdx->coders[i++].thread, NULL);

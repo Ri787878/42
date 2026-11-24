@@ -15,6 +15,8 @@ struct codexion_struct	*init_codexion_struct(int argc, char *argv[])
 	cdx->arguments = NULL;
 	cdx->dongles = NULL;
 	cdx->coders = NULL;
+	cdx->coder_mutexes_initialized = 0;
+	atomic_init(&cdx->stop_requested, false);
 	if (argc != 9 || argv == NULL)
 		return (cdx);
 	cdx->arguments = malloc(argc * sizeof(char *));
@@ -59,6 +61,12 @@ void free_codexion_struct(struct codexion_struct *cdx)
 		i++;
 	}
     free(cdx->arguments);
+	if (cdx->coders != NULL)
+	{
+		i = 0;
+		while (i < cdx->coder_mutexes_initialized)
+			pthread_mutex_destroy(&cdx->coders[i++].mutex);
+	}
     free(cdx->dongles);
     free(cdx->coders);
     free(cdx);
@@ -85,13 +93,26 @@ int	allocate_arrays(struct codexion_struct *cdx){
 		cdx->coders[i].right_dongle = &cdx->dongles[(i + 1) % cdx->nb_coders];
 		cdx->coders[i].state = 1;
 		cdx->coders[i].cooldown = 0;
-		cdx->coders[i].tm_lst_compile = get_start_tm_ms(cdx);
-		if (pthread_create(&cdx->coders[i].thread, NULL, coder_thr_fn, NULL) != 0){
+		cdx->coders[i].tm_lst_compile = 0;
+		i++;
+	}
+	i = 0;
+	while (i < cdx->nb_coders)
+	{
+		if (pthread_mutex_init(&cdx->coders[i].mutex, NULL) != 0)
+			return (-33);
+		cdx->coder_mutexes_initialized++;
+		i++;
+	}
+	i = 0;
+	while (i < cdx->nb_coders)
+	{
+		if (pthread_create(&cdx->coders[i].thread, NULL, coder_thr_fn, NULL) != 0)
+		{
 			while (i > 0)
 				pthread_join(cdx->coders[--i].thread, NULL);
-			return (-33);
+			return (-34);
 		}
-
 		i++;
 	}
 	return (1);

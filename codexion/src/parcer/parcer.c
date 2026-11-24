@@ -20,7 +20,7 @@ static int	is_valid_number(const char *str)
 	return (1);
 }
 
-void	fill_struct(struct codexion_struct *cdx)
+static void	fill_struct(struct codexion_struct *cdx)
 {
 	cdx->nb_coders = ft_atoi(cdx->arguments[1]);
 	cdx->tm_burnout = ft_atoi(cdx->arguments[2]);
@@ -32,10 +32,6 @@ void	fill_struct(struct codexion_struct *cdx)
 	cdx->scheduler = cdx->arguments[8];
 	clock_gettime(CLOCK_MONOTONIC, &cdx->start_time);
 	clock_gettime(CLOCK_MONOTONIC, &cdx->current_time);
-	pthread_create(&cdx->monitor_thread, NULL, mont_thr_fn, cdx);
-	cdx->coders = NULL;
-	cdx->dongles = NULL;
-
 }
 
 

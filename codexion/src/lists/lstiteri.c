@@ -1,14 +1,16 @@
 #include "../codexion.h"
 
 
-void	lstiter(t_list *lst, void (*f)(void *))
+int	lstiter(t_list *lst, int (*f)(void *))
 {
 	if (lst && f)
 	{
 		while (lst)
 		{
-			f(lst->content);
+			if (f(lst->content) <= 0)
+				return (-1);
 			lst = lst->next;
 		}
 	}
+	return (1);
 }
