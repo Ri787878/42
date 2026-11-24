@@ -1,43 +1,70 @@
 # include "../codexion.h"
 
+# include <errno.h>
+
 void	*mont_thr_fn(void *arg)
 {
 	struct codexion_struct	*cdx;
-	struct timespec			poll_interval;
+	struct timespec			deadline;
 	int64_t					elapsed;
 	int						i;
 	int						burned_out;
+	int						result;
 
 	cdx = (struct codexion_struct *)arg;
-	poll_interval.tv_sec = 0;
-	poll_interval.tv_nsec = 1000000;
-	while (!atomic_load(&cdx->stop_requested))
+	result = pthread_mutex_lock(&cdx->coordinator_mutex);
+	if (result != 0)
+	{
+		fprintf(stderr, "monitor: failed to lock coordinator\n");
+		return (NULL);
+	}
+	while (!cdx->stop_requested)
 	{
 		elapsed = get_time_elapsed_ms(cdx);
 		if (elapsed < 0)
 		{
 			fprintf(stderr, "monitor: failed to read elapsed time\n");
-			atomic_store(&cdx->stop_requested, true);
+			cdx->stop_requested = true;
+			pthread_cond_broadcast(&cdx->coordinator_changed);
 			break ;
 		}
 		i = 0;
 		burned_out = 0;
 		while (i < cdx->config.nb_coders)
 		{
-			pthread_mutex_lock(&cdx->coders[i].mutex);
-			if (elapsed - cdx->coders[i].tm_lst_compile >= cdx->config.tm_burnout)
+			if (cdx->coders[i].state != DONE
+				&& elapsed - cdx->coders[i].tm_lst_compile
+				>= cdx->config.tm_burnout)
+			{
 				burned_out = 1;
-			pthread_mutex_unlock(&cdx->coders[i].mutex);
-			if (burned_out)
 				break ;
+			}
 			i++;
 		}
 		if (burned_out)
 		{
-			atomic_store(&cdx->stop_requested, true);
+			log_event_locked(cdx, cdx->coders[i].id, "burned out");
+			cdx->stop_requested = true;
+			pthread_cond_broadcast(&cdx->coordinator_changed);
 			break ;
 		}
-		nanosleep(&poll_interval, NULL);
+		if (get_realtime_deadline_ms(&deadline, 1) != 0)
+		{
+			fprintf(stderr, "monitor: failed to get wait deadline\n");
+			cdx->stop_requested = true;
+			pthread_cond_broadcast(&cdx->coordinator_changed);
+			break ;
+		}
+		result = pthread_cond_timedwait(&cdx->coordinator_changed,
+				&cdx->coordinator_mutex, &deadline);
+		if (result != 0 && result != ETIMEDOUT)
+		{
+			fprintf(stderr, "monitor: failed to wait on coordinator\n");
+			cdx->stop_requested = true;
+			pthread_cond_broadcast(&cdx->coordinator_changed);
+			break ;
+		}
 	}
+	pthread_mutex_unlock(&cdx->coordinator_mutex);
 	return (NULL);
 }

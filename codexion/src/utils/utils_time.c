@@ -17,3 +17,20 @@ int64_t	convert_to_ms(struct timespec time){
 	return ((int64_t)time.tv_sec * 1000
 		+ time.tv_nsec / 1000000);
 }
+
+int	get_realtime_deadline_ms(struct timespec *deadline, long wait_ms)
+{
+	struct timeval	now;
+
+	if (deadline == NULL || wait_ms < 0 || gettimeofday(&now, NULL) != 0)
+		return (-1);
+	deadline->tv_sec = now.tv_sec + wait_ms / 1000;
+	deadline->tv_nsec = now.tv_usec * 1000
+		+ (wait_ms % 1000) * 1000000;
+	if (deadline->tv_nsec >= 1000000000)
+	{
+		deadline->tv_sec++;
+		deadline->tv_nsec -= 1000000000;
+	}
+	return (0);
+}

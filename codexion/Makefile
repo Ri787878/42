@@ -48,6 +48,8 @@ TEST_OBJECTS = $(TEST_SRCS:.c=.o)
 
 all: $(NAME)
 
+$(OBJECTS) $(TEST_OBJECTS): src/codexion.h
+
 $(NAME): $(OBJECTS)
 	$(AR) $(NAME) $(OBJECTS)
 

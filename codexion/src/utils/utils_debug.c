@@ -33,3 +33,17 @@ void	print_struct(struct codexion_struct *cdx)
 	printf("\n\nElapsed time %" PRIi64 "\n", get_time_elapsed_ms(cdx));
 
 }
+
+void	log_event_locked(struct codexion_struct *cdx, int coder_id,
+		const char *message)
+{
+	int64_t	elapsed;
+
+	elapsed = get_time_elapsed_ms(cdx);
+	if (elapsed < 0)
+	{
+		fprintf(stderr, "log: failed to read elapsed time\n");
+		return ;
+	}
+	printf("%" PRIi64 " %d %s\n", elapsed, coder_id, message);
+}

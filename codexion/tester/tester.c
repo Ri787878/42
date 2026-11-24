@@ -1,6 +1,120 @@
 # include "../src/codexion.h"
 #include <assert.h>
+#include <unistd.h>
 
+static int	run_and_capture(char **arguments, char *output, size_t output_size)
+{
+	FILE	*capture;
+	int		saved_stdout;
+	int		result;
+	size_t	bytes_read;
+
+	capture = tmpfile();
+	assert(capture != NULL);
+	fflush(stdout);
+	saved_stdout = dup(STDOUT_FILENO);
+	assert(saved_stdout >= 0);
+	assert(dup2(fileno(capture), STDOUT_FILENO) >= 0);
+	result = codexion(9, arguments);
+	fflush(stdout);
+	assert(dup2(saved_stdout, STDOUT_FILENO) >= 0);
+	close(saved_stdout);
+	rewind(capture);
+	bytes_read = fread(output, 1, output_size - 1, capture);
+	output[bytes_read] = '\0';
+	assert(!ferror(capture));
+	fclose(capture);
+	return (result);
+}
+
+static int	count_events(const char *output, const char *event)
+{
+	int			count;
+	const char	*match;
+
+	count = 0;
+	match = output;
+	while ((match = strstr(match, event)) != NULL)
+	{
+		count++;
+		match += strlen(event);
+	}
+	return (count);
+}
+
+static void	test_single_coder_burnout(void)
+{
+	char	*arguments[9] = {
+		"codexion", "1", "10", "7", "4", "4", "1", "1", "fifo"
+	};
+	char	output[1024];
+
+	assert(run_and_capture(arguments, output, sizeof(output)) == 1);
+	assert(count_events(output, " 1 burned out\n") == 1);
+	assert(count_events(output, " is compiling\n") == 0);
+	printf("\n[SINGLE CODER BURNOUT] Expected: coder 1 burns out without compiling. Passed.");
+}
+
+static void	test_fifo_completion(void)
+{
+	char	*arguments[9] = {
+		"codexion", "2", "500", "1", "1", "1", "1", "1", "fifo"
+	};
+	char	output[1024];
+
+	assert(run_and_capture(arguments, output, sizeof(output)) == 1);
+	assert(count_events(output, " is compiling\n") == 2);
+	assert(count_events(output, " 1 is compiling\n") == 1);
+	assert(count_events(output, " 2 is compiling\n") == 1);
+	assert(count_events(output, " has taken a dongle\n") == 4);
+	assert(count_events(output, " burned out\n") == 0);
+	printf("\n[FIFO COMPLETION] Expected: both coders compile once; no burnout. Passed.");
+}
+
+static void	test_edf_work_cycles(void)
+{
+	char	*arguments[9] = {
+		"codexion", "2", "1000", "1", "1", "1", "2", "1", "edf"
+	};
+	char	output[1024];
+
+	assert(run_and_capture(arguments, output, sizeof(output)) == 1);
+	assert(count_events(output, " is compiling\n") == 4);
+	assert(count_events(output, " 1 is compiling\n") == 2);
+	assert(count_events(output, " 2 is compiling\n") == 2);
+	assert(count_events(output, " is debugging\n") == 2);
+	assert(count_events(output, " 1 is debugging\n") == 1);
+	assert(count_events(output, " 2 is debugging\n") == 1);
+	assert(count_events(output, " is refactoring\n") == 2);
+	assert(count_events(output, " 1 is refactoring\n") == 1);
+	assert(count_events(output, " 2 is refactoring\n") == 1);
+	assert(count_events(output, " burned out\n") == 0);
+	printf("\n[EDF WORK CYCLES] Expected: both coders compile twice, with one debug and refactor each. Passed.");
+}
+
+static void	test_ten_coder_completion(void)
+{
+	char	*arguments[9] = {
+		"codexion", "10", "5000", "1", "1", "1", "1", "1", "fifo"
+	};
+	char	output[4096];
+	char	expected_event[64];
+	int		coder;
+
+	assert(run_and_capture(arguments, output, sizeof(output)) == 1);
+	assert(count_events(output, " is compiling\n") == 10);
+	assert(count_events(output, " has taken a dongle\n") == 20);
+	assert(count_events(output, " burned out\n") == 0);
+	coder = 1;
+	while (coder <= 10)
+	{
+		snprintf(expected_event, sizeof(expected_event),
+			" %d is compiling\n", coder);
+		assert(count_events(output, expected_event) == 1);
+		coder++;
+	}
+	printf("\n[TEN CODER COMPLETION] Expected: all 10 coders compile once without burnout. Passed.");
+}
 
 void	test_codexion_argument_types()
 {
@@ -102,6 +216,10 @@ void	test_parcer()
 	test_codexion_argument_quantities();
 	test_codexion_argument_types();
 	test_codexion_argument_ranges();
+	test_single_coder_burnout();
+	test_fifo_completion();
+	test_edf_work_cycles();
+	test_ten_coder_completion();
 	
     printf("\n[ARGUMENT QUANTITY TEST] All argument quantity assertions passed successfully!");
     printf("\n[ARGUMENT TYPES TEST] All matrix position and invalid type tests passed successfully!");
