@@ -22,10 +22,10 @@ void	*mont_thr_fn(void *arg)
 		}
 		i = 0;
 		burned_out = 0;
-		while (i < cdx->nb_coders)
+		while (i < cdx->config.nb_coders)
 		{
 			pthread_mutex_lock(&cdx->coders[i].mutex);
-			if (elapsed - cdx->coders[i].tm_lst_compile >= cdx->tm_burnout)
+			if (elapsed - cdx->coders[i].tm_lst_compile >= cdx->config.tm_burnout)
 				burned_out = 1;
 			pthread_mutex_unlock(&cdx->coders[i].mutex);
 			if (burned_out)

@@ -1,99 +1,84 @@
 # include "../codexion.h"
 
-static int	is_valid_number(const char *str)
+# include <errno.h>
+# include <limits.h>
+
+static int	parse_number(const char *arg, long *number);
+
+
+int	parse_arguments(char **argv, t_config *config)
 {
-	int	i;
+	long		numbers[7];
+	t_scheduler	scheduler;
+	int			result;
+	int			i;
 
-	if (str == NULL || str[0] == '\0')
-		return (0);
-	i = 0;
-	if (str[i] == '+' || str[i] == '-')
-		i++;
-	if (str[i] == '\0')
-		return (0);
-	while (str[i] != '\0')
-	{
-		if (!ft_isdigit(str[i]))
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
-static void	fill_struct(struct codexion_struct *cdx)
-{
-	cdx->nb_coders = ft_atoi(cdx->arguments[1]);
-	cdx->tm_burnout = ft_atoi(cdx->arguments[2]);
-	cdx->tm_compile = ft_atoi(cdx->arguments[3]);
-	cdx->tm_debug = ft_atoi(cdx->arguments[4]);
-	cdx->tm_refactor = ft_atoi(cdx->arguments[5]);
-	cdx->nb_compiles = ft_atoi(cdx->arguments[6]);
-	cdx->dongle_cooldown = ft_atoi(cdx->arguments[7]);
-	cdx->scheduler = cdx->arguments[8];
-	clock_gettime(CLOCK_MONOTONIC, &cdx->start_time);
-	clock_gettime(CLOCK_MONOTONIC, &cdx->current_time);
-}
-
-
-int	parse_arguments(struct codexion_struct *cdx)
-{
-	int			c;
-	const char	*argument;
-
-	c = 1;
-	if (cdx == NULL)
-		return (-30);
-	if (cdx->argc != 9)
-		return (-29);
-	if (cdx->arguments == NULL)
+	if (argv == NULL)
 		return (-22);
-	while (c <= 7){
-		// Check if not a number
-		if (!is_valid_number(cdx->arguments[c])){
-			argument = cdx->arguments[c];
-			if (argument == NULL)
-			printf("[PARCING ERROR CODE -22] Argument \"(null)\" type is not an int!\n");
+	if (config == NULL)
+		return (-30);
+	i = 0;
+	while (i < 7)
+	{
+		result = parse_number(argv[i + 1], &numbers[i]);
+		if (result == -22)
+		{
+			print_to_stderr("[ERROR] Numeric arguments must be integers.");
 			return (-22);
 		}
-		c++;
+		if (result == -24)
+		{
+			print_to_stderr("[ERROR] Numeric argument is out of range.");
+			return (-24);
+		}
+		if (numbers[i] < 0 || (i == 0
+				&& (numbers[i] == 0 || numbers[i] > INT_MAX)))
+		{
+			print_to_stderr("[ERROR] Numeric argument is out of range.");
+			return (-24);
+		}
+		i++;
 	}
-	if (cdx->arguments[c] == NULL){
-		printf("[PARCING ERROR CODE -22] Scheduler argument is missing!\n");
+	if (argv[8] == NULL)
 		return (-22);
-	}
-	if (strcmp(cdx->arguments[c], "fifo")
-		&& strcmp(cdx->arguments[c], "edf")){
-		printf("[PARCING ERROR CODE -23] Scheduler argument \"%s\" isn't \"fifo\" or \"edf\"!\n",
-			cdx->arguments[c]);
+	if (strcmp(argv[8], "fifo") == 0)
+		scheduler = FIFO;
+	else if (strcmp(argv[8], "edf") == 0)
+		scheduler = EDF;
+	else
+	{
+		print_to_stderr("[ERROR] Scheduler must be fifo or edf.");
 		return (-23);
 	}
-	fill_struct(cdx);
+	config->nb_coders = (int)numbers[0];
+	config->tm_burnout = numbers[1];
+	config->tm_compile = numbers[2];
+	config->tm_debug = numbers[3];
+	config->tm_refactor = numbers[4];
+	config->nb_compiles_required = numbers[5];
+	config->dongle_cooldown = numbers[6];
+	config->scheduler = scheduler;
 	return (1);
 }
 
-int	validate_numbers(struct codexion_struct *cdx)
+static int	parse_number(const char *arg, long *number)
 {
-    if (cdx->nb_coders < 1){
-        printf("[PARCING ERROR CODE -40] Number of coders must be more than 0!\n");
-        return (-24);
-    } else if (cdx->nb_compiles < 0){
-        printf("[PARCING ERROR CODE -41] Number of compiles must be more than or equal to 0!\n");
-        return (-24);
-    } else if (cdx->tm_burnout < 0){
-        printf("[PARCING ERROR CODE -42] Number of time_to_burnout must be more than or equal to 0!\n");
-        return (-24);
-    } else if (cdx->tm_compile < 0){
-        printf("[PARCING ERROR CODE -43] Number of time_to_compile must be more than or equal to 0!\n");
-        return (-24);
-    } else if (cdx->tm_debug < 0){
-        printf("[PARCING ERROR CODE -44] Number of time_to_debug must be more than or equal to 0!\n");
-        return (-24);
-    } else if (cdx->tm_refactor < 0){
-        printf("[PARCING ERROR CODE -45] Number of time_to_refactor must be more than or equal to 0!\n");
-        return (-24);
-    } else if (cdx->dongle_cooldown < 0){
-        printf("[PARCING ERROR CODE -46] The dongle_cooldown must be more than or equal to 0!\n");
-        return (-24);
-    }
-    return (1);
+	const char	*cursor;
+
+	if (arg == NULL || arg[0] == '\0')
+		return (-22);
+	cursor = arg;
+	if (*cursor == '+' || *cursor == '-')
+		cursor++;
+	if (*cursor < '0' || *cursor > '9')
+		return (-22);
+	while (*cursor >= '0' && *cursor <= '9')
+		cursor++;
+	if (*cursor != '\0')
+		return (-22);
+	errno = 0;
+	*number = strtol(arg, NULL, 10);
+	if (errno == ERANGE)
+		return (-24);
+	return (1);
 }

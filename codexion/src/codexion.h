@@ -25,13 +25,13 @@ typedef enum e_scheduler
 typedef struct s_config
 {
 	int 		nb_coders;
-	int 		nb_compiles;
 	long	 	tm_burnout;
 	long	 	tm_compile;
 	long	 	tm_debug;
 	long	 	tm_refactor;
+	long	 	nb_compiles_required;
 	long	 	dongle_cooldown;
-	t_scheduler	*scheduler;
+	t_scheduler	scheduler;
 }	t_config;
 
 // Dongle Struct
@@ -83,11 +83,7 @@ struct	codexion_struct {
 };
 
 // Parcer Utils
-int		ft_isdigit(int c);
-int		ft_atoi(const char *str);
-int		ft_strcmp(const char *s1, const char *s2);
 int		ft_strlen(const char *str);
-char	*ft_strdup(const char *src);
 
 // Debug Utils
 void	print_struct(struct codexion_struct *cdx);
@@ -97,17 +93,17 @@ int64_t	get_time_elapsed_ms(struct codexion_struct *cdx);
 int64_t	convert_to_ms(struct timespec time);
 
 // Declare Utils
-struct	codexion_struct *init_codexion_struct(int argc, char *argv[]);
+struct codexion_struct	*init_codexion_struct(t_config	*configs);
 void	free_codexion_struct(struct codexion_struct *cdx);
 int	allocate_arrays(struct codexion_struct *cdx);
+int	print_to_stderr(const char *msg);
 
 // Parcer
-int		parse_arguments(struct codexion_struct *cdx);
-int		validate_numbers(struct codexion_struct *cdx);
+int	parse_arguments(char **argv, t_config *configs);
+
 
 // Codexion main function
 int		codexion(long int argc, char** arguments);
-void	runtime(struct codexion_struct *cdx);
 
 // Monitoring Threads
 void	*mont_thr_fn(void *arg);

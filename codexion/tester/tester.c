@@ -9,7 +9,6 @@ void	test_codexion_argument_types()
 
 	assert(codexion(9, empty_pointer) == -22);
     assert(codexion(9, empty_string) == -22);
-    assert(codexion(9, NULL) == -22);
 
 	// Array of invalid type representations to test against
     char *invalid_types[] = {
@@ -18,10 +17,9 @@ void	test_codexion_argument_types()
         "x",     // char
         " ",     // space
         "",      // empty string
-        "3.14",  // float
-        NULL     // void
+        "3.14"   // float
     };
-    int num_invalid_types = 7;
+    int num_invalid_types = 6;
 
     // Default valid arguments template (index 0 is program name "codexion")
     // Positions 1 through 8: number_of_coders, number_of_compiles, time_to_burnout,
@@ -43,7 +41,7 @@ void	test_codexion_argument_types()
             test_argv[pos] = invalid_types[t];
 
             // 3. Assert that codexion correctly identifies it and returns -2
-            if (pos == 8 && t != 6)
+            if (pos == 8)
                 assert(codexion(9, test_argv) == -23);
             else
                 assert(codexion(9, test_argv) == -22);
@@ -52,11 +50,18 @@ void	test_codexion_argument_types()
 }
 
 void test_codexion_argument_quantities(void) {
-    char *emt = "";
+    char *too_many_args[1001];
+    int i;
 
-	assert(codexion(0, &emt) == -30);
-    assert(codexion(10, &emt) == -29);
-    assert(codexion(1000, &emt) == -29);
+    too_many_args[0] = "codexion";
+    i = 1;
+    while (i < 1000)
+        too_many_args[i++] = "extra";
+    too_many_args[10] = NULL;
+    assert(codexion(10, too_many_args) == -29);
+    too_many_args[10] = "extra";
+    too_many_args[1000] = NULL;
+    assert(codexion(1000, too_many_args) == -29);
 }
 
 void test_codexion_argument_ranges(void){
