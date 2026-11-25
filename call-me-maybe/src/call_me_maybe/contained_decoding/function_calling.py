@@ -45,7 +45,7 @@ def build_single_call_prompt(
     return f"""Return compact JSON only:
 {{"name":"function","parameters":{{"parameter":"value"}}}}
 Functions: {functions_json}
-Use exact names; include all parameters and no extras. Preserve quoted values.
+Use exact names; include all parameters and no extras. Preserve quoted values, every number must include a decimal point.
 Escape JSON strings. Digits: [0-9]+. Characters 2 and 5: [25].
 Request:{prompt_text}
 JSON:"""
@@ -92,14 +92,12 @@ def normalize_parameter_types(
     for parameter_name, expected_type in expected_types.items():
         value = function_call.parameters.get(parameter_name)
 
-        if expected_type == "number" and isinstance(value, str):
+        if expected_type == "number":
+            if isinstance(value, bool):
+                continue
             try:
-                function_call.parameters[parameter_name] = (
-                    float(value)
-                    if "." in value
-                    else int(value)
-                )
-            except ValueError:
+                function_call.parameters[parameter_name] = float(value)
+            except (TypeError, ValueError):
                 pass
 
 

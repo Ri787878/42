@@ -42,6 +42,8 @@ def softmax(x, temperature=1.0):
 
 
 def decoding_strategy(probs: np.ndarray | None) -> int:
+    if probs is None:
+        raise ValueError("Cannot decode without probabilities.")
     return int(np.argmax(probs))
 
 

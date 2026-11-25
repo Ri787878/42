@@ -5,12 +5,13 @@ INSTALL_STAMP = .install_compiled
 CACHE_ROOT ?= $(HOME)/sgoinfre
 
 export UV_CACHE_DIR := $(CACHE_ROOT)/uv-cache
+export UV_PROJECT_ENVIRONMENT ?= $(CACHE_ROOT)/call-me-maybe-venv
 export TMPDIR := $(CACHE_ROOT)/tmp
 export HF_HOME := $(CACHE_ROOT)/huggingface
 
 install: $(INSTALL_STAMP)
-$(INSTALL_STAMP): pyproject.toml uv.lock
-	mkdir -p "$(UV_CACHE_DIR)" "$(TMPDIR)" "$(HF_HOME)"
+$(INSTALL_STAMP): Makefile pyproject.toml uv.lock
+	mkdir -p "$(UV_CACHE_DIR)" "$(UV_PROJECT_ENVIRONMENT)" "$(TMPDIR)" "$(HF_HOME)"
 	uv sync
 	touch $(INSTALL_STAMP)
 

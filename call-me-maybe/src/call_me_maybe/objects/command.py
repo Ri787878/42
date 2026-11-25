@@ -208,8 +208,8 @@ class Command(BaseModel):
             inference_seconds += time.perf_counter() - step_start
 
             step_start = time.perf_counter()
-            logits = np.asarray(logits, dtype=float)
-            next_token_id = select_json_token(logits, json_fsm)
+            logits_array = np.asarray(logits, dtype=float)
+            next_token_id = select_json_token(logits_array, json_fsm)
             selection_seconds += time.perf_counter() - step_start
 
             json_fsm.update_state(next_token_id)
