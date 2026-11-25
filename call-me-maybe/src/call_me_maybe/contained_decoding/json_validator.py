@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from copy import copy
+import re
 
 import numpy as np
 
@@ -33,12 +34,18 @@ class BasicJsonFSM:
     STATE_IN_UNICODE_ESCAPE = 7
     STATE_AFTER_VALUE = 8
     STATE_DONE = 9
+    STATE_IN_NUMBER = 10
 
     VALID_ESCAPES = set('"\\/bfnrt')
     HEX_DIGITS = set("0123456789abcdefABCDEF")
 
-    def __init__(self, tokenizer_vocab: dict[str, int]):
+    def __init__(
+        self,
+        tokenizer_vocab: dict[str, int],
+        parameter_types: dict[str, str] | None = None,
+    ):
         self.vocab = tokenizer_vocab
+        self.parameter_types = parameter_types or {}
         self.inv_vocab = {
             token_id: token
             for token, token_id in tokenizer_vocab.items()
@@ -55,6 +62,8 @@ class BasicJsonFSM:
         self.string_kind: str | None = None
         self.string_has_content = False
         self.unicode_digits_remaining = 0
+        self.current_key = ""
+        self.number_buffer = ""
 
     @staticmethod
     def _normalize_token(token: str) -> str:
@@ -72,6 +81,32 @@ class BasicJsonFSM:
         self.string_kind = None
         self.string_has_content = False
         self.unicode_digits_remaining = 0
+        self.current_key = ""
+        self.number_buffer = ""
+        self._allowed_cache.clear()
+
+    def _number_is_valid(self) -> bool:
+        return re.fullmatch(
+            r'-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?',
+            self.number_buffer,
+        ) is not None
+
+    def _finish_number_delimiter(self, character: str) -> bool:
+        if not self._number_is_valid():
+            return False
+
+        self.number_buffer = ""
+        if character.isspace():
+            self.current_state = self.STATE_AFTER_VALUE
+        elif character == ",":
+            self.current_state = self.STATE_EXPECT_KEY_OR_CLOSE
+        elif character == "}":
+            self.object_depth -= 1
+            if self.object_depth == 0:
+                self.current_state = self.STATE_DONE
+            else:
+                self.current_state = self.STATE_AFTER_VALUE
+        return True
 
     def is_done(self) -> bool:
         return self.current_state == self.STATE_DONE
@@ -110,12 +145,10 @@ class BasicJsonFSM:
             if character == '"':
                 self.string_kind = "key"
                 self.string_has_content = False
+                self.current_key = ""
                 self.current_state = self.STATE_IN_STRING
                 return True
 
-            return False
-
-        if self.current_state == self.STATE_IN_KEY:
             return False
 
         if self.current_state == self.STATE_EXPECT_COLON:
@@ -133,6 +166,8 @@ class BasicJsonFSM:
                 return True
 
             if character == '"':
+                if self.parameter_types.get(self.current_key) == "number":
+                    return False
                 self.string_kind = "value"
                 self.string_has_content = False
                 self.current_state = self.STATE_IN_STRING
@@ -143,6 +178,17 @@ class BasicJsonFSM:
                 self.current_state = self.STATE_EXPECT_KEY_OR_CLOSE
                 return True
 
+            if self.parameter_types.get(self.current_key) == "string":
+                return False
+
+            if character == "-" or character.isdigit():
+                self.number_buffer = character
+                self.current_state = self.STATE_IN_NUMBER
+                return True
+
+            return False
+
+        if self.current_state == self.STATE_IN_KEY:
             return False
 
         if self.current_state == self.STATE_IN_STRING:
@@ -154,6 +200,9 @@ class BasicJsonFSM:
 
                 self.string_kind = None
                 return True
+
+            if self.string_kind == "key":
+                self.current_key += character
 
             if character == "\\":
                 self.current_state = self.STATE_IN_ESCAPE
@@ -188,6 +237,49 @@ class BasicJsonFSM:
                 self.current_state = self.STATE_IN_STRING
 
             return True
+
+        if self.current_state == self.STATE_IN_NUMBER:
+            if character.isspace() or character in ",}":
+                return self._finish_number_delimiter(character)
+
+            if character.isdigit():
+                self.number_buffer += character
+                return True
+
+            if character == "-" and ("e" in self.number_buffer.lower()):
+                if self.number_buffer.lower().endswith(("e", "E")):
+                    self.number_buffer += character
+                    return True
+                return False
+
+            if character in "+" and ("e" in self.number_buffer.lower()):
+                if self.number_buffer.lower().endswith(("e", "E")):
+                    self.number_buffer += character
+                    return True
+                return False
+
+            if character == ".":
+                if "." not in self.number_buffer and "e" not in self.number_buffer.lower():
+                    self.number_buffer += character
+                    return True
+                return False
+
+            if character in "eE":
+                if (
+                    "e" not in self.number_buffer.lower()
+                    and "." not in self.number_buffer
+                    or (
+                        "e" not in self.number_buffer.lower()
+                        and "." in self.number_buffer
+                        and self.number_buffer.endswith(tuple("0123456789"))
+                    )
+                ):
+                    if re.fullmatch(r'-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?', self.number_buffer):
+                        self.number_buffer += character
+                        return True
+                return False
+
+            return False
 
         if self.current_state == self.STATE_AFTER_VALUE:
             if character.isspace():
@@ -235,6 +327,8 @@ class BasicJsonFSM:
             self.string_kind,
             self.string_has_content,
             self.unicode_digits_remaining,
+            self.current_key,
+            self.number_buffer,
         )
         if key not in self._allowed_cache:
             self._allowed_cache[key] = tuple(

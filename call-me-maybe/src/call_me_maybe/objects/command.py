@@ -192,7 +192,13 @@ class Command(BaseModel):
         ]
 
         if json_fsm is None:
-            json_fsm = BasicJsonFSM(self.vocab)
+            parameter_types = {}
+            for definition in self.func_definition_list:
+                parameter_types.update(dict(definition.parameters))
+            json_fsm = BasicJsonFSM(
+                self.vocab,
+                parameter_types=parameter_types,
+            )
         else:
             json_fsm.reset()
 
@@ -273,7 +279,13 @@ class Command(BaseModel):
         max_attempts = 4
         generated_calls: list[dict] = []
         self.vocab = load_vocab_from_model(self.llm_model)
-        json_fsm = BasicJsonFSM(self.vocab)
+        parameter_types = {}
+        for definition in self.func_definition_list:
+            parameter_types.update(dict(definition.parameters))
+        json_fsm = BasicJsonFSM(
+            self.vocab,
+            parameter_types=parameter_types,
+        )
         run_start = time.perf_counter()
 
         for prompt_data in self.prompts_list:

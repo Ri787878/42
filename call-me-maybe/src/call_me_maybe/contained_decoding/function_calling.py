@@ -45,7 +45,7 @@ def build_single_call_prompt(
     return f"""Return compact JSON only:
 {{"name":"function","parameters":{{"parameter":"value"}}}}
 Functions: {functions_json}
-Use exact names; include all parameters and no extras. Preserve quoted values, every number must include a decimal point.
+Use exact names; include all parameters and no extras. Preserve quoted values. Every number parameter must be a JSON floating-point number with a decimal point, for example 2.0 or 265.0.
 Escape JSON strings. Digits: [0-9]+. Characters 2 and 5: [25].
 Request:{prompt_text}
 JSON:"""
