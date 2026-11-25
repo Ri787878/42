@@ -1,10 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/11/25 09:59:26 by ridias            #+#    #+#             */
+/*   Updated: 2026/11/25 09:59:27 by ridias           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 # include "codexion.h"
 
 
 int main(int argc, char** argv)
 {
-	// For testing exit code of codexion
-	//char *emt = "";
-	// printf("res=%d\n\n", codexion(0, &emt));
 	return (codexion(argc, argv));
 }

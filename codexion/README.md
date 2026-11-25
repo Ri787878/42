@@ -1,6 +1,6 @@
 ### Error Codes:
 
-	- Argument parsing errors reported to stderr return '-1'.
+	- Argument parsing errors reported to stderr return '-20'.
 	- '-30' to '-39' are Memory errors:
 		- '-30' Expected variable to not be 'NULL', but 'NULL';
 		- '-31' Error allocating dongles or coders array;

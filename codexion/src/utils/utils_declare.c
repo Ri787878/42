@@ -1,28 +1,33 @@
-# include "../codexion.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils_declare.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/11/25 09:57:51 by ridias            #+#    #+#             */
+/*   Updated: 2026/11/25 09:57:52 by ridias           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "../codexion.h"
 
 struct codexion_struct	*init_codexion_struct(t_config	*configs)
 {
 	struct codexion_struct	*cdx;
 
-	if (configs == NULL)
-		return (NULL);
 	cdx = malloc(sizeof(*cdx));
-	if (!cdx)
+	if (!cdx || configs == NULL)
 		return (NULL);
 	memset(cdx, 0, sizeof(*cdx));
 	cdx->config = *configs;
 	if (pthread_mutex_init(&cdx->coordinator_mutex, NULL) != 0)
-	{
-		free(cdx);
-		return (NULL);
-	}
+		return (free(cdx), NULL);
 	cdx->coordinator_mutex_initialized = true;
 	if (pthread_cond_init(&cdx->coordinator_changed, NULL) != 0)
 	{
 		pthread_mutex_destroy(&cdx->coordinator_mutex);
-		free(cdx);
-		return (NULL);
+		return (free(cdx), NULL);
 	}
 	cdx->coordinator_cond_initialized = true;
 	if (clock_gettime(CLOCK_MONOTONIC, &cdx->start_time) != 0
@@ -33,7 +38,6 @@ struct codexion_struct	*init_codexion_struct(t_config	*configs)
 		free(cdx);
 		return (NULL);
 	}
-
 	return (cdx);
 }
 
@@ -43,7 +47,6 @@ void	free_codexion_struct(struct codexion_struct *cdx)
 
 	if (cdx == NULL)
 		return ;
-
 	i = 0;
 	while (i < cdx->argc && cdx->arguments != NULL)
 		free(cdx->arguments[i++]);
@@ -82,7 +85,8 @@ int	allocate_arrays(struct codexion_struct *cdx)
 		cdx->coders[i].id = i + 1;
 		cdx->coders[i].cdx = cdx;
 		cdx->coders[i].left_dongle = &cdx->dongles[i];
-		cdx->coders[i].right_dongle = &cdx->dongles[(i + 1) % cdx->config.nb_coders];
+		cdx->coders[i].right_dongle = (
+				&cdx->dongles[(i + 1) % cdx->config.nb_coders]);
 		cdx->coders[i].state = IDLE;
 		cdx->coders[i].cooldown = 0;
 		cdx->coders[i].tm_lst_compile = 0;

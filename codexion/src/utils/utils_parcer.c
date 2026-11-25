@@ -1,8 +1,16 @@
-# include "../codexion.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils_parcer.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ridias <ridias@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/11/25 09:59:13 by ridias            #+#    #+#             */
+/*   Updated: 2026/11/25 09:59:14 by ridias           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-
-int	ft_atoi(const char *str);
-int	ft_strlen(const char *str);
+#include "../codexion.h"
 
 int	ft_strlen(const char *str)
 {
