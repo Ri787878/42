@@ -4,6 +4,7 @@
 
 ## Description
 • Algorithm explanation: Describe your constrained decoding approach in detail
+
 • Design decisions: Explain key choices in your implementation
 • Performance analysis: Discuss accuracy, speed, and reliability of your solution
 • Challenges faced: Document difficulties encountered and how you solved them
