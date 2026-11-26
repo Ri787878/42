@@ -25,3 +25,7 @@ build-backend = "uv_build"
 
 [tool.uv.sources]
 llm-sdk = { path = "./llm_sdk", editable = true }
+
+[[tool.mypy.overides]]
+module = ["llm_sdk", "llm_sdk.*"]
+follow_import = "skip"

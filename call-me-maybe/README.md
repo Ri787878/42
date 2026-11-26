@@ -3,13 +3,38 @@
 # Call Me Maybe
 
 ## Description
-• Algorithm explanation: Describe your constrained decoding approach in detail
+### Algorithm explanation: Describe your constrained decoding approach in detail
+My constrained decoding strategy for this project was for the program to builds a prompt from the user’s request and the available function definitions. The tokenizer then turns the prompt into tokens, and the model produces scores (logits) for the next token. After that BasicJsonFSM, which is a finite state machine, checks which next tokens keep the response within its supported JSON structure. It tracks states such as expecting a key, a value, a string escape, or a closing brace. It can check tokens character by character, including tokens that contain multiple characters. Then select_json_token() chooses the highest-scoring allowed token. It tries promising candidates first and falls back to checking the full allowed-token set when needed. The selected token is appended to the input, and generation repeats until the JSON is complete or the token limit is reached.
+The program decodes the generated tokens and validates the call against the function definitions. Invalid calls can be retried.
 
-• Design decisions: Explain key choices in your implementation
-• Performance analysis: Discuss accuracy, speed, and reliability of your solution
-• Challenges faced: Document difficulties encountered and how you solved them
-• Testing strategy: Describe how you validated your implementation
-• Example usage: Provide clear examples of running your program
+Although the BasicJsonFSM helps enforce format, it doesn’t guarantee the model chose the right function or understood the request correctly. Those require validation and good function descriptions. So it just guarentees it return a vaild generated JSON.
+
+### Design decisions: Explain key choices in your implementation
+To utilize the local model I use the llm_sdk as the middleman that allows me to ecode and decode the messages between generations. For performance sake it is utilized one model instance per run, meaning the same loaded model is reused for every prompt in the input batch. For guarenteeing a JSON complient output file a JSON state machine is used this prevents invalid JSON tokens being added to the response during generation, rather than relying only on fixing malformed output afterward. For selecting tokens a Greedy selection is used, that means the decoder chooses the highest-scoring allowed token instead of sampling. This is straightforward and generally repeatable, though it doesn’t explore alternatives. The available functions are described outside the generation code, so the model can be given different tool definitions. For validation and retries, generated arguments are checked before being written to the output and retries give the model another chance after a validation error. As a default the model has 3 retries of 50 tokens each to achieve a valid response, although it could be altered at the file values.py.
+
+### Performance analysis: Discuss accuracy, speed, and reliability of your solution
+The model achieves a success probability of above 90% although the precise number is hard to define without hundreds of retries. in regards to time it takes roughly 2.58 to 2.62 minutes for it to generate a response for 11 prompts. The model load speed is around 1.6 to 1.9 seconds, although the first load is always the longest at around 44 seconds.
+It is worth mentioning that performances and results may vary depending on function-definitions complexity and size, aswell as number of prompts given.
+These numbers are tested on 42 Lisbon computers.
+
+### Challenges faced: Document difficulties encountered and how you solved them
+Describe actual problems and what you learned from them. Examples from this project include:
+
+    Ambiguous or unsupported prompts: a request may not correspond to any defined function. The system needs to handle that explicitly rather than assuming every prompt has a valid call.
+    Syntax versus meaning: a regex can compile and still match the wrong text. Your vowel and cat examples demonstrate why syntax/type validation alone doesn’t ensure semantic correctness.
+    Giving the model enough context: function names and parameter types may not explain how to choose values. Function and parameter descriptions should be included in the generation prompt.
+    Retries and failure messages: retry limits should come from the project’s configuration, and exhausted retries should produce a useful explanation rather than an opaque exception.
+
+### Testing strategy: Describe how you validated your implementation
+Explain what you ran and what it checked. A good strategy for this project includes:
+
+    Decoder tests: allowed and rejected token transitions, strings and escapes, numbers, and completion of the JSON object.
+    Call-validation tests: unknown function names, missing parameters, incorrect value types, and invalid generated JSON.
+    Meaning-focused tests: apply substitution patterns to their source strings and check the resulting text—not just whether the patterns compile.
+    End-to-end tests: run the prompts in your input file and compare function names and parameters with expected calls.
+    Performance checks: record model-load, inference, token-selection, and total time, along with the hardware and model used.
+
+### Example usage: Provide clear examples of running your program
 
 
 ## Instructions

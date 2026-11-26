@@ -4,7 +4,7 @@ from .prompts import Prompt
 from ..parcer import Parcer
 from ..values import Values
 from ..contained_decoding.function_calling import (
-    FunctionCallResult,
+    FunctionCallList,
     parse_function_call,
     validate_parameter_types,
     normalize_parameter_types,
@@ -174,7 +174,7 @@ class Command(BaseModel):
     ):
         """Generates a single function call."""
         start = time.perf_counter()
-        generation_prompt = FunctionCallResult.build_generation_prompt(
+        generation_prompt = FunctionCallList.build_generation_prompt(
             prompt,
             self.func_definition_list,
         )
@@ -264,7 +264,7 @@ class Command(BaseModel):
         normalize_substitution_regex(function_call)
 
         # Validate the complete result through Pydantic.
-        result = FunctionCallResult.model_validate({
+        result = FunctionCallList.model_validate({
             "calls": [function_call],
         })
         print(
@@ -276,7 +276,6 @@ class Command(BaseModel):
 
     def run(self) -> None:
         """Generate and validate one function call per user prompt."""
-
         values = Values()
         max_attempts = values.max_tries
         generated_calls: list[dict] = []
@@ -302,7 +301,7 @@ class Command(BaseModel):
                         prompt=prompt,
                         feedback=feedback,
                         json_fsm=json_fsm,
-                        max_tokens=values.max_tokens
+                        max_tokens=values.max_tokens,
                     )
                     break
 

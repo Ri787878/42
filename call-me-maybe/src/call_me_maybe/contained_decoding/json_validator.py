@@ -1,5 +1,4 @@
-from __future__ import annotations
-
+from llm_sdk import Small_LLM_Model
 import json
 from copy import copy
 import re
@@ -259,7 +258,10 @@ class BasicJsonFSM:
                 return False
 
             if character == ".":
-                if "." not in self.number_buffer and "e" not in self.number_buffer.lower():
+                if (
+                    "." not in self.number_buffer
+                    and "e" not in self.number_buffer.lower()
+                ):
                     self.number_buffer += character
                     return True
                 return False
@@ -274,7 +276,12 @@ class BasicJsonFSM:
                         and self.number_buffer.endswith(tuple("0123456789"))
                     )
                 ):
-                    if re.fullmatch(r'-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?', self.number_buffer):
+                    if (
+                        re.fullmatch(
+                            r'-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?',
+                            self.number_buffer
+                        )
+                    ):
                         self.number_buffer += character
                         return True
                 return False
@@ -371,7 +378,6 @@ def apply_json_mask(
     return masked_logits
 
 
-
 def select_json_token(logits: np.ndarray, fsm: BasicJsonFSM) -> int:
     """Choose the highest-scoring valid token without scanning the vocabulary.
 
@@ -398,7 +404,7 @@ def select_json_token(logits: np.ndarray, fsm: BasicJsonFSM) -> int:
     return int(np.argmax(masked_logits))
 
 
-def load_vocab_from_model(llm_model) -> dict[str, int]:
+def load_vocab_from_model(llm_model: Small_LLM_Model) -> dict[str, int]:
     """
     Load a tokenizer vocabulary from the model's vocabulary file.
     """

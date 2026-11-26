@@ -6,18 +6,20 @@ from pydantic import BaseModel, Field
 
 
 class FunctionParameter(BaseModel):
+    """Class that stores a Function parameter'"""
     name: str
     type: str
     description: str = Field(default="")
 
 
 class FunctionCall(BaseModel):
+    """Class stores a Function call, prompt and list of parameters."""
     prompt: str = Field(default="")
     name: str
     parameters: dict[str, Any] = Field(default_factory=dict)
 
 
-class FunctionCallResult(BaseModel):
+class FunctionCallList(BaseModel):
     calls: list[FunctionCall] = Field(default_factory=list)
 
     @staticmethod
