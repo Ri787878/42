@@ -40,7 +40,6 @@ class SimpleBanningProcessor:
             elif unknown_token_policy == "error":
                 raise ValueError(f"Unknown token in words_to_ban: {w!r}")
 
-        # Deduplicate for efficiency
         self.banned_ids = sorted(set(self.banned_ids))
 
     def __call__(

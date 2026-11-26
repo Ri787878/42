@@ -2,6 +2,7 @@ from utils import print_to_stderr
 from pydantic import BaseModel, Field, model_validator, ConfigDict
 from .prompts import Prompt
 from ..parcer import Parcer
+from ..values import Values
 from ..contained_decoding.function_calling import (
     FunctionCallResult,
     parse_function_call,
@@ -168,7 +169,7 @@ class Command(BaseModel):
         self,
         prompt: str,
         feedback: str = "",
-        max_tokens: int = 80,
+        max_tokens: int = 50,
         json_fsm: BasicJsonFSM | None = None,
     ):
         """Generates a single function call."""
@@ -276,7 +277,8 @@ class Command(BaseModel):
     def run(self) -> None:
         """Generate and validate one function call per user prompt."""
 
-        max_attempts = 4
+        values = Values()
+        max_attempts = values.max_tries
         generated_calls: list[dict] = []
         self.vocab = load_vocab_from_model(self.llm_model)
         parameter_types = {}
@@ -300,6 +302,7 @@ class Command(BaseModel):
                         prompt=prompt,
                         feedback=feedback,
                         json_fsm=json_fsm,
+                        max_tokens=values.max_tokens
                     )
                     break
 

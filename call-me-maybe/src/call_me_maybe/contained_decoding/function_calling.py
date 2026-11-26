@@ -77,14 +77,29 @@ def parse_function_call(text: str) -> FunctionCall | None:
     except (json.JSONDecodeError, ValueError):
         return None
 
+def get_function_definition(
+    function_name: str,
+    definitions: list[Any],
+) -> Any:
+    definition = next(
+        (item for item in definitions if item.name == function_name),
+        None,
+    )
+    if definition is None:
+        available = ", ".join(item.name for item in definitions)
+        raise ValueError(
+            f"Unknown function '{function_name}'. "
+            f"Available functions: {available}"
+        )
+    return definition
 
 def normalize_parameter_types(
     function_call: FunctionCall,
     definitions: list[Any],
 ) -> None:
-    definition = next(
-        item for item in definitions
-        if item.name == function_call.name
+    definition = get_function_definition(
+        function_call.name,
+        definitions,
     )
 
     expected_types = dict(definition.parameters)
@@ -93,7 +108,7 @@ def normalize_parameter_types(
         value = function_call.parameters.get(parameter_name)
 
         if expected_type == "number":
-            if isinstance(value, bool):
+            if value is None or isinstance(value, bool):
                 continue
             try:
                 function_call.parameters[parameter_name] = float(value)

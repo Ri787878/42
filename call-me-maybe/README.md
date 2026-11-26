@@ -30,7 +30,11 @@ uv run
 ```
 Note - the uv run already runs the cmd for installing the project.
 
-
+###
+For a more custom approach, there is a way to set each inputted file manually:
+```
+uv run python -m src [--functions_definition <function_definition_file>] [--input <input_file>] [--output <output_file>]
+```
 ## Resources
 
 - https://www.geeksforgeeks.org/python/read-json-file-using-python/
