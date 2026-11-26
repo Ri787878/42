@@ -15,9 +15,6 @@ from ..contained_decoding.json_validator import (
     select_json_token,
     load_vocab_from_model,
 )
-# from .generator import Generator
-from ..values import Values
-# from ..contained_decoding import BasicJsonFSM, load_vocab_from_model
 from .function_definition import Function_definition
 from llm_sdk import Small_LLM_Model
 from pathlib import Path
@@ -309,7 +306,8 @@ class Command(BaseModel):
                     feedback = str(exc)
                     print_to_stderr(
                         f"Attempt {attempt + 1}/{max_attempts} failed after "
-                        f"{time.perf_counter() - attempt_start:.2f}s: {feedback}"
+                        f"{time.perf_counter() - attempt_start:.2f}s: "
+                        f"{feedback}"
                     )
 
                     if attempt == max_attempts - 1:
