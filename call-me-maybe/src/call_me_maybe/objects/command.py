@@ -5,6 +5,7 @@ from ..parcer import Parcer
 from ..values import Values
 from ..contained_decoding.function_calling import (
     FunctionCallList,
+    FunctionCall,
     parse_function_call,
     validate_parameter_types,
     normalize_parameter_types,
@@ -18,6 +19,7 @@ from ..contained_decoding.json_validator import (
 from .function_definition import Function_definition
 from llm_sdk import Small_LLM_Model
 from pathlib import Path
+from typing import cast
 import numpy as np
 import json
 import time
@@ -168,7 +170,7 @@ class Command(BaseModel):
         feedback: str = "",
         max_tokens: int = 50,
         json_fsm: BasicJsonFSM | None = None,
-    ):
+    ) -> FunctionCall:
         """Generates a single function call."""
         start = time.perf_counter()
         generation_prompt = FunctionCallList.build_generation_prompt(
@@ -190,18 +192,18 @@ class Command(BaseModel):
         ]
 
         if json_fsm is None:
-            parameter_types = {}
-            for definition in self.func_definition_list:
-                parameter_types.update(dict(definition.parameters))
+            function_schemas = {
+                definition.name: dict(definition.parameters)
+                for definition in self.func_definition_list
+            }
             json_fsm = BasicJsonFSM(
                 self.vocab,
-                parameter_types=parameter_types,
+                function_schemas=function_schemas,
             )
         else:
             json_fsm.reset()
 
         generated_token_ids: list[int] = []
-
         inference_seconds = 0.0
         selection_seconds = 0.0
         prompt_token_count = len(input_ids)
@@ -217,7 +219,6 @@ class Command(BaseModel):
             selection_seconds += time.perf_counter() - step_start
 
             json_fsm.update_state(next_token_id)
-
             input_ids.append(next_token_id)
             generated_token_ids.append(next_token_id)
 
@@ -231,14 +232,15 @@ class Command(BaseModel):
             f"token selection: {selection_seconds:.2f}s"
         )
 
+        generated_text = self.llm_model.decode(generated_token_ids)
+
         if not json_fsm.is_done():
             raise ValueError(
-                "The model did not generate a complete JSON function call."
+                "The model did not generate a complete JSON function call. "
+                f"Partial response: {generated_text!r}"
             )
 
-        generated_text = self.llm_model.decode(generated_token_ids)
         function_call = parse_function_call(generated_text)
-
         if function_call is None:
             raise ValueError(
                 f"Could not parse generated function call: {generated_text!r}"
@@ -252,37 +254,37 @@ class Command(BaseModel):
             function_call,
             self.func_definition_list,
         )
-
         validate_parameter_types(
             function_call,
             self.func_definition_list,
         )
-
         normalize_substitution_regex(function_call)
 
-        # Validate the complete result through Pydantic.
-        result = FunctionCallList.model_validate({
-            "calls": [function_call],
-        })
-        print(
-            f"Function generation took "
-            f"{time.perf_counter() - start:.2f}s"
+        result = cast(
+            FunctionCallList,
+            FunctionCallList.model_validate({
+                "calls": [function_call],
+            }),
         )
-
+        print(f"Function generation took {time.perf_counter() - start:.2f}s")
         return result.calls[0]
 
     def run(self) -> None:
         """Generate and validate one function call per user prompt."""
-        values = Values()
-        max_attempts = values.max_tries
+        max_attempts = self.project_values.max_tries
         generated_calls: list[dict] = []
         self.vocab = load_vocab_from_model(self.llm_model)
         parameter_types = {}
         for definition in self.func_definition_list:
             parameter_types.update(dict(definition.parameters))
+        function_schemas = {
+            definition.name: dict(definition.parameters)
+            for definition in self.func_definition_list
+        }
+
         json_fsm = BasicJsonFSM(
             self.vocab,
-            parameter_types=parameter_types,
+            function_schemas=function_schemas,
         )
         run_start = time.perf_counter()
 
@@ -298,7 +300,7 @@ class Command(BaseModel):
                         prompt=prompt,
                         feedback=feedback,
                         json_fsm=json_fsm,
-                        max_tokens=values.max_tokens,
+                        max_tokens=self.project_values.max_tokens,
                     )
                     break
 

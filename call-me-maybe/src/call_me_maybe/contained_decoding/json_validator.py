@@ -41,10 +41,15 @@ class BasicJsonFSM:
     def __init__(
         self,
         tokenizer_vocab: dict[str, int],
-        parameter_types: dict[str, str] | None = None,
+        function_schemas: dict[str, dict[str, str]],
     ):
+        self.function_schemas = function_schemas
+        self.selected_function: str | None = None
         self.vocab = tokenizer_vocab
-        self.parameter_types = parameter_types or {}
+        self.root_keys_seen: frozenset[str] = frozenset()
+        self.parameter_keys_seen: frozenset[str] = frozenset()
+        self.string_buffer = ""
+        self.expecting_key_after_comma = False
         self.inv_vocab = {
             token_id: token
             for token, token_id in tokenizer_vocab.items()
@@ -74,6 +79,49 @@ class BasicJsonFSM:
         """
         return token.replace("Ġ", " ").replace("▁", " ")
 
+    def _expected_keys(self) -> frozenset[str]:
+        if self.object_depth == 1:
+            if self.selected_function is None:
+                return frozenset({"name"} - self.root_keys_seen)
+            return frozenset({"name", "parameters"} - self.root_keys_seen)
+
+        if self.object_depth == 2 and self.selected_function is not None:
+            parameter_names = self.function_schemas[self.selected_function]
+            return frozenset(parameter_names) - self.parameter_keys_seen
+
+        return frozenset()
+
+    def _object_is_complete(self) -> bool:
+        if self.object_depth == 1:
+            return self.root_keys_seen == frozenset({"name", "parameters"})
+
+        if self.object_depth == 2 and self.selected_function is not None:
+            return self.parameter_keys_seen == frozenset(
+                self.function_schemas[self.selected_function]
+            )
+
+        return False
+
+    def _close_object(self) -> bool:
+        if self.expecting_key_after_comma or not self._object_is_complete():
+            return False
+
+        self.object_depth -= 1
+        self.current_state = (
+            self.STATE_DONE
+            if self.object_depth == 0
+            else self.STATE_AFTER_VALUE
+        )
+        return True
+
+    def _current_parameter_type(self) -> str | None:
+        if self.object_depth != 2 or self.selected_function is None:
+            return None
+
+        return (
+            self.function_schemas[self.selected_function].get(self.current_key)
+        )
+
     def reset(self) -> None:
         self.current_state = self.STATE_EXPECT_OPEN_BRACE
         self.object_depth = 0
@@ -83,6 +131,11 @@ class BasicJsonFSM:
         self.current_key = ""
         self.number_buffer = ""
         self._allowed_cache.clear()
+        self.selected_function = None
+        self.root_keys_seen = frozenset()
+        self.parameter_keys_seen = frozenset()
+        self.string_buffer = ""
+        self.expecting_key_after_comma = False
 
     def _number_is_valid(self) -> bool:
         return re.fullmatch(
@@ -94,17 +147,16 @@ class BasicJsonFSM:
         if not self._number_is_valid():
             return False
 
-        self.number_buffer = ""
-        if character.isspace():
-            self.current_state = self.STATE_AFTER_VALUE
+        if character == "}":
+            if not self._close_object():
+                return False
         elif character == ",":
             self.current_state = self.STATE_EXPECT_KEY_OR_CLOSE
-        elif character == "}":
-            self.object_depth -= 1
-            if self.object_depth == 0:
-                self.current_state = self.STATE_DONE
-            else:
-                self.current_state = self.STATE_AFTER_VALUE
+            self.expecting_key_after_comma = True
+        else:
+            self.current_state = self.STATE_AFTER_VALUE
+
+        self.number_buffer = ""
         return True
 
     def is_done(self) -> bool:
@@ -134,17 +186,13 @@ class BasicJsonFSM:
                 return True
 
             if character == "}":
-                if self.object_depth == 1:
-                    self.object_depth = 0
-                    self.current_state = self.STATE_DONE
-                    return True
+                return self._close_object()
 
-                return False
-
-            if character == '"':
+            if character == '"' and self._expected_keys():
                 self.string_kind = "key"
                 self.string_has_content = False
                 self.current_key = ""
+                self.expecting_key_after_comma = False
                 self.current_state = self.STATE_IN_STRING
                 return True
 
@@ -164,23 +212,31 @@ class BasicJsonFSM:
             if character.isspace():
                 return True
 
-            if character == '"':
-                if self.parameter_types.get(self.current_key) == "number":
-                    return False
+            if self.object_depth == 1 and self.current_key == "name":
+                if character == '"':
+                    self.string_kind = "function_name"
+                    self.string_buffer = ""
+                    self.current_state = self.STATE_IN_STRING
+                    return True
+                return False
+
+            if self.object_depth == 1 and self.current_key == "parameters":
+                if character == "{" and self.selected_function is not None:
+                    self.object_depth += 1
+                    self.current_state = self.STATE_EXPECT_KEY_OR_CLOSE
+                    return True
+                return False
+
+            parameter_type = self._current_parameter_type()
+
+            if parameter_type == "string" and character == '"':
                 self.string_kind = "value"
-                self.string_has_content = False
                 self.current_state = self.STATE_IN_STRING
                 return True
 
-            if character == "{":
-                self.object_depth += 1
-                self.current_state = self.STATE_EXPECT_KEY_OR_CLOSE
-                return True
-
-            if self.parameter_types.get(self.current_key) == "string":
-                return False
-
-            if character == "-" or character.isdigit():
+            if parameter_type == "number" and (
+                character == "-" or character.isdigit()
+            ):
                 self.number_buffer = character
                 self.current_state = self.STATE_IN_NUMBER
                 return True
@@ -193,7 +249,23 @@ class BasicJsonFSM:
         if self.current_state == self.STATE_IN_STRING:
             if character == '"':
                 if self.string_kind == "key":
+                    if self.current_key not in self._expected_keys():
+                        return False
+
+                    if self.object_depth == 1:
+                        self.root_keys_seen |= {self.current_key}
+                    else:
+                        self.parameter_keys_seen |= {self.current_key}
+
                     self.current_state = self.STATE_EXPECT_COLON
+
+                elif self.string_kind == "function_name":
+                    if self.string_buffer not in self.function_schemas:
+                        return False
+
+                    self.selected_function = self.string_buffer
+                    self.current_state = self.STATE_AFTER_VALUE
+
                 else:
                     self.current_state = self.STATE_AFTER_VALUE
 
@@ -201,11 +273,28 @@ class BasicJsonFSM:
                 return True
 
             if self.string_kind == "key":
-                self.current_key += character
+                candidate_key = self.current_key + character
+                if not any(
+                    key.startswith(candidate_key)
+                    for key in self._expected_keys()
+                ):
+                    return False
+                self.current_key = candidate_key
+
+            elif self.string_kind == "function_name":
+                if character == "\\":
+                    return False
+
+                candidate_name = self.string_buffer + character
+                if not any(
+                    name.startswith(candidate_name)
+                    for name in self.function_schemas
+                ):
+                    return False
+                self.string_buffer = candidate_name
 
             if character == "\\":
                 self.current_state = self.STATE_IN_ESCAPE
-                self.string_has_content = True
                 return True
 
             if ord(character) < 0x20:
@@ -294,17 +383,11 @@ class BasicJsonFSM:
 
             if character == ",":
                 self.current_state = self.STATE_EXPECT_KEY_OR_CLOSE
+                self.expecting_key_after_comma = True
                 return True
 
             if character == "}":
-                self.object_depth -= 1
-
-                if self.object_depth == 0:
-                    self.current_state = self.STATE_DONE
-                else:
-                    self.current_state = self.STATE_AFTER_VALUE
-
-                return True
+                return self._close_object()
 
             return False
 
@@ -336,6 +419,11 @@ class BasicJsonFSM:
             self.unicode_digits_remaining,
             self.current_key,
             self.number_buffer,
+            self.selected_function,
+            self.root_keys_seen,
+            self.parameter_keys_seen,
+            self.string_buffer,
+            self.expecting_key_after_comma,
         )
         if key not in self._allowed_cache:
             self._allowed_cache[key] = tuple(
@@ -396,11 +484,34 @@ def select_json_token(logits: np.ndarray, fsm: BasicJsonFSM) -> int:
             scores = logits.copy()
         scores[token_id] = -np.inf
 
+    allowed_token_ids = fsm.get_allowed_token_ids()
+
+    if not allowed_token_ids:
+        probe = copy(fsm)
+        can_consume_n = probe._consume_character("n")
+
+        raise ValueError(
+            "No JSON tokens are allowed. "
+            f"state={fsm.current_state}, depth={fsm.object_depth}, "
+            f"selected_function={fsm.selected_function!r}, "
+            f"current_key={fsm.current_key!r}, "
+            f"root_keys_seen={fsm.root_keys_seen}, "
+            f"parameter_keys_seen={fsm.parameter_keys_seen}, "
+            f"string_kind={fsm.string_kind!r}, "
+            f"expected_keys={fsm._expected_keys()}, "
+            f"can_consume_n={can_consume_n}"
+        )
+
     masked_logits = apply_json_mask(logits, fsm)
     if not np.isfinite(masked_logits).any():
         raise ValueError(
-            "The model produced no valid token for the JSON response."
+            "Allowed JSON tokens have no finite model logits. "
+            f"allowed_count={len(allowed_token_ids)}, "
+            f"state={fsm.current_state}, depth={fsm.object_depth}, "
+            f"selected_function={fsm.selected_function!r}, "
+            f"current_key={fsm.current_key!r}"
         )
+
     return int(np.argmax(masked_logits))
 
 

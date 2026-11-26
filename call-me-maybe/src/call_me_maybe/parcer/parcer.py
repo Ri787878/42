@@ -101,7 +101,7 @@ class Parcer(BaseModel):
         return parameters_list
 
     @staticmethod
-    def load_json_safely(path: str, default):
+    def load_json_safely(path: str, default: Any) -> Any:
         p = Path(path)
         raw = p.read_text(encoding="utf-8").strip()
         if raw == "":

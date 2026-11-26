@@ -1,15 +1,19 @@
 from llm_sdk import Small_LLM_Model
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 import json
 import sys
 
 
-def print_to_stderr(*a):
+def print_to_stderr(*a: object) -> None:
     """Print a message to stderr"""
     print(*a, file=sys.stderr)
 
 
-def softmax(x, temperature=1.0):
+def softmax(
+    x: ArrayLike,
+    temperature: float = 1.0,
+) -> NDArray[np.float64]:
     values = np.asarray(x, dtype=float)
 
     if not np.isfinite(values).any():
@@ -72,7 +76,7 @@ def get_token_id(llm_model: Small_LLM_Model) -> dict[str, int]:
     return token_to_id
 
 
-def extract_last_position_if_needed(logits) -> np.ndarray:
+def extract_last_position_if_needed(logits: ArrayLike) -> np.ndarray:
     """
     Normalize model logits to a 1D next-token logits vector [vocab_size].
 

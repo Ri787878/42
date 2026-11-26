@@ -1,7 +1,7 @@
 import re
 import json
 from typing import Any
-
+from typing import cast
 from pydantic import BaseModel, Field
 
 
@@ -70,14 +70,14 @@ def parse_function_call(text: str) -> FunctionCall | None:
 
     try:
         parsed_response, _ = decoder.raw_decode(candidate)
-        return FunctionCall.model_validate(parsed_response)
+        return cast(FunctionCall, FunctionCall.model_validate(parsed_response))
     except (json.JSONDecodeError, ValueError):
         pass
 
     try:
         repaired_text = _repair_invalid_json_escapes(candidate)
         parsed_response, _ = decoder.raw_decode(repaired_text)
-        return FunctionCall.model_validate(parsed_response)
+        return cast(FunctionCall, FunctionCall.model_validate(parsed_response))
     except (json.JSONDecodeError, ValueError):
         return None
 
