@@ -7,7 +7,7 @@
 My constrained decoding strategy for this project was for the program to builds a prompt from the user's request and the available function definitions. The tokenizer then turns the prompt into tokens, and the model produces scores (logits) for the next token. After that BasicJsonFSM, which is a finite state machine, checks which next tokens keep the response within its supported JSON structure. It tracks states such as expecting a key, a value, a string escape, or a closing brace. It can check tokens character by character, including tokens that contain multiple characters.
 
 Then select_json_token() chooses the highest-scoring allowed token. It tries promising candidates first and falls back to checking the full allowed-token set when needed. The selected token is appended to the input, and generation repeats until the JSON is complete or the token limit is reached.
-The program decodes the generated tokens and validates the call against the function definitions. Invalid calls can be retried.
+The program decodes the generated tokens and validates the call against the function definitions. Invalid calls can be retried. If all attempts for a prompt fail, an error entry is added to the output array and generation continues with the remaining prompts.
 
 Although the BasicJsonFSM helps enforce format, it doesn't guarantee the model chose the right function or understood the request correctly. Those require validation and good function descriptions. So it just guarentees it return a vaild generated JSON.
 
@@ -20,7 +20,7 @@ It is worth mentioning that performances and results may vary depending on funct
 These numbers are tested on 42 Lisbon computers.
 
 ### Challenges faced:
-While developing this project many issues arose, the main one was how to get the program to provide a valid output under the time constraints of 5 minutes. To solve this problm I simplefied the way I was selecting each next token for the algorithm.
+While developing this project many issues arose, the main one was how to get the project to provide a valid output under the time constraints of 5 minutes. To solve this problm I simplefied the way I was selecting each next token for the algorithm.
 Another big problem that came up was understading what and how a llm actually does, this question answered it self after asking many diferent students and many google queries aswell as some help with Artificial Inteligence.
 
 ### Testing strategy:
