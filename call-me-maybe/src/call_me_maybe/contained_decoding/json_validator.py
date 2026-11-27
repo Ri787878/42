@@ -431,7 +431,6 @@ class BasicJsonFSM:
                 for token_id in self.inv_vocab
                 if self._token_is_allowed(token_id)
             )
-        # Preserve the public list interface without exposing the cached data.
         return list(self._allowed_cache[key])
 
     def update_state(self, selected_token_id: int) -> None:

@@ -3,39 +3,67 @@
 # Call Me Maybe
 
 ## Description
-### Algorithm explanation: Describe your constrained decoding approach in detail
-My constrained decoding strategy for this project was for the program to builds a prompt from the user’s request and the available function definitions. The tokenizer then turns the prompt into tokens, and the model produces scores (logits) for the next token. After that BasicJsonFSM, which is a finite state machine, checks which next tokens keep the response within its supported JSON structure. It tracks states such as expecting a key, a value, a string escape, or a closing brace. It can check tokens character by character, including tokens that contain multiple characters. Then select_json_token() chooses the highest-scoring allowed token. It tries promising candidates first and falls back to checking the full allowed-token set when needed. The selected token is appended to the input, and generation repeats until the JSON is complete or the token limit is reached.
+### Algorithm explanation:
+My constrained decoding strategy for this project was for the program to builds a prompt from the user's request and the available function definitions. The tokenizer then turns the prompt into tokens, and the model produces scores (logits) for the next token. After that BasicJsonFSM, which is a finite state machine, checks which next tokens keep the response within its supported JSON structure. It tracks states such as expecting a key, a value, a string escape, or a closing brace. It can check tokens character by character, including tokens that contain multiple characters.
+
+Then select_json_token() chooses the highest-scoring allowed token. It tries promising candidates first and falls back to checking the full allowed-token set when needed. The selected token is appended to the input, and generation repeats until the JSON is complete or the token limit is reached.
 The program decodes the generated tokens and validates the call against the function definitions. Invalid calls can be retried.
 
-Although the BasicJsonFSM helps enforce format, it doesn’t guarantee the model chose the right function or understood the request correctly. Those require validation and good function descriptions. So it just guarentees it return a vaild generated JSON.
+Although the BasicJsonFSM helps enforce format, it doesn't guarantee the model chose the right function or understood the request correctly. Those require validation and good function descriptions. So it just guarentees it return a vaild generated JSON.
 
-### Design decisions: Explain key choices in your implementation
-To utilize the local model I use the llm_sdk as the middleman that allows me to ecode and decode the messages between generations. For performance sake it is utilized one model instance per run, meaning the same loaded model is reused for every prompt in the input batch. For guarenteeing a JSON complient output file a JSON state machine is used this prevents invalid JSON tokens being added to the response during generation, rather than relying only on fixing malformed output afterward. For selecting tokens a Greedy selection is used, that means the decoder chooses the highest-scoring allowed token instead of sampling. This is straightforward and generally repeatable, though it doesn’t explore alternatives. The available functions are described outside the generation code, so the model can be given different tool definitions. For validation and retries, generated arguments are checked before being written to the output and retries give the model another chance after a validation error. As a default the model has 3 retries of 50 tokens each to achieve a valid response, although it could be altered at the file values.py.
+### Design decisions:
+To utilize the local model I use the llm_sdk as the middleman that allows me to ecode and decode the messages between generations. For performance sake it is utilized one model instance per run, meaning the same loaded model is reused for every prompt in the input batch. For guarenteeing a JSON complient output file a JSON state machine is used this prevents invalid JSON tokens being added to the response during generation, rather than relying only on fixing malformed output afterward. For selecting tokens a Greedy selection is used, that means the decoder chooses the highest-scoring allowed token instead of sampling. This is straightforward and generally repeatable, though it doesn't explore alternatives. The available functions are described outside the generation code, so the model can be given different tool definitions. For validation and retries, generated arguments are checked before being written to the output and retries give the model another chance after a validation error. As a default the model has 3 retries of 50 tokens each to achieve a valid response, although it could be altered at the file values.py.
 
-### Performance analysis: Discuss accuracy, speed, and reliability of your solution
-The model achieves a success probability of above 90% although the precise number is hard to define without hundreds of retries. in regards to time it takes roughly 2.58 to 2.62 minutes for it to generate a response for 11 prompts. The model load speed is around 1.6 to 1.9 seconds, although the first load is always the longest at around 44 seconds.
+### Performance analysis:
+The model achieves a success probability of above 90% although the precise number is hard to define without hundreds of retries. in regards to time it takes roughly 2.58 to 3.4 minutes for it to generate a response for 11 prompts. The model load speed is around 1.6 to 1.9 seconds, although the first load is always the longest at around 44 seconds.
 It is worth mentioning that performances and results may vary depending on function-definitions complexity and size, aswell as number of prompts given.
 These numbers are tested on 42 Lisbon computers.
 
-### Challenges faced: Document difficulties encountered and how you solved them
-Describe actual problems and what you learned from them. Examples from this project include:
+### Challenges faced:
+While developing this project many issues arose, the main one was how to get the program to provide a valid output under the time constraints of 5 minutes. To solve this problm I simplefied the way I was selecting each next token for the algorithm.
+Another big problem that came up was understading how an what a llm actually did, this question answered it self after asking many diferent students and many google queries aswell as some help with Artificial Inteligence.
 
-    Ambiguous or unsupported prompts: a request may not correspond to any defined function. The system needs to handle that explicitly rather than assuming every prompt has a valid call.
-    Syntax versus meaning: a regex can compile and still match the wrong text. Your vowel and cat examples demonstrate why syntax/type validation alone doesn’t ensure semantic correctness.
-    Giving the model enough context: function names and parameter types may not explain how to choose values. Function and parameter descriptions should be included in the generation prompt.
-    Retries and failure messages: retry limits should come from the project’s configuration, and exhausted retries should produce a useful explanation rather than an opaque exception.
+### Testing strategy:
+To test this project I rellied much on the provided examples and even creating a few of my own, with diferent types of prompts and queries to ask of it. The only part I didnt create much was new functions to test the model on.
 
-### Testing strategy: Describe how you validated your implementation
-Explain what you ran and what it checked. A good strategy for this project includes:
+I also used timestamps to help me ensure my model loading speeds, generation loop speeds, single call speeds and token selection speeds were correct on the schools computers being weaker than my own. The time stamps show the time it took to load the model, the time of generating the new information (each call generation time/token selection) and the time it takes for each of the prompts to load. Finally it also show the time it took to run the whole project.
 
-    Decoder tests: allowed and rejected token transitions, strings and escapes, numbers, and completion of the JSON object.
-    Call-validation tests: unknown function names, missing parameters, incorrect value types, and invalid generated JSON.
-    Meaning-focused tests: apply substitution patterns to their source strings and check the resulting text—not just whether the patterns compile.
-    End-to-end tests: run the prompts in your input file and compare function names and parameters with expected calls.
-    Performance checks: record model-load, inference, token-selection, and total time, along with the hardware and model used.
+### Example usage:
+Simple utilization usinng provided tests and function definitions:
+```
+$ make run
+uv run python -m src
+Model loading took 2.87s
+[SYSTEM] Function_Definitions File Exist.
+[SYSTEM] Input File Exist.
 
-### Example usage: Provide clear examples of running your program
-
+[SYSTEM] Output File Created.
+Prompt: 185 tokens; generated: 21 tokens; model: 13.73s; token selection: 0.51s
+Function generation took 14.24s
+Prompt: 189 tokens; generated: 25 tokens; model: 16.84s; token selection: 0.53s
+Function generation took 17.37s
+Prompt: 179 tokens; generated: 14 tokens; model: 8.67s; token selection: 0.05s
+Function generation took 8.72s
+Prompt: 178 tokens; generated: 13 tokens; model: 8.51s; token selection: 0.05s
+Function generation took 8.56s
+Prompt: 180 tokens; generated: 13 tokens; model: 8.61s; token selection: 0.53s
+Function generation took 9.13s
+Prompt: 180 tokens; generated: 13 tokens; model: 8.39s; token selection: 0.53s
+Function generation took 8.92s
+Prompt: 184 tokens; generated: 17 tokens; model: 11.44s; token selection: 0.07s
+Function generation took 11.50s
+Prompt: 184 tokens; generated: 18 tokens; model: 12.09s; token selection: 0.07s
+Function generation took 12.16s
+Prompt: 196 tokens; generated: 39 tokens; model: 28.77s; token selection: 0.66s
+Function generation took 29.43s
+Prompt: 187 tokens; generated: 34 tokens; model: 26.01s; token selection: 0.63s
+Function generation took 26.64s
+Prompt: 197 tokens; generated: 35 tokens; model: 25.89s; token selection: 0.64s
+Function generation took 26.53s
+Total generation took 173.23s
+--- 176.69915390014648 seconds ---
+```
+Note: the model is already loaded on this test.
 
 ## Instructions
 ### To setup on 42 school computers
@@ -51,7 +79,7 @@ export HF_HOME="/sgoinfre/$USER/huggingface"
 To execute the code you need to run the following commands:
 ```bash
 uv sync
-uv run 
+make run 
 ```
 Note - the uv run already runs the cmd for installing the project.
 
@@ -66,21 +94,9 @@ uv run python -m src [--functions_definition <function_definition_file>] [--inpu
 - https://www.w3schools.com/python/python_dictionaries_access.asp
 - https://telnyx.com/learn-ai/logits-ai
 - https://medium.com/@c.savur/mastering-the-logits-a-guide-to-constrained-decoding-in-hugging-face-and-vllm-357a5c1b9a28
+- https://www.kunwar.page/chapter/043-structured-generation-guided-decoding-json-mode-regex-constraints-fsm-masking
+- https://en.wikipedia.org/wiki/Softmax_function
+- https://numpy.org/doc/stable/reference/generated/numpy.argmax.html
 
 
-
-“Constrained decoding for JSON generation”
-“Logit masking token-by-token decoding”
-“Finite state machine JSON parser generation”
-“Regex / CFG / DFA constrained text generation LLM”
-“Function calling schema enforcement LLM”
-“Argument extraction from natural language to structured JSON”
-“Deterministic fallback for tool calling”
-“Validation and repair loop for LLM structured outputs”
-“Tokenizer BPE token boundaries JSON generation pitfalls”
-“Evaluation metrics for tool selection and argument accuracy”
-
-
-## FIX ERROR WHEN INPUTTING A OUTPUT FILE AND ONLY A FILE NAME IS GIVEN
-
-check ambiguous prompts
+The use of AI was used for better understanding the logit behind an llm, improving functions for more clarity, and to format the ReadMe.

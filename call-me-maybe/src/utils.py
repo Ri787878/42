@@ -14,6 +14,10 @@ def softmax(
     x: ArrayLike,
     temperature: float = 1.0,
 ) -> NDArray[np.float64]:
+    """
+    Turns an array on floats into a probability distribution. 
+    All the umbers in the distribution add up to 1 depending on their size before calculation.
+    """
     values = np.asarray(x, dtype=float)
 
     if not np.isfinite(values).any():
@@ -46,6 +50,7 @@ def softmax(
 
 
 def decoding_strategy(probs: np.ndarray | None) -> int:
+    """Returns the index of the maximum value in an array."""
     if probs is None:
         raise ValueError("Cannot decode without probabilities.")
     return int(np.argmax(probs))
@@ -57,10 +62,6 @@ def get_token_id(llm_model: Small_LLM_Model) -> dict[str, int]:
     with open(vocab_path, "r", encoding="utf-8") as vf:
         vocab_obj = json.load(vf)
 
-    # Support common vocab layouts:
-    # 1) {"token": id, ...}
-    # 2) [{"token": "...", "id": 123}, ...]
-    # 3) ["token0", "token1", ...]  -> index is id
     if isinstance(vocab_obj, dict):
         token_to_id = {str(tok): int(tid) for tok, tid in vocab_obj.items()}
     elif (

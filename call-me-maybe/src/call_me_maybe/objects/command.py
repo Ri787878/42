@@ -44,7 +44,7 @@ class Command(BaseModel):
 
     @model_validator(mode="after")
     def validate_files(self) -> "Command":
-        # Change files to the Custom ones
+        """Change files to the Custom ones"""
         self.change_default_filepaths()
 
         if not self.do_files_exist():
