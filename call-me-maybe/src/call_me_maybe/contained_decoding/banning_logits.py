@@ -1,7 +1,8 @@
 from typing import Dict, Iterable, List, Optional
+from pydantic import BaseModel
 
 
-class SimpleBanningProcessor:
+class SimpleBanningProcessor(BaseModel):
     """
     Pure-Python logits processor that bans configured tokens
     by setting their score to -inf.

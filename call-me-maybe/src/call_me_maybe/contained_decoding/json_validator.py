@@ -1,4 +1,5 @@
 from llm_sdk import Small_LLM_Model
+from pydantic import BaseModel
 import json
 from copy import copy
 import re
@@ -6,7 +7,7 @@ import re
 import numpy as np
 
 
-class BasicJsonFSM:
+class BasicJsonFSM(BaseModel):
     """
     Constrained decoder for JSON objects containing strings and nested objects.
 
