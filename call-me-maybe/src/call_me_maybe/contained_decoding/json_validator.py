@@ -1,12 +1,14 @@
 from llm_sdk import Small_LLM_Model
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr
 import json
 from copy import copy
 import re
+from typing import ClassVar
 
 import numpy as np
 
 
-class BasicJsonFSM:
+class BasicJsonFSM(BaseModel):
     """
     Constrained decoder for JSON objects containing strings and nested objects.
 
@@ -23,20 +25,42 @@ class BasicJsonFSM:
     tokens are handled correctly.
     """
 
-    STATE_EXPECT_OPEN_BRACE = 0
-    STATE_EXPECT_KEY_OR_CLOSE = 1
-    STATE_IN_KEY = 2
-    STATE_EXPECT_COLON = 3
-    STATE_EXPECT_VALUE = 4
-    STATE_IN_STRING = 5
-    STATE_IN_ESCAPE = 6
-    STATE_IN_UNICODE_ESCAPE = 7
-    STATE_AFTER_VALUE = 8
-    STATE_DONE = 9
-    STATE_IN_NUMBER = 10
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    VALID_ESCAPES = set('"\\/bfnrt')
-    HEX_DIGITS = set("0123456789abcdefABCDEF")
+    STATE_EXPECT_OPEN_BRACE: ClassVar[int] = 0
+    STATE_EXPECT_KEY_OR_CLOSE: ClassVar[int] = 1
+    STATE_IN_KEY: ClassVar[int] = 2
+    STATE_EXPECT_COLON: ClassVar[int] = 3
+    STATE_EXPECT_VALUE: ClassVar[int] = 4
+    STATE_IN_STRING: ClassVar[int] = 5
+    STATE_IN_ESCAPE: ClassVar[int] = 6
+    STATE_IN_UNICODE_ESCAPE: ClassVar[int] = 7
+    STATE_AFTER_VALUE: ClassVar[int] = 8
+    STATE_DONE: ClassVar[int] = 9
+    STATE_IN_NUMBER: ClassVar[int] = 10
+
+    VALID_ESCAPES: ClassVar[set[str]] = set('"\\/bfnrt')
+    HEX_DIGITS: ClassVar[set[str]] = set("0123456789abcdefABCDEF")
+
+    vocab: dict[str, int]
+    function_schemas: dict[str, dict[str, str]]
+    selected_function: str | None = None
+    root_keys_seen: frozenset[str] = frozenset()
+    parameter_keys_seen: frozenset[str] = frozenset()
+    string_buffer: str = ""
+    expecting_key_after_comma: bool = False
+    inv_vocab: dict[int, str] = Field(default_factory=dict)
+    normalized_vocab: dict[int, str] = Field(default_factory=dict)
+    current_state: int = STATE_EXPECT_OPEN_BRACE
+    object_depth: int = 0
+    string_kind: str | None = None
+    string_has_content: bool = False
+    unicode_digits_remaining: int = 0
+    current_key: str = ""
+    number_buffer: str = ""
+    _allowed_cache: dict[tuple, tuple[int, ...]] = PrivateAttr(
+        default_factory=dict
+    )
 
     def __init__(
         self,
@@ -44,13 +68,7 @@ class BasicJsonFSM:
         function_schemas: dict[str, dict[str, str]],
     ):
         """Initialize the JSON FSM with a tokenizer vocabulary and schemas."""
-        self.function_schemas = function_schemas
-        self.selected_function: str | None = None
-        self.vocab = tokenizer_vocab
-        self.root_keys_seen: frozenset[str] = frozenset()
-        self.parameter_keys_seen: frozenset[str] = frozenset()
-        self.string_buffer = ""
-        self.expecting_key_after_comma = False
+        super().__init__(vocab=tokenizer_vocab, function_schemas=function_schemas)
         self.inv_vocab = {
             token_id: token
             for token, token_id in tokenizer_vocab.items()
@@ -60,15 +78,6 @@ class BasicJsonFSM:
             token_id: self._normalize_token(token)
             for token_id, token in self.inv_vocab.items()
         }
-        self._allowed_cache: dict[tuple, tuple[int, ...]] = {}
-
-        self.current_state = self.STATE_EXPECT_OPEN_BRACE
-        self.object_depth = 0
-        self.string_kind: str | None = None
-        self.string_has_content = False
-        self.unicode_digits_remaining = 0
-        self.current_key = ""
-        self.number_buffer = ""
 
     @staticmethod
     def _normalize_token(token: str) -> str:
