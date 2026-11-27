@@ -151,7 +151,7 @@ class Command(BaseModel):
 
     def ingest_function_definitions(self) -> None:
         """
-        Function that ingests the function_definitions and 
+        Function that ingests the function_definitions and
         stores them in func_definition_list.
         """
         data = Parcer.load_json_safely(
