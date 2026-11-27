@@ -43,6 +43,7 @@ class BasicJsonFSM:
         tokenizer_vocab: dict[str, int],
         function_schemas: dict[str, dict[str, str]],
     ):
+        """Initialize the JSON FSM with a tokenizer vocabulary and schemas."""
         self.function_schemas = function_schemas
         self.selected_function: str | None = None
         self.vocab = tokenizer_vocab
@@ -80,6 +81,7 @@ class BasicJsonFSM:
         return token.replace("Ġ", " ").replace("▁", " ")
 
     def _expected_keys(self) -> frozenset[str]:
+        """Return the keys permitted in the current JSON object."""
         if self.object_depth == 1:
             if self.selected_function is None:
                 return frozenset({"name"} - self.root_keys_seen)
@@ -92,6 +94,7 @@ class BasicJsonFSM:
         return frozenset()
 
     def _object_is_complete(self) -> bool:
+        """Return whether the current object contains all required keys."""
         if self.object_depth == 1:
             return self.root_keys_seen == frozenset({"name", "parameters"})
 
@@ -103,6 +106,9 @@ class BasicJsonFSM:
         return False
 
     def _close_object(self) -> bool:
+        """
+        Close the current object if it is complete and has no trailing comma.
+        """
         if self.expecting_key_after_comma or not self._object_is_complete():
             return False
 
@@ -115,6 +121,9 @@ class BasicJsonFSM:
         return True
 
     def _current_parameter_type(self) -> str | None:
+        """
+        Return the expected type of the current function parameter, if any.
+        """
         if self.object_depth != 2 or self.selected_function is None:
             return None
 
@@ -123,6 +132,9 @@ class BasicJsonFSM:
         )
 
     def reset(self) -> None:
+        """
+        Reset the FSM to its initial state for a new JSON generation.
+        """
         self.current_state = self.STATE_EXPECT_OPEN_BRACE
         self.object_depth = 0
         self.string_kind = None
@@ -138,12 +150,19 @@ class BasicJsonFSM:
         self.expecting_key_after_comma = False
 
     def _number_is_valid(self) -> bool:
-        return re.fullmatch(
-            r'-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?',
-            self.number_buffer,
-        ) is not None
+        """Return whether the buffered text matches JSON number syntax."""
+        try:
+            value = json.loads(
+                self.number_buffer,
+                parse_constant=lambda _: None
+            )
+        except json.JSONDecodeError:
+            return False
+
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
 
     def _finish_number_delimiter(self, character: str) -> bool:
+        """Finish a valid number and process the character that follows it."""
         if not self._number_is_valid():
             return False
 
@@ -160,16 +179,11 @@ class BasicJsonFSM:
         return True
 
     def is_done(self) -> bool:
+        """Check if json is done"""
         return self.current_state == self.STATE_DONE
 
-    def _is_inside_string(self) -> bool:
-        return self.current_state in {
-            self.STATE_IN_STRING,
-            self.STATE_IN_ESCAPE,
-            self.STATE_IN_UNICODE_ESCAPE,
-        }
-
     def _consume_character(self, character: str) -> bool:
+        """Function checks if it can consume a charecter"""
         if self.current_state == self.STATE_DONE:
             return False
 
@@ -394,6 +408,7 @@ class BasicJsonFSM:
         return False
 
     def _token_is_allowed(self, token_id: int) -> bool:
+        """Function checks if token is allowed"""
         token = self.normalized_vocab.get(token_id)
 
         if token is None:
@@ -408,6 +423,7 @@ class BasicJsonFSM:
         return True
 
     def get_allowed_token_ids(self) -> list[int]:
+        """Function returns list of ints of allowed token ids"""
         if self.is_done():
             return []
 
@@ -434,6 +450,11 @@ class BasicJsonFSM:
         return list(self._allowed_cache[key])
 
     def update_state(self, selected_token_id: int) -> None:
+        """
+        Advance the JSON parser state using a model-selected token.
+        The token is processed character by character, updating this FSM in
+        place.
+        """
         token = self.normalized_vocab.get(selected_token_id)
 
         if token is None:

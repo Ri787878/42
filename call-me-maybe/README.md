@@ -21,7 +21,7 @@ These numbers are tested on 42 Lisbon computers.
 
 ### Challenges faced:
 While developing this project many issues arose, the main one was how to get the program to provide a valid output under the time constraints of 5 minutes. To solve this problm I simplefied the way I was selecting each next token for the algorithm.
-Another big problem that came up was understading how an what a llm actually did, this question answered it self after asking many diferent students and many google queries aswell as some help with Artificial Inteligence.
+Another big problem that came up was understading what and how a llm actually does, this question answered it self after asking many diferent students and many google queries aswell as some help with Artificial Inteligence.
 
 ### Testing strategy:
 To test this project I rellied much on the provided examples and even creating a few of my own, with diferent types of prompts and queries to ask of it. The only part I didnt create much was new functions to test the model on.

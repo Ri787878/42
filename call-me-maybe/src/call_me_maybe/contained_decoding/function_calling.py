@@ -27,6 +27,10 @@ class FunctionCallList(BaseModel):
         prompt_text: str,
         definitions: list[Any],
     ) -> str:
+        """
+        Internal detatchment layer for builder function to
+        generate single prompt calls.
+        """
         return build_single_call_prompt(prompt_text, definitions)
 
 
@@ -34,6 +38,10 @@ def build_single_call_prompt(
     prompt_text: str,
     definitions: list[Any],
 ) -> str:
+    """
+    Function that returns a single call for a prompt, with
+    all attached function definitions an their respective parameters.
+    """
     available_functions = []
 
     for definition in definitions:
@@ -65,6 +73,10 @@ def _repair_invalid_json_escapes(text: str) -> str:
 
 
 def parse_function_call(text: str) -> FunctionCall | None:
+    """
+    Function to chack if a functionCall is json valid.
+    Returns valid functions.
+    """
     decoder = json.JSONDecoder()
     candidate = text.lstrip()
 
@@ -86,6 +98,10 @@ def get_function_definition(
     function_name: str,
     definitions: list[Any],
 ) -> Any:
+    """
+    Helper function that extracts function definitions from the
+    main project definitions list.
+    """
     definition = next(
         (item for item in definitions if item.name == function_name),
         None,
@@ -103,6 +119,10 @@ def normalize_parameter_types(
     function_call: FunctionCall,
     definitions: list[Any],
 ) -> None:
+    """
+    Function ensures generated function parameters match
+    function definition expected types.
+    """
     definition = get_function_definition(
         function_call.name,
         definitions,
@@ -126,6 +146,9 @@ def validate_parameter_types(
     function_call: FunctionCall,
     definitions: list[Any],
 ) -> None:
+    """
+    Function that checks if a parameter matches expected type.
+    """
     definition = next(
         item
         for item in definitions
