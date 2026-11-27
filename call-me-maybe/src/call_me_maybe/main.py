@@ -7,6 +7,7 @@ import time
 
 
 def main() -> None:
+    """The main function that runs the project."""
     cmd = None
 
     try:

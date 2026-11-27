@@ -26,6 +26,9 @@ import time
 
 
 class Command(BaseModel):
+    """
+    Class that stores the whole project variables.
+    """
     model_config = ConfigDict(arbitrary_types_allowed=True)
     vocab: dict[str, int] = Field(default_factory=dict)
     arguments: list[str] = Field(default_factory=list)
@@ -135,6 +138,9 @@ class Command(BaseModel):
             )
 
     def ingest_prompts(self) -> None:
+        """
+        Function that ingests the prompts and stores them in self.prompts_list.
+        """
         data = Parcer.load_json_safely(self.input_filepath, default=[])
         if not isinstance(data, list):
             raise ValueError(
@@ -144,6 +150,10 @@ class Command(BaseModel):
             self.prompts_list.append(Prompt(prompt=item["prompt"]))
 
     def ingest_function_definitions(self) -> None:
+        """
+        Function that ingests the function_definitions and 
+        stores them in func_definition_list.
+        """
         data = Parcer.load_json_safely(
             self.function_definition_filepath,
             default=[])

@@ -6,11 +6,15 @@ from pathlib import Path
 
 
 class Parcer(BaseModel):
+    """Class that holds all the parcer logic of the program."""
     function_definition_filepath: str = Field(default="")
     input_filepath: str = Field(default="")
     output_filepath: str = Field(default="function_calling_results.json")
 
     def get_arguments(self, command: list[str]) -> list[str]:
+        """
+        Function extract all the parameters passed when running the program.
+        """
         arguments: list[str] = []
         for i in range(len(command)):
             if (command[i].startswith("--") and i + 1 >= len(command)):
@@ -32,6 +36,9 @@ class Parcer(BaseModel):
 
     @staticmethod
     def get_parameters_list(data: Any) -> list[tuple[str, str]]:
+        """
+        Function creates and returns a list of all the parameters.
+        """
         parameters_list: list[tuple[str, str]] = []
 
         for param_name, param_def in data["parameters"].items():
@@ -41,6 +48,7 @@ class Parcer(BaseModel):
 
     @staticmethod
     def load_json_safely(path: str, default: Any) -> Any:
+        """Function loads a json safely catching errors if needed."""
         p = Path(path)
         raw = p.read_text(encoding="utf-8").strip()
         if raw == "":

@@ -3,6 +3,7 @@ from typing import Any
 
 
 class Function_definition(BaseModel):
+    """Class that holds the a function definition."""
     name: str = Field()
     description: str = Field()
     parameters: list[tuple[str, str]] = Field()
@@ -11,5 +12,6 @@ class Function_definition(BaseModel):
 
     @model_validator(mode="after")
     def schema_creator(self) -> "Function_definition":
+        """Function creates a schema for the class object."""
         self.json_schema = self.model_json_schema()
         return self
