@@ -322,17 +322,15 @@ class Command(BaseModel):
                         f"{feedback}"
                     )
 
-                    if attempt == max_attempts - 1:
-                        error = (
-                            f"Could not generate a valid function call for "
-                            f"prompt after {max_attempts} attempts: {prompt}"
-                        )
-                        raise ValueError(error) from exc
-
             if function_call is None:
-                raise ValueError(
-                    f"No function call generated for prompt: {prompt}"
-                )
+                generated_calls.append({
+                    "prompt": prompt,
+                    "error": (
+                        f"Could not generate a valid function call for "
+                        f"prompt after {max_attempts} attempts"
+                    ),
+                })
+                continue
 
             generated_calls.append({
                 "prompt": prompt,
